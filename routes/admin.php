@@ -31,6 +31,11 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
 
+    Route::group(['prefix' => 'user'], function () {
+        Route::get('/', [PermissionController::class, 'create'])->name('admin.user.create');
+        Route::post('save', [PermissionController::class, 'save'])->name('admin.user.save');
+    });
+
 
 
 
