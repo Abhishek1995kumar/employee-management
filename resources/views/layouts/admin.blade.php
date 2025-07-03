@@ -200,7 +200,7 @@
                                     <span class="menu-title">Permissions</span>
                                 </span>
                             </a>
-                            <a href="#" class="menu-item menu-accordion">
+                            <a href="{{ url('admin/user') }}" class="menu-item menu-accordion">
                                 <span class="menu-link">
                                     <span class="menu-icon">
                                         <span class="svg-icon svg-icon-2">
