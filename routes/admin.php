@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\DesignationController;
+use App\Http\Controllers\Admin\UserOnboardingController;
 
 Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'department'], function () {
@@ -32,8 +33,8 @@ Route::group(['prefix' => 'admin'], function () {
 
 
     Route::group(['prefix' => 'user'], function () {
-        Route::get('/', [PermissionController::class, 'create'])->name('admin.user.create');
-        Route::post('save', [PermissionController::class, 'save'])->name('admin.user.save');
+        Route::get('/', [UserOnboardingController::class, 'create'])->name('admin.user.create');
+        Route::post('save', [UserOnboardingController::class, 'save'])->name('admin.user.save');
     });
 
 
