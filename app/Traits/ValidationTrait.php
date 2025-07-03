@@ -1,7 +1,9 @@
 <?php
 
+namespace App\Traits;
 
-trait ValidationTraits {
+
+trait ValidationTrait {
     public function departmentValidate($data) {
         try {
             $rules = [

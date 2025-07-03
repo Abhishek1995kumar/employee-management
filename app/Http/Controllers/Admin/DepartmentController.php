@@ -14,7 +14,7 @@ class DepartmentController extends Controller {
     }
 
     public function createDepartment() {
-        return view('admin.department.index');
+        return view('admin.user-management.departments.index');
     }
 
     public function saveDepartment(Request $request) {

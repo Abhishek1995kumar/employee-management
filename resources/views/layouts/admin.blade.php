@@ -155,7 +155,7 @@
                                     <span class="menu-title">Departments</span>
                                 </span>
                             </a>
-                            <a href="#" class="menu-item menu-accordion">
+                            <a href="{{ url('admin/designation') }}" class="menu-item menu-accordion">
                                 <span class="menu-link ">
                                     <span class="menu-icon">
                                         <span class="svg-icon svg-icon-2">
@@ -170,7 +170,7 @@
                                     <span class="menu-title">Designations</span>
                                 </span>
                             </a>
-                            <a href="#" class="menu-item menu-accordion">
+                            <a href="{{ url('admin/role') }}" class="menu-item menu-accordion">
                                 <span class="menu-link">
                                     <span class="menu-icon">
                                         <span class="svg-icon svg-icon-2">
@@ -185,7 +185,7 @@
                                     <span class="menu-title">Roles</span>
                                 </span>
                             </a>
-                            <a href="#" class="menu-item menu-accordion">
+                            <a href="{{ url('admin/permission') }}" class="menu-item menu-accordion">
                                 <span class="menu-link">
                                     <span class="menu-icon">
                                         <span class="svg-icon svg-icon-2">
