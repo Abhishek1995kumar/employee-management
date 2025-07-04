@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use App\Traits\ValidationTraits;
+use App\Traits\ValidationTrait;
 use App\Http\Controllers\Controller;
 
 
 class DepartmentController extends Controller {
+    use ValidationTrait;
 
     public function __construct() {
         // $this->middleware('auth');
@@ -20,7 +21,7 @@ class DepartmentController extends Controller {
     public function saveDepartment(Request $request) {
         try {
             $data = $request->all();
-            $validationResponse = $this->departmentValidate($data);
+            $validationResponse = $this->departmentValidationTrait($data);
             dd($validationResponse);
 
             if ($validationResponse->getStatusCode() !== 200) {
