@@ -106,22 +106,21 @@
                         </div>
                     </div>
                     <div class="modal-body">
-                        <form id="designationForm" action="" method="POST" enctype="multipart/form-data">
+                        <form id="designationForm" action="{{ route('admin.designation.save') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <input type="hidden" name="application_category_id" value="8">
                                             <div class="row">
                                                 <div class="col-md-6 mb-4 " id="departmentDiv">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">Department</label>
                                                         <select name="department_name" class="form-select" id="departmentId" data-control="select2" data-placeholder="Select department name" >
                                                             <option ></option>
-                                                            <option value="1">ABC Center</option>
-                                                            <option value="2">Veterinary Health Department</option>
-                                                            <option value="3">MR Rabies Response Team</option>
+                                                            @foreach ($departments as $key => $department)
+                                                                <option value="{{ $key }}">{{ $department }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -132,7 +131,13 @@
                                                         <input type="text" name="name" id="designationName" class="form-control" maxlength="100" placeholder="Enter department name" >
                                                     </div>
                                                 </div>
-
+                                                
+                                                <div class="col-md-6 mb-4 " id="descriptionDiv">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">Description</label>
+                                                        <input type="text" name="description" id="descriptionId" class="form-control" maxlength="100" placeholder="Enter description" >
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="card-footer modal-footer">
@@ -151,6 +156,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 <script>
     var KTAppEcommerceCategories = function() {
         var n = () => {
@@ -176,8 +182,6 @@
     }));
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-
 <script>
     $('#addDesignation').on('hidden.bs.modal', function () {
         $('#animalVaccinationForm')[0].reset();
@@ -191,25 +195,34 @@
         e.preventDefault(); 
         let departmentId = $("#departmentId").val();
         let designationName = $("#designationName").val();
-        if (departmentId === '') {
-            Swal.fire({
-                title: 'Missing department name',
-                text: "Please select a valid department name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
-
-        if (designationName === '') {
-            Swal.fire({
-                title: 'Missing designation name',
-                text: "Please enter a designation name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
+        let descriptionId = $("#descriptionId").val();
+        // if (departmentId === '') {
+        //     Swal.fire({
+        //         title: 'Missing department name',
+        //         text: "Please select a valid department name.",
+        //         icon: 'error',
+        //         confirmButtonText: 'OK'
+        //     });
+        //     return false;
+        // }
+        // if (designationName === '') {
+        //     Swal.fire({
+        //         title: 'Missing designation name',
+        //         text: "Please enter a designation name.",
+        //         icon: 'error',
+        //         confirmButtonText: 'OK'
+        //     });
+        //     return false;
+        // }
+        // if (descriptionId === '') {
+        //     Swal.fire({
+        //         title: 'Missing description',
+        //         text: "Please enter a description.",
+        //         icon: 'error',
+        //         confirmButtonText: 'OK'
+        //     });
+        //     return false;
+        // }
 
         document.getElementById("designationForm").submit();
     }
