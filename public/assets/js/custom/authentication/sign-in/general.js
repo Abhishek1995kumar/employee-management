@@ -1,7 +1,11 @@
 "use strict";
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    }
+});
 var KTModalAdd = function () {
     var t, e, o, n, r, i;
     return {
@@ -45,7 +49,7 @@ var KTModalAdd = function () {
                     var passwordd = document.getElementById("Password").value;
                     $.ajax({
                         type: "POST",
-                        url: "/admin/auth",
+                        url: "/auth",
                         data: {
                             login: loginn,
                             password: passwordd

@@ -104,7 +104,7 @@
                         </div>
                     </div>
                     <div class="modal-body">
-                        <form id="roleForm" action="" method="POST" enctype="multipart/form-data">
+                        <form id="roleForm" action="{{ route('admin.role.save') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-12">
@@ -149,33 +149,6 @@
 
 @section('scripts')
 <script>
-    var KTAppEcommerceCategories = function() {
-        var n = () => {
-
-        };
-        return {
-            init: function() {
-                (t = document.querySelector("#kt_table")) && ((e = $(t).DataTable({
-                    info: !1,
-                    order: [],
-                    pageLength: 10,
-
-                })).on("draw", (function() {
-                    n()
-                })), document.querySelector('[data-kt-table-filter="search"]').addEventListener("keyup", (function(t) {
-                    e.search(t.target.value).draw()
-                })), n())
-            }
-        }
-    }();
-    KTUtil.onDOMContentLoaded((function() {
-        KTAppEcommerceCategories.init()
-    }));
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-
-<script>
     $('#addRole').on('hidden.bs.modal', function () {
         $('#animalVaccinationForm')[0].reset();
         $('#animalVaccinationForm').find('select').val('').trigger('change');
@@ -187,17 +160,17 @@
     function saveRole(e) {
         e.preventDefault(); 
         let roleName = $("#roleName").val();
-        if (roleName === '') {
-            Swal.fire({
-                title: 'Missing role name',
-                text: "Please enter a role name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
+        // if (roleName === '') {
+        //     Swal.fire({
+        //         title: 'Missing role name',
+        //         text: "Please enter a role name.",
+        //         icon: 'error',
+        //         confirmButtonText: 'OK'
+        //     });
+        //     return false;
+        // }
 
-        document.getElementById("#roleForm").submit();
+        document.getElementById("roleForm").submit();
     }
 
 </script>

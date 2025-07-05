@@ -116,7 +116,7 @@
                                                 <div class="col-md-6 mb-4 " id="departmentDiv">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">Department</label>
-                                                        <select name="department_name" class="form-select" id="departmentId" data-control="select2" data-placeholder="Select department name" >
+                                                        <select name="department_id" class="form-select" id="departmentId" data-control="select2" data-placeholder="Select department name" >
                                                             <option ></option>
                                                             @foreach ($departments as $key => $department)
                                                                 <option value="{{ $key }}">{{ $department }}</option>
