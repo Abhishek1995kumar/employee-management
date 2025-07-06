@@ -182,7 +182,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 <script>
     function addMoreBankDetails(e) {
         e.preventDefault();

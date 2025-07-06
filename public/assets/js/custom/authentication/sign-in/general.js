@@ -1,7 +1,11 @@
 "use strict";
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    }
+});
 var KTModalAdd = function () {
     var t, e, o, n, r, i;
     return {
@@ -45,14 +49,14 @@ var KTModalAdd = function () {
                     var passwordd = document.getElementById("Password").value;
                     $.ajax({
                         type: "POST",
-                        url: "/admin/auth",
+                        url: "/auth",
                         data: {
                             login: loginn,
                             password: passwordd
                         },
                         dataType: "json",
                         success: function (response) {
-                            if (response.status == 200) {
+                            if (response.success == 200) {
                                 swal.fire({
                                     text: "Your credentials matches our record",
                                     icon: "success",
@@ -63,10 +67,13 @@ var KTModalAdd = function () {
                                 const work = async () => {
                                     await sleep(1000);
                                     swal.close();
-                                    window.location = "/admin/dashboard";
+                                    if(response.data.otp_verified == 0) {
+                                        $('#otpModal').modal('show');
+                                        $('#loggedInUserId').val(response.data.user_id);
+                                    }
                                 };
                                 work();
-                            } else if (response.status == 201) {
+                            } else if (response.success == 201) {
                                 swal.fire({
                                     text: "Password is incorrect",
                                     icon: "error",
@@ -78,7 +85,7 @@ var KTModalAdd = function () {
                                 }).then(function () {
                                     KTUtil.scrollTop();
                                 });
-                            } else if (response.status == 202) {
+                            } else if (response.success == 202) {
                                 swal.fire({
                                     text: "User not found in our records",
                                     icon: "error",
@@ -90,7 +97,7 @@ var KTModalAdd = function () {
                                 }).then(function () {
                                     KTUtil.scrollTop();
                                 });
-                            } else if (response.status == 204) {
+                            } else if (response.success == 204) {
                                 swal.fire({
                                     text: "You have been deactivated from logging into the panel. Kindly contact the admin to reinstate your privileges.",
                                     icon: "error",
@@ -102,7 +109,7 @@ var KTModalAdd = function () {
                                 }).then(function () {
                                     KTUtil.scrollTop();
                                 });
-                            } else if (response.status == 205) {
+                            } else if (response.success == 205) {
                                 swal.fire({
                                     text: "You have been banned from accessing the Admin Panel.",
                                     icon: "error",
@@ -114,7 +121,7 @@ var KTModalAdd = function () {
                                 }).then(function() {
                                     KTUtil.scrollTop();
                                 });
-                            } else if (response.status == 206) {
+                            } else if (response.success == 206) {
                                 swal.fire({
                                     text: "You are not authorised to log into Admin Panel.",
                                     icon: "error",
@@ -128,7 +135,7 @@ var KTModalAdd = function () {
                                 });
                             }else {
                                 swal.fire({
-                                    text: "Please enter a valid login id and password",
+                                    text: "User already logged in.",
                                     icon: "error",
                                     buttonsStyling: false,
                                     confirmButtonText: "Try Again",
@@ -148,3 +155,37 @@ var KTModalAdd = function () {
 KTUtil.onDOMContentLoaded(function () {
     KTModalAdd.init();
 });
+
+function verifyOtp() {
+    let otp = document.getElementById('otpCode').value;
+    let userId = document.getElementById('loggedInUserId').value;
+    let verifyOtpUrl = window.verifyOtpUrl || '/admin/verify-otp'; 
+    $.ajax({
+        url: verifyOtpUrl,
+        method: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            otp: otp,
+            user_id: userId
+        },
+        success: function(res) {
+            if(res.success) {
+                Swal.fire({
+                    text: "OTP Verified Successfully!",
+                    icon: "success",
+                    timer: 1000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/admin/dashboard";
+                });
+            } else {
+                Swal.fire({
+                    text: res.message,
+                    icon: "error",
+                    showConfirmButton: true
+                });
+            }
+        }
+    });
+}
+

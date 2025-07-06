@@ -13,23 +13,24 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->integer('department_id')->nullable()->comment('Department ID the user belongs to');
-            $table->integer('designation_id')->nullable()->comment('Designation ID the user holds');
-            $table->integer('role_id')->nullable()->comment('Role ID assigned to the user');
+            $table->integer('department_id')->nullable()->comment('Department id fetch from department table');
+            $table->integer('designation_id')->nullable()->comment('Designation id fetch from designation table');
+            $table->integer('role_id')->nullable()->comment('role id fetch from roles table');
             $table->string('name');
             $table->string('username')->unique()->comment('Unique username for the user');
-            $table->longText('profile_picture')->nullable()->comment('URL of the user profile picture');
-            $table->string('phone')->nullable()->comment('User phone number');
-            $table->string('address')->nullable()->comment('User address');
-            $table->string('email_verified_at')->nullable()->comment('Timestamp when the email was verified');
-            $table->string('slug')->unique()->comment('Unique slug for the user, typically derived from the name or username');
+            $table->longText('profile_picture')->nullable();
+            $table->string('phone')->unique();
+            $table->string('address')->nullable();
+            $table->string('email_verified_at')->nullable();
+            // $table->string('slug')->unique()->comment('Unique slug for the user, typically derived from the name or username');
             $table->string('email')->unique();
             $table->string('password');
             $table->tinyInteger('status')->default(1)->comment('1=active, 2=archived, 0=inactive');
             $table->integer('created_by')->nullable()->comment('User ID of the creator');
             $table->integer('updated_by')->nullable()->comment('User ID of the last updater');
-            $table->string('api_token')->nullable()->comment('API token for the user, used for authentication in API requests');
-            $table->string('api_token_expiry')->nullable()->comment('Expiry date and time of the API token');
+            $table->string('api_token')->nullable();
+            $table->string('api_token_expiry')->nullable();
+            $table->string('is_otp_verified')->nullable()->comment('0=not verify, 1=varified, 2=pending varification');
             $table->softDeletes()->comment('Timestamp when the user was deleted, if applicable');
             $table->rememberToken()->comment('Token for remembering the user session');
             $table->timestamps();

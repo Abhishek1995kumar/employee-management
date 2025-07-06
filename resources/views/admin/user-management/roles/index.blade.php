@@ -2,7 +2,7 @@
 @section('title') {{ __('Role')}} @endsection
 
 @section('header')
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('breadcrumb')
@@ -81,14 +81,16 @@
                     </tr>
                 </thead>
                 <tbody class="fw-semibold text-gray-600">
-                    
+                   
                 </tbody>
             </table>
         </div>
     </div>
 
+
+
     <!-- Create Role start -->
-        <div class="modal fade modal-lg" id="addRole" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addRoleTitle" aria-hidden="true">
+        <div class="modal fade modal-md" id="addRole" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addRoleTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-md">
                 <div class="modal-content">
                     <input type="hidden" name="id" value="">
@@ -104,36 +106,22 @@
                         </div>
                     </div>
                     <div class="modal-body">
-                        <form id="roleForm" action="" method="POST" enctype="multipart/form-data">
-                            @csrf
+                        <form id="roleForm" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <!-- <div class="col-md-6 mb-4 " id="departmentDiv">
-                                                    <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">Department</label>
-                                                        <select name="department_name" class="form-select" id="departmentId" data-control="select2" data-placeholder="Select department name" >
-                                                            <option ></option>
-                                                            <option value="1">ABC Center</option>
-                                                            <option value="2">Veterinary Health Department</option>
-                                                            <option value="3">MR Rabies Response Team</option>
-                                                        </select>
-                                                    </div>
-                                                </div> -->
-
-                                                <div class="col-md-6 mb-4 " id="roleNameDiv">
+                                                <div class="col-md-12 mb-4 " id="roleNameDiv">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Role')}}</label>
                                                         <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name" >
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                         <div class="card-footer modal-footer">
-                                            <button type="submit" class="btn btn-primary" id="" onclick="saveRole(event)">{{ __('Create Role')}}</button>
+                                            <button type="submit" class="btn btn-primary roleBtn" id="" onclick="saveRole(event)">{{ __('Create Role')}}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -148,58 +136,6 @@
 @endsection
 
 @section('scripts')
-<script>
-    var KTAppEcommerceCategories = function() {
-        var n = () => {
-
-        };
-        return {
-            init: function() {
-                (t = document.querySelector("#kt_table")) && ((e = $(t).DataTable({
-                    info: !1,
-                    order: [],
-                    pageLength: 10,
-
-                })).on("draw", (function() {
-                    n()
-                })), document.querySelector('[data-kt-table-filter="search"]').addEventListener("keyup", (function(t) {
-                    e.search(t.target.value).draw()
-                })), n())
-            }
-        }
-    }();
-    KTUtil.onDOMContentLoaded((function() {
-        KTAppEcommerceCategories.init()
-    }));
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-
-<script>
-    $('#addRole').on('hidden.bs.modal', function () {
-        $('#animalVaccinationForm')[0].reset();
-        $('#animalVaccinationForm').find('select').val('').trigger('change');
-        $('#animalVaccinationForm').find('input[type="file"]').val('');
-        $('#animalFirstImageId').val('');
-        $('#animalImageId').val('');
-    });
-
-    function saveRole(e) {
-        e.preventDefault(); 
-        let roleName = $("#roleName").val();
-        if (roleName === '') {
-            Swal.fire({
-                title: 'Missing role name',
-                text: "Please enter a role name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
-
-        document.getElementById("#roleForm").submit();
-    }
-
-</script>
+<script src="{{asset('assets/js/custom/roles/role.js')}}"></script>
 
 @endsection
