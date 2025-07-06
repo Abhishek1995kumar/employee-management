@@ -22,7 +22,6 @@ class DepartmentController extends Controller {
         try {
             $data = $request->all();
             $validationResponse = $this->departmentValidationTrait($data);
-            dd($validationResponse);
 
             if ($validationResponse->getStatusCode() !== 200) {
                 return $validationResponse;

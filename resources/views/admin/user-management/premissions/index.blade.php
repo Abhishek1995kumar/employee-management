@@ -2,7 +2,7 @@
 @section('title') {{ __('Permission')}} @endsection
 
 @section('header')
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('breadcrumb')
@@ -61,7 +61,7 @@
                             <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
                         </svg>
                     </span>
-                    <input type="text" data-kt-table-filter="search" class="form-control w-250px ps-15" placeholder="Search department" />
+                    <input type="text" id="searchInput" class="form-control w-250px ps-15" placeholder="Search department" />
                 </div>
             </div>
             <div class="card-toolbar">
@@ -71,24 +71,13 @@
             </div>
         </div>
         <div class="card-body table-responsive">
-            <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table">
-                <thead>
-                    <tr class="text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                        <th class="text-center min-w-125px">{{ __('Id')}}</th>
-                        <th class="text-center min-w-125px">{{ __('Name')}}</th>
-                        <!-- <th class="text-center min-w-125px">{{ __('Description')}}</th> -->
-                        <th class="text-center min-w-125px">{{ __('Action')}}</th>
-                    </tr>
-                </thead>
-                <tbody class="fw-semibold text-gray-600">
-                    
-                </tbody>
-            </table>
+            @include('admin.user-management.premissions.ajax-data')
         </div>
     </div>
 
+
     <!-- Create Permission start -->
-        <div class="modal fade modal-lg" id="addPermission" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addPermissionTitle" aria-hidden="true">
+        <div class="modal fade modal-MD" id="addPermission" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addPermissionTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-md">
                 <div class="modal-content">
                     <input type="hidden" name="id" value="">
@@ -104,36 +93,23 @@
                         </div>
                     </div>
                     <div class="modal-body">
-                        <form id="permissionForm" action="" method="POST" enctype="multipart/form-data">
-                            @csrf
+                        <form id="permissionForm" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <!-- <div class="col-md-6 mb-4 " id="departmentDiv">
-                                                    <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Select Role')}}</label>
-                                                        <select name="role_name" class="form-select" id="roleId" data-control="select2" data-placeholder="Select role name" >
-                                                            <option ></option>
-                                                            <option value="1">Admin</option>
-                                                            <option value="2">HR Team</option>
-                                                            <option value="3">Sales Team</option>
-                                                        </select>
-                                                    </div>
-                                                </div> -->
-
-                                                <div class="col-md-6 mb-4 " id="permissionNameDiv">
+                                                <div class="col-md-12 mb-4 " id="permissionNameDiv">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Permission')}}</label>
-                                                        <input type="text" name="name" id="permissionName" class="form-control" maxlength="100" placeholder="Enter role name" >
+                                                        <input type="text" name="permission" id="permissionName" class="form-control" maxlength="100" placeholder="Enter role name" >
                                                     </div>
                                                 </div>
 
                                             </div>
                                         </div>
                                         <div class="card-footer modal-footer">
-                                            <button type="submit" class="btn btn-primary" id="" onclick="savePermission(event)">{{ __('Create Permission')}}</button>
+                                            <button type="submit" class="btn btn-primary permissionBtn" id="" onclick="savePermission(event)">{{ __('Create Permission')}}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -145,60 +121,11 @@
         </div>
     <!-- Create Designation end -->
 
+
 @endsection
 
 @section('scripts')
-<script>
-    var KTAppEcommerceCategories = function() {
-        var n = () => {
 
-        };
-        return {
-            init: function() {
-                (t = document.querySelector("#kt_table")) && ((e = $(t).DataTable({
-                    info: !1,
-                    order: [],
-                    pageLength: 10,
-
-                })).on("draw", (function() {
-                    n()
-                })), document.querySelector('[data-kt-table-filter="search"]').addEventListener("keyup", (function(t) {
-                    e.search(t.target.value).draw()
-                })), n())
-            }
-        }
-    }();
-    KTUtil.onDOMContentLoaded((function() {
-        KTAppEcommerceCategories.init()
-    }));
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-
-<script>
-    $('#addPermission').on('hidden.bs.modal', function () {
-        $('#animalVaccinationForm')[0].reset();
-        $('#animalVaccinationForm').find('select').val('').trigger('change');
-        $('#animalVaccinationForm').find('input[type="file"]').val('');
-        $('#animalFirstImageId').val('');
-        $('#animalImageId').val('');
-    });
-
-    function savePermission(e) {
-        e.preventDefault(); 
-        let permissionName = $("#permissionName").val();
-        if (permissionName === '') {
-            Swal.fire({
-                title: 'Missing permission name',
-                text: "Please enter a permission name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
-
-        document.getElementById("permissionForm").submit();
-    }
-</script>
+<script src="{{asset('assets/js/custom/roles/role.js')}}"></script>
 
 @endsection

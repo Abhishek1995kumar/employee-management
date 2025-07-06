@@ -34,7 +34,53 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade modal-md" id="otpModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="otpModalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-scrollable modal-md">
+		<div class="modal-content">
+			<input type="hidden" name="id" value="">
+			<div class="modal-header">
+				<h2 class="fw-bold">{{ __('OTP Section')}}</h2>
+				<!-- <div data-bs-dismiss="modal" class="btn btn-icon btn-sm btn-active-icon-primary">
+					<span class="svg-icon svg-icon-1">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+							<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+						</svg>
+					</span>
+				</div> -->
+			</div>
+			<div class="modal-body">
+				<form id="roleForm" action="{{ route('admin.verify-otp') }}" method="POST" enctype="multipart/form-data">
+					@csrf
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-12 mb-4 " id="roleNameDiv">
+											<div class="form-group">
+												<label class="required fs-6 fw-semibold mb-2">{{ __('OTP Verification')}}</label>
+												<input type="text" name="otp" id="otpCode" class="form-control" maxlength="6" placeholder="Enter OTP" oninput="validateNumber(num)" />
+												<input type="hidden" id="loggedInUserId" value="">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-footer modal-footer">
+									<button type="button" class="btn btn-primary" onclick="verifyOtp()">Verify OTP</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
 @endsection
 @section('footer')
 <script src="{{asset('assets/js/custom/authentication/sign-in/general.js')}}"></script>
+
 @endsection

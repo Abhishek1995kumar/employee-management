@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 
 class DesignationController extends Controller {
     use ValidationTrait;
-
     public function create(Request $request) {
         $sql = "SELECT id, name FROM departments WHERE deleted_at IS NULL";
         $query = DB::select($sql);
@@ -33,8 +32,8 @@ class DesignationController extends Controller {
         try {
             $data = $request->all();
             $validationResponse = $this->designationValidationTrait($data);
-            dd($validationResponse);
-            if ($validationResponse->getStatusCode() !== 200) {
+            // if ($validationResponse->getStatusCode() !== 200) {
+            if ($validationResponse) {
                 return $validationResponse;
             }
 

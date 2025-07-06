@@ -8,6 +8,7 @@ use App\Models\Admin\Role;
 use Illuminate\Support\Str;
 use App\Models\Admin\Department;
 use App\Models\Admin\Designation;
+use App\Models\Admin\Permission;
 use App\Models\User;
 
 trait ValidationTrait {
@@ -180,16 +181,16 @@ trait ValidationTrait {
 
     public function roleValidationTrait($data) {
         try {
-            $role = Role::where('name', $data['name'])->first();
+            $role = Role::where('name', $data['role'])->first();
             $rules = [
-                'name' => ['required', 'string', 'max:255'],
+                'role' => ['required', 'string', 'max:255'],
                 // 'description' => ['string', 'max:255'],
             ];
 
             $messages = [
-                'name.required' => 'The name field is required.',
-                'name.string' => 'The name must be a string.',
-                'name.max' => 'The name may not be greater than 255 characters.',
+                'role.required' => 'The name field is required.',
+                'role.string' => 'The name must be a string.',
+                'role.max' => 'The name may not be greater than 255 characters.',
                 // 'description.string' => 'The description must be a string.',
                 // 'description.max' => 'The description may not be greater than 255 characters.',
                 // 'department_id.required' => 'The department field is required.',
@@ -216,7 +217,7 @@ trait ValidationTrait {
             }
 
             if(!empty($role)) {
-                $errors['name'][] = 'Already role exists, please enter anyother role name.';
+                $errors['role'][] = 'Already role exists, please enter anyother role name.';
             }
 
             return $errors;
@@ -236,16 +237,16 @@ trait ValidationTrait {
 
     public function permissionValidationTrait($data) {
         try {
-            $role = Role::where('name', $data['name'])->first();
+            $permissions = Permission::where('name', $data['permission'])->first();
             $rules = [
-                'name' => ['required', 'string', 'max:255'],
+                'permission' => ['required', 'string', 'max:255'],
                 // 'description' => ['string', 'max:255'],
             ];
 
             $messages = [
-                'name.required' => 'The name field is required.',
-                'name.string' => 'The name must be a string.',
-                'name.max' => 'The name may not be greater than 255 characters.',
+                'permission.required' => 'The name field is required.',
+                'permission.string' => 'The name must be a string.',
+                'permission.max' => 'The name may not be greater than 255 characters.',
                 // 'description.string' => 'The description must be a string.',
                 // 'description.max' => 'The description may not be greater than 255 characters.',
                 // 'department_id.required' => 'The department field is required.',
@@ -271,8 +272,8 @@ trait ValidationTrait {
                 }
             }
 
-            if(!empty($role)) {
-                $errors['name'][] = 'Already permission exists, please enter anyother permission name.';
+            if(!empty($permissions)) {
+                $errors['permission'][] = 'Already permission exists, please enter anyother permission name.';
             }
 
             return $errors;

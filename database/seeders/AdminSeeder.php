@@ -17,6 +17,7 @@ class AdminSeeder extends Seeder {
                 "department_id"=> 1,
                 "designation_id"=> 1,
                 "name" => "Abhishek",
+                "slug" => "abhishekkumar007",
                 "username" => "abhishekkumar007",
                 "email"=> "super.admin@gmail.com",
                 "password"=> Hash::make("admin"),
