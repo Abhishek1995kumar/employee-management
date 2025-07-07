@@ -124,6 +124,61 @@ function submitPermission(permissionName) {
 }
 
 
+document.getElementById("fileTypeId").addEventListener('click', function() {
+    let element = this.value;
+    $.ajax({
+         
+    }) 
+})
 
+
+function addRow() {
+    let html = `
+    <div class="row documentRow">
+        <div class="col-md-5 mb-3">
+            <select name="file_type[]" class="form-control">
+                <option value="">Select</option>
+                <option value="marksheet">Marksheet</option>
+                <option value="aadhar">Aadhar</option>
+                <option value="pan_card">Pan Card</option>
+                <option value="bank_details">Bank Details</option>
+                <option value="address_proof">Address Proof</option>
+                <option value="licence">Licence</option>
+            </select>
+        </div>
+        <div class="col-md-5 mb-3">
+            <input type="file" name="document[]" class="form-control">
+        </div>
+        <div class="col-md-2 mt-2">
+            <button type="button" class="btn btn-danger removeRow">Remove</button>
+        </div>
+    </div>
+    `;
+    $('#documentContainer').append(html);
+}
+
+$(document).on('click', '.removeRow', function () {
+    $(this).closest('.documentRow').remove();
+});
+
+function saveAllDocuments(event) {
+    event.preventDefault();
+
+    let formData = new FormData(document.getElementById("documentForm"));
+
+    $.ajax({
+        url: '{{ route("your.route.name") }}',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            Swal.fire('Success', response.message, 'success');
+        },
+        error: function (xhr) {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
 // Permission Js End --
 

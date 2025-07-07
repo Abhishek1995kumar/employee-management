@@ -64,8 +64,13 @@
                     <input type="text" id="searchInput" class="form-control w-250px ps-15" placeholder="Search department" />
                 </div>
             </div>
-            <div class="card-toolbar">
+            <!-- <div class="card-toolbar">
                 <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addPermission" class="btn btn-primary" >
+                    {{ __('Add Permission')}}
+                </button>
+            </div> -->
+            <div class="card-toolbar">
+                <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addDocument" class="btn btn-primary" >
                     {{ __('Add Permission')}}
                 </button>
             </div>
@@ -77,7 +82,7 @@
 
 
     <!-- Create Permission start -->
-        <div class="modal fade modal-MD" id="addPermission" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addPermissionTitle" aria-hidden="true">
+        <!-- <div class="modal fade modal-MD" id="addPermission" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addPermissionTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-md">
                 <div class="modal-content">
                     <input type="hidden" name="id" value="">
@@ -118,9 +123,68 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     <!-- Create Designation end -->
 
+    <div class="modal fade modal-lg" id="addDocument" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="addPermissionTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-md">
+            <div class="modal-content">
+                <input type="hidden" name="id" value="">
+                <div class="modal-header">
+                    <h2 class="fw-bold">{{ __('Create document')}}</h2>
+                    <div data-bs-dismiss="modal" class="btn btn-icon btn-sm btn-active-icon-primary">
+                        <span class="svg-icon svg-icon-1">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+                                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <form id="documentForm" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 " id="fileTypeIdDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('File Type')}}</label>
+                                                    <select name="file_type[]" class="form-control">
+                                                        <option value="">Select</option>
+                                                        <option value="marksheet">Marksheet</option>
+                                                        <option value="aadhar">Aadhar</option>
+                                                        <option value="pan_card">Pan Card</option>
+                                                        <option value="bank_details">Bank Details</option>
+                                                        <option value="address_proof">Address Proof</option>
+                                                        <option value="licence">Licence</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 " id="documentIdDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Document')}}</label>
+                                                    <input type="file" name="document[]" id="documentId" class="form-control" maxlength="100" placeholder="Select file" >
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 mt-4">
+                                                <button type="button" class="btn btn-danger removeRow">Remove</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   <div class="card-footer modal-footer mt-4">
+                                        <button type="button" class="btn btn-secondary" onclick="addRow()">Add More</button>
+                                        <button type="submit" class="btn btn-primary" onclick="saveAllDocuments(event)">Final Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
