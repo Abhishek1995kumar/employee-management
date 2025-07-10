@@ -46,40 +46,40 @@ class PermissionController extends Controller {
     }
 
 
-    // public function save1(Request $request) {
-    //     try {
-    //         $data = $request->all();
-    //         $validator = $this->permissionValidationTrait($data);
-    //         if($validator) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => $validator
-    //             ], 404);
-    //         }
+    public function save(Request $request) {
+        try {
+            $data = $request->all();
+            $validator = $this->permissionValidationTrait($data);
+            if($validator) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator
+                ], 404);
+            }
 
-    //         $permission = new Permission();
-    //         $permission->name = $request->permission;
-    //         $permission->slug = str_replace(' ', '_', strtolower($request->permission));
-    //         $permission->status = 1;
-    //         $permission->updated_at = NULL;
-    //         $permission->created_by = Auth::user()->id;
-    //         $permission->created_at = Carbon::now();
-    //         $permission->updated_by = NULL;
-    //         $permission->deleted_by = NULL;
-    //         $permission->save();
-    //         $this->storeLog('Permission', 'save', 'Permission');
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'New permission created successfully.'
-    //         ], 200);
+            $permission = new Permission();
+            $permission->name = $request->permission;
+            $permission->slug = str_replace(' ', '_', strtolower($request->permission));
+            $permission->status = 1;
+            $permission->updated_at = NULL;
+            $permission->created_by = Auth::user()->id;
+            $permission->created_at = Carbon::now();
+            $permission->updated_by = NULL;
+            $permission->deleted_by = NULL;
+            $permission->save();
+            $this->storeLog('Permission', 'save', 'Permission');
+            return response()->json([
+                'success' => true,
+                'message' => 'New permission created successfully.'
+            ], 200);
 
-    //     } catch (Exception $e) {
-    //         return response()->json([
-    //             'success' => false, 
-    //             'message' => __('Error creating permission: ') . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => __('Error creating permission: ') . $e->getMessage()
+            ], 500);
+        }
+    }
 
     
     public function save2(Request $request) {
@@ -183,45 +183,44 @@ class PermissionController extends Controller {
         }
     }
 
-    public function save(Request $request)
-{
-    try {
-        $fileTypes = $request->file_type;
-        $documents = $request->file('document');
-        $docPaths = [];
+    public function save1(Request $request) {
+        try {
+            $fileTypes = $request->file_type;
+            $documents = $request->file('document');
+            $docPaths = [];
 
-        foreach ($fileTypes as $index => $type) {
-            if (!empty($documents[$index])) {
-                $file = $documents[$index];
-                $name = $type . '-' . time() . '-' . $file->getClientOriginalName();
-                $file->move(public_path('uploads'), $name);
-                $docPaths[] = [
-                    'file_type' => $type,
-                    'path' => 'uploads/' . $name
-                ];
+            foreach ($fileTypes as $index => $type) {
+                if (!empty($documents[$index])) {
+                    $file = $documents[$index];
+                    $name = $type . '-' . time() . '-' . $file->getClientOriginalName();
+                    $file->move(public_path('uploads'), $name);
+                    $docPaths[] = [
+                        'file_type' => $type,
+                        'path' => 'uploads/' . $name
+                    ];
+                }
             }
+
+            // Save to DB
+            foreach ($docPaths as $docPath) {
+                $doc = new Document();
+                $doc->file_type = $docPath['file_type'];
+                $doc->document = $docPath['path'];
+                $doc->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All documents saved successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving documents: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Save to DB
-        foreach ($docPaths as $docPath) {
-            $doc = new Document();
-            $doc->file_type = $docPath['file_type'];
-            $doc->document = $docPath['path'];
-            $doc->save();
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'All documents saved successfully.'
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error saving documents: ' . $e->getMessage()
-        ], 500);
     }
-}
 
 
 

@@ -2,7 +2,7 @@
 @section('title') {{ __('User')}} @endsection
 
 @section('header')
-
+<link href="{{ asset('assets/css/comman.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('breadcrumb')
@@ -43,15 +43,15 @@
 @endif
 <div class="card">
     <ul class="nav nav-tabs p-4">
-        <li class="nav-item"><a class="nav-link active" href="#tab_1" data-bs-toggle="tab">User Details</a></li>
-        <li class="nav-item"><a class="nav-link" href="#tab_2" data-bs-toggle="tab">Bank Details</a></li>
-        <li class="nav-item"><a class="nav-link" href="#tab_3" data-bs-toggle="tab">Attendence Details</a></li>
-        <li class="nav-item"><a class="nav-link" href="#tab_4" data-bs-toggle="tab">Leave Details</a></li>
-        <li class="nav-item"><a class="nav-link" href="#tab_5" data-bs-toggle="tab">Experience Details</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#tab_1_1" data-bs-toggle="tab">User Details</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tab_1_2" data-bs-toggle="tab">Bank Details</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tab_1_3" data-bs-toggle="tab">Attendence Details</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tab_1_4" data-bs-toggle="tab">Leave Details</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tab_1_5" data-bs-toggle="tab">Experience Details</a></li>
     </ul>
     <div class="card-body">
         <div class="tab-content">
-            <div class="tab-pane active" id="tab_1">
+            <div class="tab-pane active" id="tab_1_1">
                 <form id="quickForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
@@ -109,7 +109,7 @@
                                     </div>
                                 </div>
                                 <div class="">
-                                    <button type="submit" form="quickForm" class="btn btn-primary" id="salaryForm">Next</button>
+                                    <button type="button" form="quickForm" class="btn btn-success" id="salaryForm">Next</button>
                                 </div>
                             </div>
                         </div>
@@ -117,64 +117,154 @@
                 </form>
             </div>
 
-            <div class="tab-pane" id="tab_2">
-                <form id="quickForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
+            <div class="tab-pane" id="tab_1_2">
+                <form id="bankDetailsForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="">
-                                        <button type="submit" form="quickForm" class="btn btn-primary" onclick="nextTabOpen(event)">Next</button>
-                                    </div>
-                                    <div class="">
-                                        <button type="submit" form="quickForm" class="btn btn-primary" onclick="addMoreBankDetails(event)">add</button>
-                                    </div>
-                                </div>
+                        <div class="col-lg-12" id="bankDetailsDiv">
+                            <!-- Make sure this div wraps only the table -->
+                            <div class="table-responsive" style="overflow-x: auto;">
+                                <table class="table table-bordered" id="bankDetailsTable" style="min-width: 1200px;">
+                                    <thead>
+                                        <tr>
+                                            <th >Action</th>
+                                            <th >{{ __('Bank Name')}}</th>
+                                            <th >{{ __('Branch Name')}}</th>
+                                            <th >{{ __('Account Holder Name')}}</th>
+                                            <th >{{ __('Account Number')}}</th>
+                                            <th >{{ __('IFSC Code')}}</th>
+                                            <th >{{ __('Beneficiary Statement')}}</th>
+                                            <th >{{ __('Bank Statement')}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bankDetails_1">
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-info text-center" onclick="addMoreBankDetails(event)">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </td>
+                                            <td><input type="text" name="bank_name[]" class="form-control" placeholder="Enter bank name"></td>
+                                            <td><input type="text" name="branch_name[]" class="form-control" placeholder="Enter branch name"></td>
+                                            <td><input type="text" name="account_holder_name[]" class="form-control" placeholder="Enter account holder name"></td>
+                                            <td><input type="text" name="account_number[]" class="form-control" placeholder="Enter account number"></td>
+                                            <td><input type="text" name="ifsc_code[]" class="form-control" placeholder="Enter IFSC code"></td>
+                                            <td><input type="text" name="beneficiary_name[]" class="form-control" placeholder="Enter beneficiary name"></td>
+                                            <td>
+                                                <input type="file" name="documents[]" class="form-control fileInput" onchange="showUploadDocumentImage(this)" placeholder="Upload document">
+                                                <div class="previewContainer" style="display: none;">
+                                                    <img class="imagePreview" style="width: 100px; height: 100px; display: none;" />
+                                                    <span onclick="removePreview(this)" style="position: absolute; top: -10px; right: -10px; cursor: pointer; background: red; color: white; border-radius: 50%; padding: 0 5px;">X</span>
+                                                    <iframe class="docPreview" style="width: 100px; height: 100px; display: none;"></iframe>
+                                                    <div class="iconPreview" style="width: 100px; height: 100px; text-align: center; line-height: 100px; border: 1px solid #ccc;">📄</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="card-body" id="bankDetails_0">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                        <div class="form-group">
-                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Bank Name')}}</label>
-                                            <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                        <div class="form-group">
-                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Branch Name')}}</label>
-                                            <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                        <div class="form-group">
-                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Beneficiary Name')}}</label>
-                                            <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                        <div class="form-group">
-                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Account Number')}}</label>
-                                            <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                        <div class="form-group">
-                                            <label class="required fs-6 fw-semibold mb-2">{{ __('IFSC Code')}}</label>
-                                            <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                        <div class="form-group">
-                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Bank Statement')}}</label>
-                                            <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
-                                        </div>
-                                    </div>
-                                </div>
+
+                            <!-- Buttons outside scroll -->
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-warning" >Previous</button>
+                                <button type="button" class="btn btn-success">Next</button>
                             </div>
                         </div>
                     </div>
                 </form>
+            </div>
+
+            <div class="tab-pane" id="tab_1_3">
+                <div class="d-flex flex-row">
+                    <p class="">{{ __('Punching Applicability :')}}</p>
+                    <div class="mx-3">
+                        <input type="radio" id="punchIn" name="choice" value="punchValue1">
+                        <label for="punchIn">{{ __('Punch In Applicable')}}</label><br>
+
+                    </div>
+                    <div class="mx-3">
+                        <input type="radio" id="punchOut" name="choice" value="punchValue2">
+                        <label for="punchOut">{{ __('Punch In Not Applicable')}}</label><br>
+                    </div>
+                </div>
+
+                <div id="content1" style="display: none;">
+                    <form id="quickForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Outside Punch Applicable')}}</label>
+                                                    <select name="outside_punch" class="form-select" id="outsidePunch" data-control="select2" data-placeholder="Select Outside Punch Applicable">
+                                                        <option></option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="2">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Shift Applicable')}}</label>
+                                                    <select name="shift_applicable" class="form-select" id="shiftApplicable" data-control="select2" data-placeholder="Select Shift Applicable">
+                                                        <option></option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="2">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Contact')}}</label>
+                                                    <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Email')}}</label>
+                                                    <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Date of Birth')}}</label>
+                                                    <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Address')}}</label>
+                                                    <input type="text" name="name" id="roleName" class="form-control" maxlength="100" placeholder="Enter role name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4" id="ngoCenterDiv">
+                                                <div class="form-group">
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="">
+                                        <button type="button" form="quickForm" class="btn btn-success" id="salaryForm">Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="content2" style="display: none;">
+                    This is content for Option 2.
+                </div>
+            </div>
+            <div class="tab-pane" id="tab_1_4">
+                <p>Leave Details Content</p>
+            </div>
+            <div class="tab-pane" id="tab_1_5">
+                <p>Experience Details Content</p>
             </div>
         </div>
     </div>
@@ -182,71 +272,5 @@
 @endsection
 
 @section('scripts')
-<script>
-    function addMoreBankDetails(e) {
-        e.preventDefault();
-        let bankDetailsCount = document.querySelectorAll('.bankDetails').length;
-        let newBankDetails = `
-            <div class="card-body" id="bankDetails_${bankDetailsCount}">
-                <div class="">
-                    <a type="button" id="nextButton" class="fa fa-trash ${bankDetailsCount} btn btn-danger removeTr"></a>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                        <div class="form-group">
-                            <label class="required fs-6 fw-semibold mb-2">{{ __('Bank Name')}}</label>
-                            <input type="text" name="bank_name[]" class="form-control" maxlength="100" placeholder="Enter bank name" >
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                        <div class="form-group">
-                            <label class="required fs-6 fw-semibold mb-2">{{ __('Branch Name')}}</label>
-                            <input type="text" name="branch_name[]" class="form-control" maxlength="100" placeholder="Enter branch name" >
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                        <div class="form-group>
-                            <label class="required fs-6 fw-semibold mb-2">{{ __('Beneficiary Name')}}</label>
-                            <input type="text" name="beneficiary_name[]" class="form-control" maxlength="100" placeholder="Enter beneficiary name" >
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                        <div class="form-group>
-                            <label class="required fs-6 fw-semibold mb-2">{{ __('Account Number')}}</label>
-                            <input type="text" name="account_number[]" class="form-control" maxlength="100" placeholder="Enter account number" >
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                        <div class="form-group>
-                            <label class="required fs-6 fw-semibold mb-2">{{ __('IFSC Code')}}</label>
-                            <input type="text" name="ifsc_code[]" class="form-control" maxlength="100" placeholder="Enter IFSC code" >
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                        <div class="form-group>
-                            <label class="required fs-6 fw-semibold mb-2">{{ __('Bank Statement')}}</label>
-                            <input type="file" name="bank_statement[]" class="form-control" accept=".pdf,.jpg,.jpeg,.png" >
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('bankDetails');
-        newDiv.innerHTML = newBankDetails;
-        document.querySelector('.card').appendChild(newDiv);
-        flatpickr(document.querySelectorAll('.flatpickr'), {
-            dateFormat: "Y-m-d",
-            allowInput: true,
-            altInput: true,
-            altFormat: "F j, Y",
-        });
-
-        document.querySelectorAll('.removeTr').forEach(button => {
-            button.addEventListener('click', function() {
-                this.closest('.bankDetails').remove();
-            });
-        });
-    }
-</script>
+<script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
 @endsection
