@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Throwable;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -45,7 +46,6 @@ class PermissionController extends Controller {
         return view('admin.user-management.premissions.index', compact('permissions', 'page', 'totalPages', 'search'));
     }
 
-
     public function save(Request $request) {
         try {
             $data = $request->all();
@@ -81,6 +81,50 @@ class PermissionController extends Controller {
         }
     }
 
+    public function update(Request $request) {
+        try {
+            $data = $request->all();
+            $validator = $this->updatePermissionValidationTrait($data);
+            if($validator) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator
+                ], 404);
+            }
+            $id = (int) $data['id'];
+            if (!$id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permission ID is required.'
+                ], 400);
+            }
+            $permission = Permission::where('id', $request->id)->whereNull('deleted_at')->first();
+            if (!$permission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permission not found.'
+                ], 404);
+            }
+            
+            $permission->name = $data['permission'];
+            $permission->slug = str_replace(' ', '_', strtolower($data['permission']));
+            $permission->updated_by = Auth::user()->id;
+            $permission->updated_at = Carbon::now();
+            $permission->save();
+
+            $this->storeLog('Role', 'update', 'Role');
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission updated successfully.'
+            ], 200);
+
+        } catch(Throwable $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => __('Error updating permission: ') . $e->getMessage()
+            ], 500);
+        }
+    }
     
     public function save2(Request $request) {
         try {
@@ -222,17 +266,12 @@ class PermissionController extends Controller {
         }
     }
 
-
-
-    public function update(Request $request) {
-
-    }
     
     public function show(Request $request) {
 
     }
 
     public function delete(Request $request) {
-
+        
     }
 }

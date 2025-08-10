@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Auth;
 class RoleController extends Controller {
     use ValidationTrait, CommanFunctionTrait;
     public function create() {
-        return view('admin.user-management.roles.index');
+        $roles = Role::where('status', 1)->get();
+        return view('admin.user-management.roles.index', [
+            'roles' => $roles
+        ]);
     }
 
     public function save(Request $request) {
@@ -50,5 +53,47 @@ class RoleController extends Controller {
             ], 500);
         }
       
+    }
+
+    public function update(Request $request) {
+        try {
+            $data = $request->all();
+            $validator = $this->updateRoleValidationTrait($data, $request->id);
+            if ($validator) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator
+                ], 201);
+            }
+            $id = (int) $request->id;
+            if (!$id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Role ID is required.'
+                ], 400);
+            }
+            $role = Role::where('id', $id)->first();
+            if (!$role) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Role not found.'
+                ], 404);
+            }
+            $role->name = $request->role;
+            $role->slug = str_replace(' ', '_', strtolower($request->role));
+            $role->updated_at = Carbon::now();
+            $role->updated_by = Auth::user()->id;
+            $role->save();
+            $this->storeLog('Role', 'update', 'Role');
+            return response()->json([
+                'success' => true,
+                'message' => 'Role updated successfully.'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Error updating role: ') . $e->getMessage()
+            ], 500);
+        }
     }
 }

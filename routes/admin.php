@@ -1,22 +1,22 @@
 <?php
 
 
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\DesignationController;
 use App\Http\Controllers\Admin\UserOnboardingController;
-
+use App\Http\Controllers\Admin\RolePermissionMappingController;
+use App\Http\Controllers\Admin\RoutePermissionMappingController;
 
 Route::group(['middleware' => 'guest'], function () {
     Route::get('admin/login', [AuthController::class, 'loadLogin'])->name('login');
     Route::post('auth', [AuthController::class, 'login'])->name('admin.auth');
     Route::post('admin/verify-otp', [AuthController::class, 'otpVerified'])->name('admin.verify-otp');
-    Route::post('forgetPassword', [AuthController::class, 'forgetpassword'])->name('forget.password');
+    Route::post('forget/password', [AuthController::class, 'forgetpassword'])->name('forget.password');
 });
 
 
@@ -38,20 +38,35 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
     Route::group(['prefix' => 'role'], function () {
         Route::get('/', [RoleController::class, 'create'])->name('admin.role.create');
         Route::post('save', [RoleController::class, 'save'])->name('admin.role.save');
+        Route::post('update', [RoleController::class, 'update'])->name('admin.role.update');
     });
 
 
     Route::group(['prefix' => 'permission'], function () {
         Route::get('/', [PermissionController::class, 'index'])->name('admin.permission.index');
         Route::get('ajax', [PermissionController::class, 'index'])->name('admin.permission.ajax'); 
-
         Route::post('save', [PermissionController::class, 'save'])->name('admin.permission.save');
-
         Route::post('show', [PermissionController::class, 'show'])->name('admin.permission.show');
         Route::post('update', [PermissionController::class, 'update'])->name('admin.permission.update');
         Route::post('delete', [PermissionController::class, 'delete'])->name('admin.permission.delete');
     });
 
+    Route::group(['prefix' => 'role-permission-mapping'], function () {
+        Route::get('/', [RolePermissionMappingController::class, 'index'])->name('admin.role-permission-mapping.index');
+        Route::post('save', [RolePermissionMappingController::class, 'save'])->name('admin.role-permission-mapping.save');
+        Route::post('update', [RolePermissionMappingController::class, 'update'])->name('admin.role-permission-mapping.update');
+        Route::post('destroy', [RolePermissionMappingController::class, 'destroy'])->name('admin.role-permission-mapping.destroy');
+        Route::post('show', [RolePermissionMappingController::class, 'show'])->name('admin.role-permission-mapping.show');
+    });
+
+    
+    Route::group(['prefix' => 'route-permission-mapping'], function () {
+        Route::get('/', [RoutePermissionMappingController::class, 'index'])->name('admin.route-permission-mapping.index');
+        Route::post('save', [RoutePermissionMappingController::class, 'save'])->name('admin.route-permission-mapping.save');
+        Route::post('update', [RoutePermissionMappingController::class, 'update'])->name('admin.route-permission-mapping.update');
+        Route::post('destroy', [RoutePermissionMappingController::class, 'destroy'])->name('admin.route-permission-mapping.destroy');
+        Route::post('show', [RoutePermissionMappingController::class, 'show'])->name('admin.route-permission-mapping.show');
+    });
 
     Route::group(['prefix' => 'user'], function () {
         Route::get('/', [UserOnboardingController::class, 'create'])->name('admin.user.create');
