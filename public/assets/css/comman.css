@@ -1,0 +1,124 @@
+/* login.blade.php css start */
+#kt_sign_in_submit:hover {
+    background-color: #27ae60 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+    border-color: #219150 !important;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+#forget-password:hover{
+    background-color: #ffc700 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 20px rgba(246, 185, 2, 0.91);
+    border-color: #ffc700 !important;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+/* login.blade.php css end */
+
+
+/* role module index.blade.php css start */
+    #createRole:hover{
+        background-color: #27ae60 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+        border-color: #219150 !important;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+    #roleBtnId:hover{
+        background-color: #27ae60 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+        border-color: #219150 !important;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+/* role module index.blade.php css end */
+
+
+/* permission module index.blade.php css start */
+    #addModalBtnPermission:hover{
+        background-color: #27ae60 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+        border-color: #219150 !important;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+    #savePermissionBtn:hover{
+        background-color: #27ae60 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+        border-color: #219150 !important;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+/* permission module index.blade.php css end */
+
+
+/* role permission mapping module index.blade.php css start */
+    #createRolePermissionMapping:hover{
+        background-color: #27ae60 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+        border-color: #219150 !important;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+    #saveRolePermissionMapping:hover{
+        background-color: #27ae60 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2);
+        border-color: #219150 !important;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+/* role permission mapping module index.blade.php css end */
+
+
+.btn-primary {
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+
+}
+
+.btn-info {
+    color: #fff !important;
+    background-color: #659be0 !important;
+    /* border-color: #508edb; */
+}
+
+
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+.table-responsive {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.table td, .table th {
+    white-space: nowrap;
+}
+
+
+/* user create.blade start -- */
+    #work_schedule_div .type {
+        margin-top: 1rem;
+        margin-bottom: 1.8rem;
+    }
+/* user create.blade end -- */

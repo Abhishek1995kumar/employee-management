@@ -2,6 +2,7 @@
 @section('title', 'Login')
 @section('header')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/comman.css') }}">
 @endsection
 @section('content')
 <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-5">
@@ -11,7 +12,7 @@
 				@csrf
 				<div class="text-center mb-11">
                     <img alt="Logo" src="{{ asset('/assets/media/logos/user.png')}} " class="mb-5" style="height: 100px;" />
-					<div class="fs-1 fw-bolder text-dark mb-3">Welcome to Employee Management Panel</div>
+					<div class="fs-1 fw-bolder text-dark mb-3">{{ __('Welcome to Employee Management Panel')}}</div>
 				</div>
 
 				<div class="" id="loginDiv">
@@ -23,20 +24,27 @@
 					</div>
 				</div>
 
-				<div class="d-grid mb-10">
+				<div class="d-flex justify-content-between">
 					<button type="submit" id="kt_sign_in_submit" class="btn btn-primary">
-						<span class="indicator-label">Sign In</span>
-						<span class="indicator-progress">Please wait...
+						<span class="indicator-label">{{ __('Sign In')}}</span>
+						<span class="indicator-progress">{{ __('Please wait...')}}
 							<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
 					</button>
+					<a class="btn btn-info " id="forget-password" href="{{ url('forget/password') }}">{{ __('Forget Password?')}}</a>
 				</div>
 			</form>
+			<?php
+				$date = date('Y');
+			?>
+			<br><br>
+			<div>
+				<p class="text-center mt-5 mb-0">{{ __('Copyright')}} &copy; {{ $date }} <a href="https://www.technostacks.com/" target="_blank" class="text-primary text-hover-primary">{{ __('Rukmani Solutions')}}</a>. {{ __('All rights reserved.')}}</p>
+			</div>
 		</div>
 	</div>
 </div>
-
 <div class="modal fade modal-md" id="otpModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="otpModalTitle" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-scrollable modal-md">
+	<div class="modal-dialog modal-dialog-centered modal-md">
 		<div class="modal-content">
 			<input type="hidden" name="id" value="">
 			<div class="modal-header">
@@ -68,7 +76,7 @@
 									</div>
 								</div>
 								<div class="card-footer modal-footer">
-									<button type="button" class="btn btn-primary" onclick="verifyOtp()">Verify OTP</button>
+									<button type="button" class="btn btn-primary" onclick="verifyOtp()">{{ __('Verify OTP')}}</button>
 								</div>
 							</div>
 						</div>
@@ -82,5 +90,4 @@
 @endsection
 @section('footer')
 <script src="{{asset('assets/js/custom/authentication/sign-in/general.js')}}"></script>
-
 @endsection

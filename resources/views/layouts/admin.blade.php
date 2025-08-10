@@ -100,13 +100,13 @@
                                         <div class="separator my-2"></div>
 
                                         <div class="menu-item px-5">
-                                            <a href="" class="menu-link px-5">My Profile</a>
+                                            <a href="" class="menu-link px-5">{{ __('My Profile')}}</a>
                                         </div>
 
                                         <div class="separator my-2"></div>
 
                                         <div class="menu-item px-5">
-                                            <a href="{{ route('admin.logout') }}" class="menu-link px-5">Sign Out</a>
+                                            <a href="{{ route('admin.logout') }}" class="menu-link px-5">{{ __('Sign Out')}}</a>
                                         </div>
 
                                     </div>
@@ -131,13 +131,13 @@
                                             </svg>
                                         </span>
                                     </span>
-                                    <span class="menu-title">Dashboard</span>
+                                    <span class="menu-title">{{ __('Dashboard')}}</span>
                                 </span>
                             </a>
 
                             <div class="menu-item pt-5">
                                 <div class="menu-content">
-                                    <span class="menu-heading fw-bold text-uppercase fs-7">User Management</span>
+                                    <span class="menu-heading fw-bold text-uppercase fs-7">{{ __('User Management')}}</span>
                                 </div>
                             </div>
 
@@ -151,7 +151,7 @@
                                             </svg>
                                         </span>
                                     </span>
-                                    <span class="menu-title">User Management</span>
+                                    <span class="menu-title">{{ __('User Management')}}</span>
                                     <span class="menu-arrow"></span>
                                 </span>
                                 <div class="menu-sub menu-sub-accordion">
@@ -168,7 +168,7 @@
                                                         </svg>
                                                     </span>
                                                 </span>
-                                                <span class="menu-title">Departments</span>
+                                                <span class="menu-title">{{ __('Departments')}}</span>
                                             </span>
                                         </a>
                                     </div>
@@ -185,7 +185,7 @@
                                                         </svg>
                                                     </span>
                                                 </span>
-                                                <span class="menu-title">Designations</span>
+                                                <span class="menu-title">{{ __('Designations')}}</span>
                                             </span>
                                         </a>
                                     </div>
@@ -202,7 +202,7 @@
                                                         </svg>
                                                     </span>
                                                 </span>
-                                                <span class="menu-title">Roles</span>
+                                                <span class="menu-title">{{ __('Roles')}}</span>
                                             </span>
                                         </a>
                                     </div>
@@ -219,10 +219,47 @@
                                                         </svg>
                                                     </span>
                                                 </span>
-                                                <span class="menu-title">Permissions</span>
+                                                <span class="menu-title">{{ __('Permissions')}}</span>
                                             </span>
                                         </a>
                                     </div>
+
+                                    <div class="menu-item">
+                                        <a href="{{ url('admin/role-permission-mapping') }}" class="menu-item menu-accordion">
+                                            <span class="menu-link {{Request::is('admin/role-permission-mapping*') ? 'active' : ''}}">
+                                                <span class="menu-icon">
+                                                    <span class="svg-icon svg-icon-2">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                            <rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                            <rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                            <rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <span class="menu-title">{{ __('Role Mapping')}}</span>
+                                            </span>
+                                        </a>
+                                    </div>
+
+                                    <div class="menu-item">
+                                        <a href="{{ url('admin/route-permission-mapping') }}" class="menu-item menu-accordion">
+                                            <span class="menu-link {{Request::is('admin/route-permission-mapping*') ? 'active' : ''}}">
+                                                <span class="menu-icon">
+                                                    <span class="svg-icon svg-icon-2">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                            <rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                            <rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                            <rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <span class="menu-title">{{ __('Route Mapping')}}</span>
+                                            </span>
+                                        </a>
+                                    </div>
+
                                     <div class="menu-item">
                                         <a href="{{ url('admin/user') }}" class="menu-item menu-accordion">
                                             <span class="menu-link {{Request::is('admin/user*') ? 'active' : ''}}">
@@ -236,7 +273,7 @@
                                                         </svg>
                                                     </span>
                                                 </span>
-                                                <span class="menu-title">Users</span>
+                                                <span class="menu-title">{{ __('Users')}}</span>
                                             </span>
                                         </a>
                                     </div>
@@ -251,7 +288,7 @@
                     <div class="header-brand">
                         <a href="#" class="d-flex align-items-center gap-5" id="kt_header_logo">
                             <img alt="Logo" src="{{asset('assets/media/logos/login.webp')}}" style="height: 40px; width: 40px;" />
-                            <span style="font-size: 30px; color: white; font-weight: 500; ">GB Tech</span>
+                            <span style="font-size: 30px; color: white; font-weight: 500; ">{{ __('GB Tech')}}</span>
                         </a>
                         <div id="kt_aside_toggle" class="btn btn-icon w-auto px-0 btn-active-color-primary aside-minimize" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="aside-minimize">
                             <span class="svg-icon svg-icon-1 me-n1 minimize-default">
@@ -337,7 +374,7 @@
                                                     </svg>
                                                 </span>
                                             </span>
-                                            <span class="menu-title">Light</span>
+                                            <span class="menu-title">{{ __('Light')}}</span>
                                         </a>
                                     </div>
                                     <div class="menu-item px-3 my-0">
@@ -352,7 +389,7 @@
                                                     </svg>
                                                 </span>
                                             </span>
-                                            <span class="menu-title">Dark</span>
+                                            <span class="menu-title">{{ __('Dark')}}</span>
                                         </a>
                                     </div>
                                     <div class="menu-item px-3 my-0">
@@ -364,7 +401,7 @@
                                                     </svg>
                                                 </span>
                                             </span>
-                                            <span class="menu-title">System</span>
+                                            <span class="menu-title">{{ __('System')}}</span>
                                         </a>
                                     </div>
                                 </div>
