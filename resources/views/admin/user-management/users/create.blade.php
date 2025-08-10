@@ -1219,7 +1219,6 @@
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Asset Name')}}</label>
                                                         <div class="form-group">
-                                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Username')}}</label>
                                                             <input type="text" name="asset_name" id="asset_name" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="asset name">
                                                         </div>
                                                     </div>
@@ -1247,7 +1246,7 @@
                     </div>
 
                     <!-- Sub Asset Tab -->
-                    <div class="tab-pane fade" id="assetTab">
+                    <div class="tab-pane fade" id="subAssetTab">
                         <form id="punchInForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
@@ -1269,8 +1268,218 @@
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Sub Asset Name')}}</label>
                                                         <div class="form-group">
-                                                            <label class="required fs-6 fw-semibold mb-2">{{ __('Username')}}</label>
                                                             <input type="text" name="sub_asset_name" id="sub_asset_name" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="sub asset name">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button type="button" class="btn btn-warning">{{ __('Previous')}}</button>
+                                            <button type="button" class="btn btn-success">{{ __('Next')}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Sub Asset Tab -->
+                    <div class="tab-pane fade" id="assignedAssetTab">
+                        <form id="punchInForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4" id="select_asset_id_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Asset Name')}}</label>
+                                                        <select name="asset_id" class="form-select" id="select_asset_id" data-control="select2" data-placeholder="Select asset">
+                                                            <option></option>
+                                                            <option value="Software">{{ __('Software')}}</option>
+                                                            <option value="Hardware">{{ __('Hardware')}}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="select_sub_asset_id_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Asset Name')}}</label>
+                                                        <select name="sub_asset_id" class="form-select" id="select_sub_asset_id" data-control="select2" data-placeholder="Select sub asset">
+                                                            <option></option>
+                                                            <option value="Software">{{ __('Software')}}</option>
+                                                            <option value="Hardware">{{ __('Hardware')}}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="brand_name_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Brand Name')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="brand_name" id="brand_name" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="sub brand name">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="modal_name_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Model Name')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="modal_name" id="modal_name" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="sub modal name">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="specification_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Specification')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="specification" id="specification" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="specification">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="asset_descrption_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Specification')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="descrption" id="asset_descrption" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="asset descrption">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="system_vendor_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Specification')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="system_vendor" id="system_vendor" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="system vendor">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4" id="perchase_date_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Perchase Date')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="perchase_date" id="perchase_date" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="perchase date">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Operation Syatem related divs -->
+                                                <div class="col-md-12 mb-4" id="operation_system_div" style="display: none;">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div class="col-md-4 mb-4" id="system_name_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('System Name')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="system_name" id="system_name" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="system name">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="system_version_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Version')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="system_version" id="system_version" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="system version">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="system_license_key_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('License Key')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="system_license_key" id="system_license_key" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="system license key">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Productivity Tool related divs -->
+                                                <div class="col-md-12 mb-4" id="productivity_tool_div" style="display: none;">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div class="col-md-4 mb-4" id="ms_office_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('MS Office')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="ms_office" id="ms_office" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="ms office">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="adobe_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Adobe')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="adobe" id="adobe" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="adobe">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="license_type_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('License Type')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="license_type" id="license_type" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="license type">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="subscription_info_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('License Type')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="subscription_info" id="subscription_info" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="subscription info">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Antivirus Tool related divs -->
+                                                <div class="col-md-12 mb-4" id="antivirus_tool_div" style="display: none;">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div class="col-md-4 mb-4" id="expiry_date_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Expiry Date')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="expiry_date" id="expiry_date" class="form-control" maxlength="100" placeholder="expiry date">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="active_devices_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Active Devices')}}</label>
+                                                                <select name="active_devices" class="form-select" id="active_devices" data-control="select2" data-placeholder="Select active devices">
+                                                                    <option></option>
+                                                                    <option value="Software">{{ __('Active')}}</option>
+                                                                    <option value="Hardware">{{ __('Not Active')}}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Database system related divs -->
+                                                <div class="col-md-12 mb-4" id="database_system_div" style="display: none;">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div class="col-md-4 mb-4" id="database_type_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Database System')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="database_type" id="database_type" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="database type">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="instance_count_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Instance Count')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="instance_count" id="instance_count" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="instance count">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 mb-4" id="license_info_div">
+                                                            <div class="form-group">
+                                                                <label class="required fs-6 fw-semibold mb-2">{{ __('License Type')}}</label>
+                                                                <div class="form-group">
+                                                                    <input type="text" name="license_info" id="license_info" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="license info">
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
