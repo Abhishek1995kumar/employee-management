@@ -22,7 +22,7 @@ class PermissionController extends Controller {
         $limit = 4;
         $offset = ($page - 1) * $limit;
 
-        $query = "SELECT id, name, created_by, created_at FROM permissions WHERE deleted_at IS NULL";
+        $query = "SELECT id, name, route_pattern, created_by, created_at FROM permissions WHERE deleted_at IS NULL";
         $countQuery = "SELECT COUNT(*) as total FROM permissions WHERE deleted_at IS NULL";
 
         $params = [];
@@ -58,8 +58,9 @@ class PermissionController extends Controller {
             }
 
             $permission = new Permission();
-            $permission->name = $request->permission;
+            $permission->name = trim(ucwords($request->permission));
             $permission->slug = str_replace(' ', '_', strtolower($request->permission));
+            $permission->route_pattern = str_replace(' ', '', strtolower($request->route_pattern));
             $permission->status = 1;
             $permission->updated_at = NULL;
             $permission->created_by = Auth::user()->id;

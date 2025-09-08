@@ -5,159 +5,6 @@ $.ajaxSetup({
     }
 });
 
-// Common function start 
-const acceptOnlyNumber = (event) => {
-    const input = event.target;
-    console.log(`Input field: ${input.placeholder || input.name}`, `Value: ${input.value}`);
-    const value = input.value;
-    const regex = /^[0-9]*$/;
-    if (!regex.test(value)) {
-        input.value = value.replace(/[^0-9]/g, '');
-        Swal.fire({
-            title: 'Invalid Input',
-            text: "Please enter a valid " + (input.placeholder || input.name) + "\nonly numbers are allowed.",
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-};
-
-function handleTypeCheckbox(type) {
-    let fixedCheckbox = document.getElementById('select_fixed_type');
-    let percentageCheckbox = document.getElementById('select_percentage_type');
-    if (type === 'fixed_amount_div') {
-        if (fixedCheckbox.checked) {
-            percentageCheckbox.checked = false;
-            ifcheckThanShowDiv(fixedCheckbox, 'fixed_amount_div');
-            ifcheckThanShowDiv(percentageCheckbox, 'percentage_amount_div');
-        }
-    } else if (type === 'percentage_amount_div') {
-        if (percentageCheckbox.checked) {
-            fixedCheckbox.checked = false;
-            ifcheckThanShowDiv(percentageCheckbox, 'percentage_amount_div');
-            ifcheckThanShowDiv(fixedCheckbox, 'fixed_amount_div');
-        }
-    }
-
-    // Handle fixed time checkboxes start --
-        let yesFixed = [], noFixed = [];
-        for (let i = 1; i <= 8; i++) {
-            yesFixed.push(document.getElementById('fixed_time_yes_' + i));
-            noFixed.push(document.getElementById('fixed_time_no_' + i));
-        }
-        // YES case
-        if (type.startsWith('fixed_time_div')) {
-            let index = type.split('_').pop();
-            if (yesFixed[index - 1].checked) {
-                noFixed[index - 1].checked = false;
-                document.getElementById('fixed_time_div_' + index).style.display = 'block';
-            } else {
-                document.getElementById('fixed_time_div_' + index).style.display = 'none';
-            }
-        }
-        // NO case
-        if (type.startsWith('no_fixed_time_div')) {
-            for (let i = 1; i <= 8; i++) {
-                yesFixed[i - 1].checked = false;
-                document.getElementById('fixed_time_div_' + i).style.display = 'none';
-            }
-        }
-    // Handle fixed time checkboxes end --
-
-
-    // Handle late applicable checkboxes start --
-        let yesLate = document.getElementById('yes_late_applicable');
-        let noLate = document.getElementById('no_late_applicable');
-        if (type === 'yes_late_woking_applicable_div') {
-            noLate.checked = false;
-            ifcheckThanShowDiv(yesLate, 'yes_late_woking_applicable_div');
-            ifcheckThanShowDiv(noLate, 'no_late_woking_applicable_div');
-
-        } else if (type === 'no_late_woking_applicable_div') {
-            yesLate.checked = false;
-            ifcheckThanShowDiv(noLate, 'no_late_woking_applicable_div');
-            ifcheckThanShowDiv(yesLate, 'yes_late_woking_applicable_div');
-        }
-    // Handle late applicable checkboxes end --
-    
-
-    // Handle leave applicable checkboxes start --
-        let yesLeave = document.getElementById('yes_accrued_period');
-        let noLeave = document.getElementById('no_accrued_period');
-        if (type === 'yes_accrued_period_div') {
-            noLeave.checked = false;
-            ifcheckThanShowDiv(yesLeave, 'yes_accrued_period_div');
-            ifcheckThanShowDiv(noLeave, 'no_accrued_period_div');
-
-        } else if (type === 'no_accrued_period_div') {
-            yesLeave.checked = false;
-            ifcheckThanShowDiv(noLeave, 'no_accrued_period_div');
-            ifcheckThanShowDiv(yesLeave, 'yes_accrued_period_div');
-        }
-    // Handle leave applicable checkboxes end --
-
-    // Handle Leaves Carry Forward checkboxes start --
-        for (let i = 1; i <= 8; i++) {
-            if (type === 'yes_carry_forward_' + i) {
-                alert('yes_carry_forward_' + i);
-                document.getElementById('no_carry_forward_' + i).checked = false;
-            }
-            if (type === 'no_carry_forward_' + i) {
-                document.getElementById('yes_carry_forward_' + i).checked = false;
-            }
-        }
-    // Handle Leaves Carry Forward checkboxes end --
-}
-
-
-const ifcheckThanShowDiv = (checkboxElement, divId) => {
-    let targetDiv = document.getElementById(divId);
-    console.log(`Checkbox: ${checkboxElement.name}`);
-    if (checkboxElement.checked) {
-        targetDiv.style.display = 'block';
-    } else {
-        targetDiv.style.display = 'none';
-    }
-};
-
-const openFlatpickr = (event) => {
-    const input = event.target;
-    if (input.type !== 'text') {
-        console.warn(`Input field with ID ${input.id} is not a text date input.`);
-        return;
-    }
-    if (!input._flatpickr) {
-        input._flatpickr = flatpickr(input, {
-            dateFormat: 'Y-m-d',
-            allowInput: true,
-            onChange: function (selectedDates, dateStr) {
-                input.value = dateStr;
-            }
-        });
-    }
-    input._flatpickr.open();
-};
-
-const stringValidation = (event) => {
-    const input = event.target;
-    console.log(`Input field: ${input.placeholder || input.name}`, `Value: ${input.value}`);
-    const value = input.value;
-    const regex = /^[a-zA-Z][a-zA-Z0-9\s.,-]*$/;
-    if (!regex.test(value)) {
-        input.value = '';
-        Swal.fire({
-            title: 'Invalid Input',
-            text: "Please enter a valid " + (input.placeholder || input.name) + "\nonly alphanumeric characters, spaces, commas, periods, and hyphens are allowed.",
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    } else {
-        console.log(`Valid input for ${input.placeholder || input.name}: ${input.value}`);
-    }
-};   
-
-// Common function end  
-
 // Bank Details Management
 function saveUserForm(event) {
     event.preventDefault();
@@ -262,7 +109,6 @@ function submitFormData(form) {
     });
 }
 
-
 function fetchUserData() {
     $.ajax({
         url: 'admin/user/save',
@@ -273,10 +119,7 @@ function fetchUserData() {
     })
 }
 
-
-
 let addMoreRows=2;
-
 function showUploadDocumentImage(input) {
     let files = input.files[0];
     let previewContainer = input.closest('.previewContainer');
@@ -357,6 +200,42 @@ function addMoreExperienceDetails(e) {
 }
 
 
+function addMoreDocumentDetails(e) {
+    e.preventDefault();
+    let newRowDetails = `
+            <tr class="documentDetails_${addMoreRows}">
+                <td class="col-lg-1">
+                    <div class="btn btn-danger mt-1"><a type="button" id="nextButton" class="fa-solid fa-user-minus removeTr" onclick='removeTr(${addMoreRows})'></a><div>
+                </td>
+                <td class="col-lg-3">
+                    <select name="document_type" class="form-select" id="document_type" data-control="select2" data-placeholder="Select document type" >
+                        <option></option>
+                        <option value="marksheet">{{ __('Marksheet')}}</option>
+                        <option value="certification">{{ __('Certification')}}</option>
+                        <option value="pan_card">{{ __('Pan Card')}}</option>
+                        <option value="aadhar_card">{{ __('Aadhar Card')}}</option>
+                        <option value="room_rent_agreement">{{ __('Room Rent Agreement')}}</option>
+                    </select>
+                </td>
+                <td class="col-lg-5">
+                    <input type="file" name="employee_personal_documents[]" id="employee_personal_documents" class="form-control fileInput" onchange="showUploadDocumentImage(this)" placeholder="Upload document">
+                    <div class="previewContainer" style="display: none;">
+                        <img class="imagePreview" style="width: 100px; height: 100px; display: none;" />
+                        <span onclick="removePreview(this)" style="position: absolute; top: -10px; right: -10px; cursor: pointer; background: red; color: white; border-radius: 50%; padding: 0 5px;">X</span>
+                        <iframe class="docPreview" style="width: 100px; height: 100px; display: none;"></iframe>
+                        <div class="iconPreview" style="width: 100px; height: 100px; text-align: center; line-height: 100px; border: 1px solid #ccc;">📄</div>
+                    </div>
+                </td>
+            </tr>
+    `;
+    $('#documentDetailsTable tbody').append(newRowDetails);
+    addMoreRows++;
+    document.querySelectorAll('.removeTr').forEach(button => {
+        button.addEventListener('click', function() {
+            this.closest('tr').remove();
+        });
+    });
+}
 // Attendence Management
 document.querySelectorAll('input[name="choice"]').forEach((elem) => {
     elem.addEventListener("change", function(event) {
@@ -370,4 +249,9 @@ document.querySelectorAll('input[name="choice"]').forEach((elem) => {
     });
 });
 
+
+
+function validateFileType(e) {
+
+}
 

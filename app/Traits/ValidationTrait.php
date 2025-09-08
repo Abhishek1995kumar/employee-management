@@ -470,7 +470,7 @@ trait ValidationTrait {
                 foreach ($rules as $field => $fieldRules) {
                     $value = $data[$field] ?? null;
                     foreach ($fieldRules as $rule) {
-                        if ($rule === 'required' && empty($value)) {
+                        if ($rule === 'required' && !array_key_exists($field, $data)) {
                             $errors[$field][] = $messages["{$field}.required"];
 
                         } elseif ($rule === 'exists' && !isset($value)) {
@@ -491,5 +491,47 @@ trait ValidationTrait {
                 ], 422);
             }
         }
+    // Role Permission Mapping Validation Trait
+
+
+
+    // Role Permission Mapping Validation Trait
+        public function routePermissionMappingValidation($data) {
+            try {
+                $rules = [
+                    'permission_id' => ['required', 'exists:permissions,id'],
+                    'route_name' => ['required', 'array'],
+                ];
+                
+                $messages = [
+                    'permission_id.required' => 'The permission field is required.',
+                    'permission_id.exists' => 'The selected permission does not exist.',
+                    'route_name.required' => 'The route name field is required.',
+                    'route_name.array' => 'The route name must be an array.',
+                ];
+
+                $errors = [];
+
+                foreach ($rules as $field => $fieldRules) {
+                    $value = $data[$field] ?? null;
+                    foreach ($fieldRules as $rule) {
+                        if ($rule === 'required' && empty($value)) {
+                            $errors[$field][] = $messages["{$field}.required"];
+                        } elseif ($rule === 'exists:permissions,id' && !\DB::table('permissions')->where('id', $value)->exists()) {
+                            $errors[$field][] = $messages["{$field}.exists"];
+                        } elseif ($rule === 'array' && !is_array($value)) {
+                            $errors[$field][] = $messages["{$field}.array"];
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
+        }
+    // Role Permission Mapping Validation Trait
+
 }
 

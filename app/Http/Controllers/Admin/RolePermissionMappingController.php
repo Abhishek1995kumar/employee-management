@@ -49,6 +49,28 @@ class RolePermissionMappingController extends Controller {
                 ]);
             }
             
+            // Check if any of the selected permissions are already assigned to the given role
+            // $d = DB::select("SELECT * FROM role_permission 
+            //             WHERE role_id = ? 
+            //             AND (
+            //                 " . implode(' OR ', array_fill(0, count($data['permission_id']), 'FIND_IN_SET(?, permission_id)')) . "
+            //             )", 
+            //             array_merge([$data['role_id']], $data['permission_id'])
+            // );
+            $isAssignedRole = RolePermission::where('role_id', $data['role_id'])
+                                ->where(function($query) use($data) {
+                                    foreach($data['permission_id'] as $permission) {
+                                        $query->orWhereRaw('FIND_IN_SET(?, permission_id)', [$permission]);
+                                    }
+                                })->first();
+
+            if($isAssignedRole) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "{$isAssignedRole['permission_id'] } Permission is already assigned to selected role"
+                ]);
+            }
+
             $rolePermissionMapping = new RolePermission();
             $rolePermissionMapping->role_id = $data['role_id'];
             $rolePermissionMapping->permission_id = implode(',', $data['permission_id']);

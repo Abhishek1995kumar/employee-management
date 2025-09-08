@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->integer('customer_id')->nullable()->comment('Customer id fetch from customer table');
+            $table->string('customer_code')->nullable()->comment('Customer code fetch from customer table');
             $table->integer('department_id')->nullable()->comment('Department id fetch from department table');
             $table->integer('designation_id')->nullable()->comment('Designation id fetch from designation table');
             $table->integer('role_id')->nullable()->comment('role id fetch from roles table');

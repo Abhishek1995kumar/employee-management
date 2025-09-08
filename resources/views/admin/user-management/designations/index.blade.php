@@ -67,9 +67,12 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addDesignation" class="btn btn-primary" >
-                    {{ __('Add Designation')}}
-                </button>
+                @if(Auth::user()->hasPermissionToRoute('admin/designation'))
+                    <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addDesignation" class="btn btn-primary" >
+                        {{ __('Add Designation')}}
+                    </button>
+                @else
+                @endif
             </div>
         </div>
         <div class="card-body table-responsive">

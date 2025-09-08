@@ -67,9 +67,12 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addAnimalVaccination" class="btn btn-primary" >
-                    {{ __('Add Department')}}
-                </button>
+                @if(Auth::user()->hasPermissionToRoute('admin/department'))
+                    <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addAnimalVaccination" class="btn btn-primary" >
+                        {{ __('Add Department')}}
+                    </button>
+                @else
+                @endif
             </div>
         </div>
         <div class="card-body table-responsive">
