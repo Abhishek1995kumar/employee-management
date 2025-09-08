@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("slug");
+            $table->string("route_pattern")->nullable()->comment('save route name by permission');
             $table->string("description")->nullable();
             $table->tinyInteger("status")->nullable()->comment('1=active permission, 0=inactive permission')->default(1);
             $table->tinyInteger("created_by")->nullable();

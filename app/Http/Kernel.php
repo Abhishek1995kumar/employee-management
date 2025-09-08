@@ -66,5 +66,6 @@ class Kernel extends HttpKernel
 
         'isAdmin' => \App\Http\Middleware\AdminAuthenticate::class,
         'verifyOtp' => \App\Http\Middleware\EnsureOtpIsVerified::class,
+        'isPermission' => \App\Http\Middleware\HasPermissionMiddleware::class,
     ];
 }

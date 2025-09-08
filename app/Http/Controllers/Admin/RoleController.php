@@ -96,4 +96,9 @@ class RoleController extends Controller {
             ], 500);
         }
     }
+
+
+    public function delete(Request $request) {
+        dd("hello delete");
+    }
 }

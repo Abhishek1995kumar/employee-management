@@ -4,6 +4,17 @@ $.ajaxSetup({
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
 });
+// sweetalert
+function validationAlert(title, text, icon, timer, confirmButtonText, showConfirmButton) {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        timer: timer, // Only set timer if confirm button is hidden
+        confirmButtonText: confirmButtonText,
+        showConfirmButton: showConfirmButton === undefined ? true : showConfirmButton,
+    });
+}
 
 // Role Js Start --
     // function fetchRoles() {
@@ -37,12 +48,7 @@ $.ajaxSetup({
         $('.roleBtn').prop('disabled', true);
         let roleName = $("#roleName").val();
         if (roleName === '') {
-            Swal.fire({
-                title: 'Missing role name',
-                text: "Please enter a role name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            validationAlert('Missing role name', 'Please enter a role name.', 'error', 2000, 'OK');
             $('.roleBtn').prop('disabled', false);
             return false;
         }
@@ -64,13 +70,7 @@ $.ajaxSetup({
                 if(res.success) {
                     $('.roleBtn').prop('disabled', true);
                     $('#roleName').val('');
-                    Swal.fire({
-                        title: 'Role created',
-                        text: "Successfully created a new role.",
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Role created', 'Successfully created a new role.', 'success', 2000, 'OK');
                     setTimeout(function() {
                         // fetchRoles();
                     }, 200);
@@ -79,22 +79,14 @@ $.ajaxSetup({
             error: function(xhr) {
                 $('.roleBtn').prop('disabled', false);
                 if(xhr.responseJSON) {
-                    Swal.fire({
-                        title: 'Already exists ',
-                        text: xhr.responseJSON.message.role,
-                        icon: 'error',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Already exists ', xhr.responseJSON.message.role, 'error', 5000, "OOP's");
                     console.log(xhr.responseJSON.message.role);
                 }
             }
 
         });
     }
-    // fetchRoles();
-
-    // update role
+    
     function editRole(button) {
         var roleId = button.getAttribute('data-id')
         var roleName = button.getAttribute('data-name')
@@ -108,12 +100,7 @@ $.ajaxSetup({
         let id = $("#roleId").val();
         let roleName = $("#updateRoleName").val();
         if (roleName === '') {
-            Swal.fire({
-                title: 'Missing role name',
-                text: "Please enter a role name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            validationAlert('Missing role name', 'Please enter a role name.', 'error', 2000, 'OK');
             $('#updateRoleBtnId').prop('disabled', false);
             return false;
         }
@@ -138,13 +125,7 @@ $.ajaxSetup({
                 if(res.success) {
                     $('#updateRoleBtnId').prop('disabled', true);
                     $('#updateRoleName').val('');
-                    Swal.fire({
-                        title: 'Role created',
-                        text: "Successfully update role.",
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Role updated', 'Successfully updated the role.', 'success', 2000, false);
                     setTimeout(function() {
                         // fetchRoles();
                     }, 200);
@@ -153,13 +134,7 @@ $.ajaxSetup({
             error: function(xhr) {
                 $('#updateRoleBtnId').prop('disabled', false);
                 if(xhr.responseJSON) {
-                    Swal.fire({
-                        title: 'Already exists ',
-                        text: xhr.responseJSON.message.role,
-                        icon: 'error',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Already exists ', xhr.responseJSON.message.role, 'error', 5000, false);
                     console.log(xhr.responseJSON.message.role);
                 }
             }
@@ -175,52 +150,47 @@ $.ajaxSetup({
         e.preventDefault();
         $('.permissionBtn').prop('disabled', true);
         let permissionName = $("#permissionName").val();
+        let routePattern = document.getElementById('routePattern').value;
         if (permissionName === '') {
-            Swal.fire({
-                title: 'Missing permission name',
-                text: "Please enter a permission name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            validationAlert('Missing permission name', 'Please enter a permission name.', 'error', 2000, 'OK');
+            $('.permissionBtn').prop('disabled', false);
             return false;
         }
-
-        submitPermission(permissionName);
+        if (routePattern === '') {
+            validationAlert('Missing route name', 'Please enter a route name.', 'error', 2000, 'OK');
+            $('.permissionBtn').prop('disabled', false);
+            return false;
+        }
+        submitPermission(permissionName, routePattern);
     }
 
-    function submitPermission(permissionName) {
+    function submitPermission(permissionName, routePattern) {
         let permissions = permissionName;
+        let routes = routePattern;
         let url = '/admin/permission/save';
         $.ajax({
             url: url,
             method: "POST",
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),
-                permission: permissionName
+                permission: permissionName,
+                route_pattern: routePattern
             },
             success: function(res) {
                 if(res.success) {
                     $('.permissionBtn').prop('disabled', false);
                     $('#addPermission').modal('hide');
                     $('#permissionName').val('');
-                    Swal.fire({
-                        title: 'Permission created',
-                        text: "Successfully created a new permission.",
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    $('#routePattern').val('');
+                    validationAlert('Permission created', 'Successfully created a new permission.', 'success', 2000, 'OK');
+                    setTimeout(function() {
+                        // fetchPermissions();
+                    }, 200);
                 }
             },
             error: function(xhr) {
                 if(xhr.responseJSON) {
-                    Swal.fire({
-                        title: 'Already exists ',
-                        text: xhr.responseJSON.message.permission,
-                        icon: 'error',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Already exists ', xhr.responseJSON.message.permission, 'error', 5000, 'OK');
                     console.log(xhr.responseJSON.message.permission);
                 }
             }
@@ -231,8 +201,10 @@ $.ajaxSetup({
     function editPermission(button) {
         let permissionId = button.getAttribute('data-id');
         let permissionName = button.getAttribute('data-name');
+        let routePattern = button.getAttribute('data-route-pattern');
         document.getElementById('hiddenPremissionId').value = permissionId;
         document.getElementById('updatePermissionName').value = permissionName;
+        document.getElementById('updateRoutePattern').value = routePattern;
     }
 
     function updatePermission(e) {
@@ -240,21 +212,23 @@ $.ajaxSetup({
         $('#updatePermissionBtn').prop('disabled', true);
         let permissionId = $("#hiddenPremissionId").val();
         let permissionName = $("#updatePermissionName").val();
+        let routePattern = $("#updateRoutePattern").val();
         if (permissionName === '') {
-            Swal.fire({
-                title: 'Missing permission name',
-                text: "Please enter a permission name.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            validationAlert('Missing permission name', 'Please enter a permission name.', 'error', 2000, 'OK');
             $('#updatePermissionBtn').prop('disabled', false);
             return false;
         }
-        updatePermissionAjax(permissionId, permissionName);
+        if (routePattern === '') {
+            validationAlert('Missing route name', 'Please enter a route name.', 'error', 2000, 'OK');
+            $('#updatePermissionBtn').prop('disabled', false);
+            return false;
+        }
+        updatePermissionAjax(permissionId, permissionName, routePattern);
     }
 
-    function updatePermissionAjax(permissionId, permissionName) {
+    function updatePermissionAjax(permissionId, permissionName, routePattern) {
         let permissions = permissionName;
+        let routes = routePattern;
         let id = permissionId;
         let url = '/admin/permission/update';
         $.ajax({
@@ -263,6 +237,7 @@ $.ajaxSetup({
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),
                 permission: permissions,
+                route_pattern: routes,
                 id: id
             },
             success: function(res) {
@@ -270,25 +245,13 @@ $.ajaxSetup({
                     $('#updatePermissionBtn').prop('disabled', false);
                     $('#editPermission').modal('hide');
                     $('#updatePermissionName').val('');
-                    Swal.fire({
-                        title: 'Permission updated',
-                        text: "Successfully updated the permission.",
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Permission updated', 'Successfully updated the permission.', 'success', 2000, 'OK');
                 }
             },
             error: function(xhr) {
                 $('#updatePermissionBtn').prop('disabled', false);
                 if(xhr.responseJSON) {
-                    Swal.fire({
-                        title: 'Already exists ',
-                        text: xhr.responseJSON.message.permission,
-                        icon: 'error',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
+                    validationAlert('Already exists', xhr.responseJSON.message.permission, 'error', 2000, 'OK');
                     console.log(xhr.responseJSON.message.permission);
                 }
             }
@@ -304,36 +267,24 @@ $.ajaxSetup({
         event.preventDefault();
         let permissionIds = [];
         let roleId = document.getElementById('roleId').value;
-
+        $('#createRolePermissionMappingBtn').prop('disabled', true);
         document.querySelectorAll('input[name="permission_id[]"]:checked').forEach(function(checkbox) {
             permissionIds.push(checkbox.value);
         });
         if (roleId === '') {
-            Swal.fire({
-                title: 'Missing role',
-                text: "Please select a role.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            validationAlert('Missing role', 'Please select a role.', 'error', 2000, 'OK');
+            $('#createRolePermissionMappingBtn').prop('disabled', false);
             return false;
         }
         if (permissionIds.length === 0) {
-            Swal.fire({
-                title: 'Missing permission',
-                text: "Please select at least one permission.",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            validationAlert('Missing permission', 'Please select at least one permission.', 'error', 2000, 'OK');
+            $('#createRolePermissionMappingBtn').prop('disabled', false);
             return false;
         }
-
-        $('#createRolePermissionMappingBtn').prop('disabled', true);
-
         saveRolePermission(roleId, permissionIds);
     }
 
     function saveRolePermission(roleId, permissionIds) {
-        alert('abhishek kumar mishra');
         let url = 'admin/role-permission-mapping/save';
         $.ajax({
             url: url,
@@ -346,14 +297,7 @@ $.ajaxSetup({
             success: function(res) {
                 $('#createRolePermissionMappingBtn').prop('disabled', false);
                 if (res.status === 'success') {
-                    Swal.fire({
-                        title: 'Role Permission Mapping',
-                        text: "Successfully assigned permissions to the role.",
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-
+                    validationAlert('Role Permission Mapping', 'Successfully assigned permissions to the role.', 'success', 2000, 'OK');
                     // Reset form
                     document.getElementById('roleId').value = '';
                     document.querySelectorAll('input[name="permissions[]"]').forEach(function(checkbox) {
@@ -364,14 +308,8 @@ $.ajaxSetup({
             },
             error: function(xhr) {
                 $('#createRolePermissionMappingBtn').prop('disabled', false);
-                if (xhr.responseJSON) {
-                    Swal.fire({
-                        title: 'Error',
-                        text: xhr.responseJSON.message,
-                        icon: 'error',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
+                if (xhr.responseText) {
+                    validationAlert('Error', xhr.responseJSON.message, 'error', 5000, "OOP's");
                     console.log(xhr.responseJSON.message);
                 }
             }
@@ -380,6 +318,95 @@ $.ajaxSetup({
 
 // Role permission mapping js end --
 
+
+
+
+
+// Route permission mapping js start --
+    $(document).ready(function() {
+        $('#routeId').select2({
+            placeholder: "Select Routes",
+            closeOnSelect: false,
+            allowClear: true
+        });
+
+        $('#routeUpdateId').select2({
+            placeholder: "Select Routes",
+            closeOnSelect: false,
+            allowClear: true
+        });
+    });
+
+    function saveRoutePermissionMapping(event) {
+        event.preventDefault();
+        $('#createRoutePermissionMappingBtn').prop('disabled', true);
+        let permissionId = document.getElementById('permissionId').value;
+        let routeIds = $('#routeId').val() || [];
+
+        if (permissionId === '') {
+            validationAlert('Missing permission', 'Please select a permission.', 'error', 2000, 'OK');
+            $('#createRoutePermissionMappingBtn').prop('disabled', false);
+            return false;
+        }
+        if (routeIds.length === 0) {
+            validationAlert('Missing route', 'Please select at least one route.', 'error', 2000, 'OK');
+            $('#createRoutePermissionMappingBtn').prop('disabled', false);
+            return false;
+        }
+
+        saveRoutePermission(permissionId, routeIds);
+    }
+
+    function saveRoutePermission(permissionId, routeIds) {
+        $('#addRolePermissionMapping').modal('hide');
+        let url = 'admin/route-permission-mapping/save';
+        $.ajax({
+            url: url,
+            method: "POST",
+             data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                permission_id: permissionId,
+                route_name: routeIds
+            },
+            success: function(res) {
+                if (res.status === 'success') {
+                    $('#createRoutePermissionMappingBtn').prop('disabled', false);
+                    validationAlert('Route Permission Mapping', 'Successfully assigned routes to the permission.', 'success', 2000, "OK");
+                    $('#routeId').val('').trigger('change');
+                    document.getElementById('permissionId').value = '';
+                    document.querySelectorAll('input[name="route_name[]"]').forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
+                    $('#addRoutePermissionMapping').modal('hide');
+                }
+            },
+            error: function(xhr) {
+                $('#createRolePermissionMappingBtn').prop('disabled', false);
+                if (xhr.responseText) {
+                    validationAlert('Error', xhr.responseJSON.message, 'error', 5000, "OOP's");
+                }
+            }
+        });
+    }
+
+    function editRoutePermissionMapping(button) {
+        var id = button.getAttribute('data-id');
+        var permissionId = button.getAttribute('data-permission_id');
+        var routeNames = JSON.parse(button.getAttribute('data-route_name')) || [];
+        // document.getElementById('hiddenRoutePermissionId').value = id;
+        // document.getElementById('permissionUpdateId').value = permissionId;
+        // $('#routeUpdateId').val(routeNames).trigger('change');
+
+        // Hidden input me id set karo
+        document.querySelector("#editRoutePermission input[name='id']").value = id;
+
+        // Permission select set karo
+        $("#permissionUpdateId").val(permissionId).trigger("change");
+
+        // Route select set karo (multiple)
+        $("#routeUpdateId").val(routeNames).trigger("change");
+    }
+// Route permission mapping js end --
 
 
 
@@ -430,10 +457,10 @@ $.ajaxSetup({
             processData: false,
             contentType: false,
             success: function (response) {
-                Swal.fire('Success', response.message, 'success');
+                validationAlert('Success', 'Documents uploaded successfully', 'success', 2000, false);
             },
             error: function (xhr) {
-                Swal.fire('Error', 'Something went wrong', 'error');
+                validationAlert('Error', 'Failed to upload documents', 'error', 5000, false);
             }
         });
     }

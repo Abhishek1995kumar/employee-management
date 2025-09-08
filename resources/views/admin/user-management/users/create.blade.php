@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title') {{ __('User')}} @endsection
+@section('title') {{ __('Employee')}} @endsection
 
 @section('header')
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,7 +8,7 @@
 @endsection
 
 @section('breadcrumb')
-<h1 class="d-flex flex-column text-dark fw-bold fs-3 mb-0">{{ __('Add User')}}</h1>
+<h1 class="d-flex flex-column text-dark fw-bold fs-3 mb-0">{{ __('Add Employee')}}</h1>
 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 pt-1">
     <li class="breadcrumb-item text-muted">
         <a href="{{url('/admin/dashboard')}}" class="text-muted text-hover-primary">{{ __('Dashboard')}}</a>
@@ -17,12 +17,12 @@
         <span class="bullet bg-gray-200 w-5px h-2px"></span>
     </li>
     <li class="breadcrumb-item text-muted">
-        <a href="{{url('/admin/permission')}}" class="text-muted text-hover-primary">{{ __('User')}}</a>
+        <a href="{{url('/admin/user')}}" class="text-muted text-hover-primary">{{ __('Employee')}}</a>
     </li>
     <li class="breadcrumb-item">
         <span class="bullet bg-gray-200 w-5px h-2px"></span>
     </li>
-    <li class="breadcrumb-item text-dark">{{ __('Add User')}}</li>
+    <li class="breadcrumb-item text-dark">{{ __('Add Employee')}}</li>
 </ul>
 @endsection
 
@@ -97,7 +97,7 @@
                                         <div class="col-md-6 mb-4" id="emailDiv">
                                             <div class="form-group">
                                                 <label class="required fs-6 fw-semibold mb-2">{{ __('Email')}}</label>
-                                                <input type="text" name="email" id="email" oninput="stringValidation(event)" class="form-control" maxlength="200" placeholder="email">
+                                                <input type="text" name="email" id="email"  class="form-control" maxlength="200" placeholder="email">
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4" id="date_of_birthDiv">
@@ -1223,16 +1223,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                                    <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Shift Applicable')}}</label>
-                                                        <select name="shift_applicable" class="form-select" id="shiftApplicable" data-control="select2" data-placeholder="Select Shift Applicable">
-                                                            <option></option>
-                                                            <option value="1">{{ __('Yes')}}</option>
-                                                            <option value="2">{{ __('No')}}</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                         <div class="mt-3">
@@ -1305,11 +1295,13 @@
                                                 </div>
                                                 <div class="col-md-6 mb-4" id="select_sub_asset_id_div">
                                                     <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Asset Name')}}</label>
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Sub Asset Name')}}</label>
                                                         <select name="sub_asset_id" class="form-select" id="select_sub_asset_id" data-control="select2" data-placeholder="Select sub asset">
                                                             <option></option>
-                                                            <option value="Software">{{ __('Software')}}</option>
-                                                            <option value="Hardware">{{ __('Hardware')}}</option>
+                                                            <option value="1">{{ __('Operation Syatem')}}</option>
+                                                            <option value="2">{{ __('Productivity Tool')}}</option>
+                                                            <option value="3">{{ __('Antivirus Tool')}}</option>
+                                                            <option value="4">{{ __('Database System')}}</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -1493,7 +1485,152 @@
                                 </div>
                             </div>
                         </form>
+                        <div class="card-body table-responsive">
+                            <table class="table align-middle table-row-dashed fs-6 gy-5" id="assigned_asset_list_table">
+                                <thead>
+                                    <tr class="text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                        <th>{{ __('Asset Name')}}</th>
+                                        <th>{{ __('Sub Asset Name')}}</th>
+                                        <th>{{ __('Action')}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fw-semibold text-gray-600" id="assigned_asset_list_body">
+                                    <!-- Dynamic rows will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Document Upload -->
+            <div class="tab-pane" id="tab_1_8">
+                <form id="documentDetailsForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-lg-12" id="documentDetailsDiv">
+                            <!-- Make sure this div wraps only the table -->
+                            <div class="table-responsive" style="overflow-x: auto;">
+                                <table class="table table-bordered" id="documentDetailsTable" >
+                                    <thead>
+                                        <tr>
+                                            <th >{{ __('Action')}}</th>
+                                            <th >{{ __('Document Type')}}</th>
+                                            <th >{{ __('Document')}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="documentDetails_1">
+                                            <td class="col-lg-1" >
+                                                <button type="button" class="btn btn-sm btn-info text-center" onclick="addMoreDocumentDetails(event)">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </td>
+                                            <td class="col-lg-3">
+                                                <select name="document_type" class="form-select" id="document_type" data-control="select2" data-placeholder="Select document type" >
+                                                    <option></option>
+                                                    <option value="marksheet">{{ __('Marksheet')}}</option>
+                                                    <option value="certification">{{ __('Certification')}}</option>
+                                                    <option value="pan_card">{{ __('Pan Card')}}</option>
+                                                    <option value="aadhar_card">{{ __('Aadhar Card')}}</option>
+                                                    <option value="room_rent_agreement">{{ __('Room Rent Agreement')}}</option>
+                                                </select>
+                                            </td>
+                                            <td class="col-lg-6">
+                                                <input type="file" name="employee_personal_documents[]" id="employee_personal_documents" class="form-control fileInput" onchange="showUploadDocumentImage(this)" placeholder="Upload document" oninput="validateFileType(event)" />
+                                                <div class="previewContainer" style="display: none;">
+                                                    <img class="imagePreview" style="width: 100px; height: 100px; display: none;" />
+                                                    <span onclick="removePreview(this)" style="position: absolute; top: -10px; right: -10px; cursor: pointer; background: red; color: white; border-radius: 50%; padding: 0 5px;"><i class="bi bi-x"></i></span>
+                                                    <iframe class="docPreview" style="width: 100px; height: 100px; display: none;"></iframe>
+                                                    <div class="iconPreview" style="width: 100px; height: 100px; text-align: center; line-height: 100px; border: 1px solid #ccc;">📄</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Buttons outside scroll -->
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-warning" >{{ __('Previous')}}</button>
+                                <button type="button" class="btn btn-success">{{ __('Next')}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="document_list_table">
+                        <thead>
+                            <tr class="text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                <th>{{ __('Document Type')}}</th>
+                                <th>{{ __('Document')}}</th>
+                                <th>{{ __('Action')}}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fw-semibold text-gray-600" id="document_list_body">
+                            <!-- Dynamic rows will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Document Upload -->
+            <div class="tab-pane" id="tab_1_9">
+                <form id="punchInForm" action="{{ route('admin.user.save') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4" id="employee_last_working_date_div">
+                                            <div class="form-group">
+                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Employee Last Working Day at office ')}}</label>
+                                                <div class="form-group">
+                                                    <input type="text" name="employee_last_working_date" id="employee_last_working_date" oninput="openFlatpickr(event)" class="form-control" placeholder="employee last working date">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4" id="employee_note_for_last_day_div">
+                                            <div class="form-group">
+                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Note')}}</label>
+                                                <div class="form-group">
+                                                    <input type="text" name="employee_note_for_last_day" id="employee_note_for_last_day" oninput="stringValidation(event)" class="form-control" placeholder="employee note for last day">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4" id="employee_attachment_for_last_day_div">
+                                            <div class="form-group">
+                                                <label class="required fs-6 fw-semibold mb-2">{{ __('Attachment')}}</label>
+                                                <div class="form-group">
+                                                    <input type="file" name="employee_attachment_for_last_day" id="employee_attachment_for_last_day" oninput="validateFileType(event)" class="form-control" placeholder="employee employee_attachment for last day">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-warning">{{ __('Previous')}}</button>
+                                    <button type="button" class="btn btn-success">{{ __('Next')}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="last_working_day_list_table">
+                        <thead>
+                            <tr class="text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                <th>{{ __('Last Working Day')}}</th>
+                                <th>{{ __('Note')}}</th>
+                                <th>{{ __('Attachment')}}</th>
+                                <th>{{ __('Action')}}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fw-semibold text-gray-600" id="last_working_day_list_body">
+                            <!-- Dynamic rows will be added here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1503,5 +1640,7 @@
 
 @section('scripts')
 <script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
+<script src="{{ asset('assets/js/custom/dashboard.js') }}"></script>
+<script src="{{ asset('assets/js/custom/comman.js') }}"></script>
 <script src="{{ asset('assets/js/jquery-date.js') }}"></script>
 @endsection
