@@ -181,7 +181,7 @@
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Permission')}}</label>
                                                         <select name="permission_id" class="form-select" id="permissionId" data-control="select2" data-placeholder="Select permission">
-                                                            
+                                                            <option value=""></option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -189,7 +189,7 @@
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Route')}}</label>
                                                         <select name="route_name[]" class="form-select" id="routeId" multiple="multiple" data-control="select2" data-placeholder="Select route">
-                                                            @if($authenticatedRoutes)
+                                                            <!-- @if($authenticatedRoutes)
                                                                 @foreach($authenticatedRoutes as $route)
                                                                     @php
                                                                         // Route URL split karo
@@ -204,7 +204,8 @@
                                                                 @endforeach
                                                             @else
                                                                 <option disabled>{{ __('No Route Available')}}</option>
-                                                            @endif
+                                                            @endif -->
+                                                            <option value=""></option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -319,13 +320,21 @@
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(response) {
-                            let res = response.permissions;                            
+                            let res = response.permissions;
                             $('#permissionId').empty(); // pehle clear karna hai
                             if(response.status === 'success') {
-                                for(var i=0; i < res.length; i++) {
-                                    $('#permissionId').append('<option></option><option value="'+permissionIds[i]+'">'+permissionNames[i]+'</option>');
-                                }
+                                console.log(res);
                                 
+                                // Agar res ek object hai, toh Object.values ka use karo
+                                if (Array.isArray(res)) {
+                                    for (var i = 0; i < res.length; i++) {
+                                        $('#permissionId').append('<option value="' + res[i].id + '">' + res[i].name + '</option>');
+                                    }
+                                } else {
+                                    Object.keys(res).forEach(function(key) {
+                                        $('#permissionId').append('<option value="' + key + '">' + res[key].name + '</option>');
+                                    });
+                                }
                             } else {
                                 $('#permissionId').append('<option disabled>No permissions found</option>');
                             }
@@ -336,9 +345,6 @@
                     $('#permissionId').append('<option disabled>Select role first</option>');
                 }
             });
-
-            
-            
         });
     </script>
 

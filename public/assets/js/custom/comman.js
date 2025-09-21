@@ -5,7 +5,75 @@ $.ajaxSetup({
     }
 });
 
-// sweetalert
+// Common function to load records in a table with action buttons
+function loadDatabaseRecord(url, columns, tableId, editFn, deleteFn, showFn, editModalId = '', emptyMsg = 'No records found') {
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(res) {
+            let tbody = '';
+            if (res && res.data && res.data.length > 0) {
+                $.each(res.data, function(_, record) {
+                    tbody += '<tr>';
+                    columns.forEach(function(column) {
+                        if (column === 'action') {
+                            tbody += `<td class="text-center">
+                                <button type="button" 
+                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 editBtn" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="${editModalId}" 
+                                    data-id="${record.id}" 
+                                    data-name="${record.name}" 
+                                    data-address="${record.user_address}">
+                                    ✏️
+                                </button>
+                                <button type="button" 
+                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 deleteBtn" 
+                                    data-id="${record.id}" 
+                                    data-name="${record.name}">
+                                    🗑️
+                                </button>
+                                <button type="button" 
+                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 showBtn" 
+                                    data-id="${record.id}" 
+                                    data-name="${record.name}">
+                                    👁️
+                                </button>
+                            </td>`;
+                        } else {
+                            tbody += `<td class="text-center">${record[column] ?? ''}</td>`;
+                        }
+                    });
+                    tbody += '</tr>';
+                });
+            } else {
+                tbody = `<tr><td colspan="${columns.length}" class="text-center">${emptyMsg}</td></tr>`;
+            }
+            $(`${tableId} tbody`).html(tbody);
+
+            // Attach events dynamically
+            if (typeof editFn === 'function') {
+                $(`${tableId} .editBtn`).off('click').on('click', function () {
+                    editFn(this);
+                });
+            }
+            if (typeof deleteFn === 'function') {
+                $(`${tableId} .deleteBtn`).off('click').on('click', function (e) {
+                    deleteFn(e, this);
+                });
+            }
+            if (typeof showFn === 'function') {
+                $(`${tableId} .showBtn`).off('click').on('click', function (e) {
+                    showFn(e, this);
+                });
+            }
+        }
+    });
+}
+
+
+
+// sweetalert 
 function validationAlert(title, text, icon, timer, confirmButtonText, showConfirmButton) {
     Swal.fire({
         title: title,
@@ -13,12 +81,13 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
         icon: icon,
         timer: timer,
         confirmButtonText: confirmButtonText,
-        showConfirmButton: showConfirmButton,
+        showConfirmButton: showConfirmButton === undefined ? true : showConfirmButton,
     });
 }
 
 
-// Common function start 
+
+// Accept Only Number function start 
 const acceptOnlyNumber = (event) => {
     const input = event.target;
     console.log(`Input field: ${input.placeholder || input.name}`, `Value: ${input.value}`);
@@ -35,6 +104,8 @@ const acceptOnlyNumber = (event) => {
     }
 };
 
+
+// Accept Only String function start
 const stringValidation = (event) => {
     const input = event.target;
     console.log(`Input field: ${input.placeholder || input.name}`, `Value: ${input.value}`);
@@ -54,6 +125,7 @@ const stringValidation = (event) => {
 };   
 
 
+// flatpickr calendar function start
 const openFlatpickr = (event) => {
     const input = event.target;
     if (input.type !== 'text') {
@@ -72,6 +144,8 @@ const openFlatpickr = (event) => {
     input._flatpickr.open();
 };
 
+
+// Show Three Month Befrore From Crruent Month And One Month After function start
 const showThreeMonthBefroreFromCrruentMonthAndOneMonthAfter = (event) => {
     const input = event.target;
     if (input.type !== 'text') {
@@ -95,6 +169,8 @@ const showThreeMonthBefroreFromCrruentMonthAndOneMonthAfter = (event) => {
     input._flatpickr.open();
 }
 
+
+// Time Picker function start
 const timePicker = (event) => {
     const input = event.target;
     if (input.type !== 'text') {
@@ -116,6 +192,8 @@ const timePicker = (event) => {
     }
     input._flatpickr.open();
 }
+
+
 
 // Automatically calculate hours from the date input
 document.addEventListener('DOMContentLoaded', function() {
@@ -143,6 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('out_time_outdoor').addEventListener('change', calculateTotalHour);
 });
 
+
+// Multi Select Flatpickr Calendar function start
 const multiSelectFlatpickrCalendar = (event) => {
     const input = event.target;
     if (input.type !== 'text') {
@@ -170,6 +250,7 @@ const multiSelectFlatpickrCalendar = (event) => {
 };
 
 
+
 // agar date picker automatically open hi rakhna hai tab onclick ki jagah onfocus use karein
 const initFlatpickrCalendar = (event) => {
     const input = document.getElementById('apply_leave');
@@ -189,11 +270,9 @@ const initFlatpickrCalendar = (event) => {
     }
     input._flatpickr.open();
 };
-// document.getElementById('applyLeave').addEventListener('shown.bs.modal', function () {
-//     initFlatpickrCalendar();
-// });
 
 
+// Handle Checkbox Selection and Show/Hide Divs
 function handleTypeCheckbox(type) {
     let fixedCheckbox = document.getElementById('select_fixed_type');
     let percentageCheckbox = document.getElementById('select_percentage_type');
@@ -281,6 +360,8 @@ function handleTypeCheckbox(type) {
     // Handle Leaves Carry Forward checkboxes end --
 }
 
+
+// Show/Hide Div based on checkbox state
 const ifcheckThanShowDiv = (checkboxElement, divId) => {
     let targetDiv = document.getElementById(divId);
     console.log(`Checkbox: ${checkboxElement.name}`);

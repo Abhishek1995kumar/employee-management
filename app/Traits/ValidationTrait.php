@@ -359,14 +359,15 @@ trait ValidationTrait {
                 $permissions = Permission::where('name', $data['permission'])->first();
                 $rules = [
                     'permission' => ['required', 'string', 'max:255'],
-                    // 'description' => ['string', 'max:255'],
+                    'module' => ['integer', 'required'],
                 ];
 
                 $messages = [
                     'permission.required' => 'The name field is required.',
                     'permission.string' => 'The name must be a string.',
                     'permission.max' => 'The name may not be greater than 255 characters.',
-                    // 'description.string' => 'The description must be a string.',
+                    'module.required' => 'The module name field is required.',
+                    'module.integer' => 'The module name must be a integer.',
                     // 'description.max' => 'The description may not be greater than 255 characters.',
                     // 'department_id.required' => 'The department field is required.',
                 ];
@@ -387,20 +388,18 @@ trait ValidationTrait {
                             if (strlen($value) > $max) {
                                 $errors[$field][] = $messages["{$field}.max"];
                             }
+                        } elseif ($rule === 'integer' && !is_string($value)) {
+                            $errors[$field][] = $messages["{$field}.integer"];
+
                         }
                     }
                 }
 
                 if(!empty($permissions)) {
-                    $errors['permission'][] = 'Already permission exists, please enter anyother permission name.';
+                    $errors['permission'][] = 'Permission name is already exists, please enter anyother permission name.';
                 }
 
                 return $errors;
-
-                // return response()->json([
-                //     'success' => empty($errors),
-                //     'errors' => $errors
-                // ], empty($errors) ? 200 : 422);
 
             } catch (Exception $e) {
                 return response()->json([
@@ -414,11 +413,13 @@ trait ValidationTrait {
             try {
                 $rules = [
                     'permission' => ['string', 'max:255'],
+                    'module' => ['integer']
                 ];
 
                 $messages = [
                     'permission.string' => 'The name must be a string.',
                     'permission.max' => 'The name may not be greater than 255 characters.',
+                    'module.integer' => 'The module name must be a integer.',
                 ];
 
                 $errors = [];
@@ -434,6 +435,9 @@ trait ValidationTrait {
                             if (strlen($value) > $max) {
                                 $errors[$field][] = $messages["{$field}.max"];
                             }
+                        } elseif ($rule === 'integer' && !is_string($value)) {
+                            $errors[$field][] = $messages["{$field}.integer"];
+
                         }
                     }
                 }

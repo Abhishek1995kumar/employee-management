@@ -66,7 +66,7 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                @if(Auth::user()->hasPermissionToRoute('admin/role-permission-mapping'))
+                @if(Auth::user()->hasPermissionToRoute('admin/mapping-role-permission'))
                     <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addRolePermissionMapping" class="btn btn-primary"  id="createRolePermissionMapping">
                         {{ __('Add Role Permission Mapping')}}
                     </button>
@@ -97,7 +97,7 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                @if(Auth::user()->hasPermissionToRoute('admin/role-permission-mapping/update'))
+                                @if(Auth::user()->hasPermissionToRoute('admin/mapping-role-permission/update'))
                                     <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" 
                                         data-bs-toggle="modal" data-bs-target="#editRole" 
                                         data-id="{{ $permission->id }}" 
@@ -116,7 +116,7 @@
                                     </button>
                                 @else
                                 @endif
-                                @if(Auth::user()->hasPermissionToRoute('admin/role-permission-mapping/delete'))
+                                @if(Auth::user()->hasPermissionToRoute('admin/mapping-role-permission/delete'))
                                     <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" onclick="deleteRole({{ $permission->id }})">
                                         <span class="svg-icon svg-icon-3">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
