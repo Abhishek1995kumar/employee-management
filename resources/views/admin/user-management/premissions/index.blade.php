@@ -79,12 +79,12 @@
             </div> -->
         </div>
         <div class="card-body table-responsive">
-            <table class="table align-middle table-row-dashed fs-6 gy-5">
+            <table class="table align-middle table-row-dashed fs-6 gy-5" id="permissionTable">
                 <thead>
                     <tr class="text-gray-400 fw-bold fs-7 text-uppercase gs-0">
                         <th class="text-center">{{ __('Id')}}</th>
                         <th class="text-center">{{ __('Name')}}</th>
-                        <th class="text-center">{{ __('Route Pattern')}}</th>
+                        <th class="text-center">{{ __('Module Name')}}</th>
                         <th class="text-center">{{ __('Action')}}</th>
                     </tr>
                 </thead>
@@ -93,7 +93,7 @@
                         <tr>
                             <td class="text-center">{{ $permission->id }}</td>
                             <td class="text-center">{{ $permission->name }}</td>
-                            <td class="text-center">{{ $permission->route_pattern }}</td>
+                            <td class="text-center">{{ $permission->module_name }}</td>
                             <td class="text-center">
                                 @if(Auth::user()->hasPermissionToRoute('admin/permission/update'))
                                     <button type="button" 
@@ -102,7 +102,8 @@
                                         data-bs-target="#editPermission" 
                                         data-id="{{ $permission->id }}" 
                                         data-name="{{ $permission->name }}" 
-                                        data-route-pattern="{{ $permission->route_pattern }}"
+                                        data-module-id="{{ $permission->module_id }}"
+                                        data-module-name="{{ $permission->module_name }}"
                                         onclick="editPermission(this)">
                                         <span class="svg-icon svg-icon-3">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -117,7 +118,7 @@
                                 @else
                                 @endif
                                 @if(Auth::user()->hasPermissionToRoute('admin/permission/delete'))
-                                    <button class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 action-select delete_permission" data-id="{{ $permission->id }}" data-name="{{ $permission->name }}" data-route-pattern="{{ $permission->route_pattern }}">
+                                    <button class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 action-select delete_permission" data-id="{{ $permission->id }}" data-name="{{ $permission->name }}" data-module-name="{{ $permission->module_name }}"  data-module-id="{{ $permission->module_id }}" onclick="deletePermission(event)">
                                         <span class="svg-icon svg-icon-3">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6V19ZM8 9H16V19H8V9Z" fill="currentColor"/>
@@ -129,7 +130,7 @@
                                 @else
                                 @endif
                                 @if(Auth::user()->hasPermissionToRoute('admin/permission/show'))
-                                    <button class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 action-select" onclick="showPermissio(event)" data-id="{{ $permission->id }}" data-name="{{ $permission->name }}" data-created_by="{{ $permission->created_by }}" data-created_at="{{ $permission->created_at }}">
+                                    <button class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 action-select" onclick="showPermission(event)" data-id="{{ $permission->id }}" data-name="{{ $permission->name }}" data-created_by="{{ $permission->created_by }}" data-created_at="{{ $permission->created_at }}" data-module-name="{{ $permission->module_name }}" data-module-id="{{ $permission->module_id }}" >
                                         <span class="svg-icon svg-icon-3">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
                                             <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8a13.133 13.133 0 0 1-1.66 2.043C11.879 11.332 10.12 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.133 13.133 0 0 1 1.172 8z"/>
@@ -182,16 +183,26 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
+                                                <div class="col-md-6 mb-4 " id="routeNameDiv">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('module Name')}}</label>
+                                                        <select name="module_id" class="form-select" id="moduleName" data-control="select2" data-placeholder="Select module name">
+                                                            <option></option>
+                                                            @if($modules)
+                                                                @foreach($modules as $module)
+                                                                    <option value="{{ $module->id }}">{{ $module->name }}</option>
+                                                                @endforeach
+                                                            @else
+                                                                <span class="badge badge-light-danger">{{ __('No Module Available')}}</span>
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                </div>
+
                                                 <div class="col-md-6 mb-4 " id="permissionNameDiv">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Permission')}}</label>
                                                         <input type="text" name="permission" id="permissionName" class="form-control" maxlength="100" placeholder="Enter permission name" >
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 mb-4 " id="routeNameDiv">
-                                                    <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Route Name')}}</label>
-                                                        <input type="text" name="route_pattern" id="routePattern" class="form-control" maxlength="100" placeholder="Enter route name" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -233,16 +244,26 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
+                                                <div class="col-md-6 mb-4 " id="updateModuleNameDiv">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Route Name')}}</label>
+                                                        <select name="module_id" class="form-select" id="updateModuleName" data-control="select2" data-placeholder="Select module name">
+                                                            <option></option>
+                                                            @if($modules)
+                                                                @foreach($modules as $module)
+                                                                    <option value="{{ $module->id }}">{{ $module->name }}</option>
+                                                                @endforeach
+                                                            @else
+                                                                <span class="badge badge-light-danger">{{ __('No Module Available')}}</span>
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                </div>
+
                                                 <div class="col-md-6 mb-4 " id="updatePermissionNameDiv">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Permission')}}</label>
                                                         <input type="text" name="permission" id="updatePermissionName" class="form-control" maxlength="100" placeholder="Enter role name" >
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 mb-4 " id="updateRouteNameDiv">
-                                                    <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Route Name')}}</label>
-                                                        <input type="text" name="route_pattern" id="updateRoutePattern" class="form-control" maxlength="100" placeholder="Enter route name" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -323,8 +344,9 @@
 @endsection
 
 @section('scripts')
-
+<script src="{{asset('assets/js/custom/comman.js')}}"></script>
 <script src="{{asset('assets/js/custom/roles/role.js')}}"></script>
+
 <script>
     let debounceTimer;
     function fetchData(page = 1, search = '') {

@@ -27,7 +27,7 @@ class RoutePermissionMappingController extends Controller {
                                         FROM route_permission rp LEFT JOIN permissions p ON p.id = rp.permission_id 
                                         LEFT JOIN users u ON u.id = rp.created_by
                                     ");
-
+        
         $routes = Route::getRoutes();
         $middlewareGroup = 'isAdmin';
         $authenticatedRoutes = [];
@@ -71,7 +71,7 @@ class RoutePermissionMappingController extends Controller {
                     'route_pattern' => $item->route_pattern
                 ]
             ];
-        }); 
+        });
         
         return response()->json([
             'status' => 'success',

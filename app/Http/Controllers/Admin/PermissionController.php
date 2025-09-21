@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Throwable;
 use Exception;
+use Dom\Document;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
@@ -11,20 +12,18 @@ use App\Models\Admin\Permission;
 use Illuminate\Support\Facades\DB;
 use App\Traits\CommanFunctionTrait;
 use App\Http\Controllers\Controller;
-use Dom\Document;
 use Illuminate\Support\Facades\Auth;
 
 class PermissionController extends Controller {
     use ValidationTrait, CommanFunctionTrait;
     public function index(Request $request) {
+        $moduleNames = DB::select("SELECT id, name FROM modules WHERE deleted_at IS NULL ORDER BY id DESC");
         $search = $request->input('search');
         $page = $request->input('page', 1);
         $limit = 4;
         $offset = ($page - 1) * $limit;
-
-        $query = "SELECT id, name, route_pattern, created_by, created_at FROM permissions WHERE deleted_at IS NULL";
+        $query = "SELECT id, name, module_name, module_id, created_by, created_at FROM permissions WHERE deleted_at IS NULL ORDER BY id DESC";
         $countQuery = "SELECT COUNT(*) as total FROM permissions WHERE deleted_at IS NULL";
-
         $params = [];
         if (!empty($search)) {
             $searchParam = '%' . $search . '%';
@@ -38,13 +37,23 @@ class PermissionController extends Controller {
         $permissions = DB::select($query, $params);
         $totalData = DB::select($countQuery, $params)[0]->total;
         $totalPages = ceil($totalData / $limit);
+        // if ($request->ajax()) {
+        //     return view('admin.user-management.premissions.ajax-data', [
+        //         'permissions' => $permissions, 
+        //         'page' => $page, 
+        //         'totalPages' => $totalPages,
+        //     ])->render();
+        // }
 
-        if ($request->ajax()) {
-            return view('admin.user-management.premissions.ajax-data', compact('permissions', 'page', 'totalPages'))->render();
-        }
-
-        return view('admin.user-management.premissions.index', compact('permissions', 'page', 'totalPages', 'search'));
+        return view('admin.user-management.premissions.index', [
+            'permissions' => $permissions, 
+            'page' => $page, 
+            'totalPages' => $totalPages,
+            'search' => $search,
+            'modules' => $moduleNames,
+        ]);
     }
+
 
     public function save(Request $request) {
         try {
@@ -53,34 +62,51 @@ class PermissionController extends Controller {
             if($validator) {
                 return response()->json([
                     'success' => false,
-                    'message' => $validator
+                    'message' => $validator,
+                    'error' => 1
                 ], 404);
             }
-
+            $mId = (int) $data['module'];
+            $module = DB::select("SELECT name FROM modules WHERE id = ? AND deleted_at IS NULL", [$mId]);
+            if (!$module) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid module name selected.',
+                    'error' => 2
+                ], 400);
+            }
+            $moduleName = '';
+            foreach($module as $mod) {
+                $moduleName = $mod->name;
+            }
             $permission = new Permission();
             $permission->name = trim(ucwords($request->permission));
             $permission->slug = str_replace(' ', '_', strtolower($request->permission));
-            $permission->route_pattern = str_replace(' ', '', strtolower($request->route_pattern));
+            // $permission->module_name = $module[0]->name;
+            $permission->module_name = $moduleName;
+            $permission->module_id = (int) $data['module'];
             $permission->status = 1;
-            $permission->updated_at = NULL;
             $permission->created_by = Auth::user()->id;
             $permission->created_at = Carbon::now();
-            $permission->updated_by = NULL;
-            $permission->deleted_by = NULL;
+            $permission->updated_at = NULL;
             $permission->save();
             $this->storeLog('Permission', 'save', 'Permission');
             return response()->json([
                 'success' => true,
-                'message' => 'New permission created successfully.'
+                'message' => 'New permission created successfully.',
+                'error' => 0
             ], 200);
 
         } catch (Exception $e) {
             return response()->json([
                 'success' => false, 
-                'message' => __('Error creating permission: ') . $e->getMessage()
+                'message' => __('Error creating permission: ') . $e->getMessage(),
+                'error' => 3
             ], 500);
         }
     }
+
+    
 
     public function update(Request $request) {
         try {
@@ -89,26 +115,46 @@ class PermissionController extends Controller {
             if($validator) {
                 return response()->json([
                     'success' => false,
-                    'message' => $validator
+                    'message' => $validator,
+                    'error' => 1
                 ], 404);
             }
+
+            $mId = (int) $data['module'];
+            $module = DB::select("SELECT name FROM modules WHERE id = ? AND deleted_at IS NULL", [$mId]);
+            if (!$module) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid module name selected.',
+                    'error' => 2
+                ], 400);
+            }
+            $moduleName = '';
+            foreach($module as $mod) {
+                $moduleName = $mod->name;
+            }
+
             $id = (int) $data['id'];
             if (!$id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Permission ID is required.'
+                    'message' => 'Permission ID is required.',
+                    'error' => 3
                 ], 400);
             }
             $permission = Permission::where('id', $request->id)->whereNull('deleted_at')->first();
             if (!$permission) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Permission not found.'
+                    'message' => 'Permission not found.',
+                    'error' => 4
                 ], 404);
             }
             
             $permission->name = $data['permission'];
             $permission->slug = str_replace(' ', '_', strtolower($data['permission']));
+            $permission->module_name = $moduleName ?? $permission->module_name;
+            $permission->module_id = (int) $data['module'] ?? $permission->module_id;
             $permission->updated_by = Auth::user()->id;
             $permission->updated_at = Carbon::now();
             $permission->save();
@@ -116,13 +162,15 @@ class PermissionController extends Controller {
             $this->storeLog('Role', 'update', 'Role');
             return response()->json([
                 'success' => true,
-                'message' => 'Permission updated successfully.'
+                'message' => 'Permission updated successfully.',
+                'error' => 0
             ], 200);
 
         } catch(Throwable $e) {
             return response()->json([
                 'success' => false, 
-                'message' => __('Error updating permission: ') . $e->getMessage()
+                'message' => __('Error updating permission: ') . $e->getMessage(),
+                'error' => 5
             ], 500);
         }
     }

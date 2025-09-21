@@ -4,17 +4,7 @@ $.ajaxSetup({
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
 });
-// sweetalert
-function validationAlert(title, text, icon, timer, confirmButtonText, showConfirmButton) {
-    Swal.fire({
-        title: title,
-        text: text,
-        icon: icon,
-        timer: timer, // Only set timer if confirm button is hidden
-        confirmButtonText: confirmButtonText,
-        showConfirmButton: showConfirmButton === undefined ? true : showConfirmButton,
-    });
-}
+
 
 // Role Js Start --
     // function fetchRoles() {
@@ -144,54 +134,188 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
 // Role Js End --
 
 
+// Module JS Start --
+    function saveModule(e) {
+        e.preventDefault();
+        $('.moduleBtn').prop('disabled', true);
+        let moduleName = $('#moduleName').val();
+        if(moduleName === '') {
+            validationAlert('Missing module name', 'Please enter a module name.', 'error', 2000, 'OK');
+            $('.moduleBtn').prop('disabled', false);
+            return false;
+        }
+        submitModule(moduleName)
+    }
+
+    function submitModule(moduleName) {
+        $('.moduleBtn').prop('disabled', false);
+        $('#moduleName').val('');
+        let url = 'admin/module/save';
+        let indexUrl = 'admin/module';
+        let columns = ['id', 'name', 'action']; // yaha aapke module table ke columns
+        let tableId = '#moduleTable'; // yaha aapke module table ka ID
+        $('#addModule').modal('hide');
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                name: moduleName
+            },
+            success: function(res) {
+                if(res.success === true) {
+                    validationAlert('Role created', 'Successfully created a new module.', 'success', 2000, 'OK');
+                    setTimeout(function() {
+                        loadDatabaseRecord(
+                            indexUrl, columns, tableId,
+                            function (btn) {   // edit function
+                                let id = $(btn).data('id');
+                                let name = $(btn).data('name');
+                                $('#editModuleId').val(id);
+                                $('#editModuleName').val(name);
+                            },
+                            function (e, btn) {
+                                let id = $(btn).data('id');
+                                if(confirm('Delete this record?')) {
+                                    // ajax call for delete
+                                    console.log('Deleting', id);
+                                }
+                            },
+                            function (e, btn) {  // show function
+                                let id = $(btn).data('id');
+                                let name = $(btn).data('name');
+                                alert('Showing record: ' + id + ' - ' + name);
+                            },
+                            '#editModule' // edit modal id
+                        );
+                    }, 200);
+                }
+            },
+            error: function(xhr) {
+                let response = xhr.responseJSON;
+                if (response) {
+                    switch (response.error) {
+                        case 1:
+                            validationAlert('Validation Error', response.message.errors?.name?.[0] || 'Validation failed', 'error', 5000, "OOP's");
+                            break;
+                        case 2:
+                            validationAlert('Error', 'Url name and module name are not match.', 'error', 5000, "OOP's");
+                            break;
+                        case 3:
+                            validationAlert('Duplicate', 'Module name already exists, please try another one.', 'error', 5000, "OOP's");
+                            break;
+                        default:
+                            validationAlert('Error', response.message || 'Something went wrong.', 'error', 5000, "OOP's");
+                            break;
+                    }
+                } else {
+                    validationAlert('Error', 'Unexpected server error', 'error', 5000, "OOP's");
+                }
+            }
+        });
+    }
+
+// Module JS End --
+
 
 // Permission Js Start --
     function savePermission(e) {
         e.preventDefault();
         $('.permissionBtn').prop('disabled', true);
         let permissionName = $("#permissionName").val();
-        let routePattern = document.getElementById('routePattern').value;
+        let moduleName = document.getElementById('moduleName').value;
         if (permissionName === '') {
             validationAlert('Missing permission name', 'Please enter a permission name.', 'error', 2000, 'OK');
             $('.permissionBtn').prop('disabled', false);
             return false;
         }
-        if (routePattern === '') {
-            validationAlert('Missing route name', 'Please enter a route name.', 'error', 2000, 'OK');
+        if (moduleName === '') {
+            validationAlert('Missing module name', 'Please enter a module name.', 'error', 2000, 'OK');
             $('.permissionBtn').prop('disabled', false);
             return false;
         }
-        submitPermission(permissionName, routePattern);
+        submitPermission(permissionName, moduleName);
     }
 
-    function submitPermission(permissionName, routePattern) {
-        let permissions = permissionName;
-        let routes = routePattern;
+    function submitPermission(permissionName, moduleName) {
         let url = '/admin/permission/save';
+        let indexUrl = 'admin/permission';
+        let columns = ['id', 'name', 'action'];
+        let tableId = '#permissionTable';
         $.ajax({
             url: url,
             method: "POST",
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),
                 permission: permissionName,
-                route_pattern: routePattern
+                module: moduleName
             },
             success: function(res) {
                 if(res.success) {
                     $('.permissionBtn').prop('disabled', false);
                     $('#addPermission').modal('hide');
                     $('#permissionName').val('');
-                    $('#routePattern').val('');
+                    $('#moduleName').val('');
                     validationAlert('Permission created', 'Successfully created a new permission.', 'success', 2000, 'OK');
                     setTimeout(function() {
-                        // fetchPermissions();
+                        window.location.reload();
+                        loadDatabaseRecord(
+                            indexUrl, columns, tableId,
+                            function (btn) {   // edit function
+                                let id = $(btn).data('id');
+                                let name = $(btn).data('name');
+                                $('#editModuleId').val(id);
+                                $('#editModuleName').val(name);
+                            },
+                            function (e, btn) {
+                                let id = $(btn).data('id');
+                                if(confirm('Delete this record?')) {
+                                    // ajax call for delete
+                                    console.log('Deleting', id);
+                                }
+                            },
+                            function (e, btn) {  // show function
+                                let id = $(btn).data('id');
+                                let name = $(btn).data('name');
+                                alert('Showing record: ' + id + ' - ' + name);
+                            },
+                            '#editModule' // edit modal id
+                        );
                     }, 200);
                 }
             },
             error: function(xhr) {
-                if(xhr.responseJSON) {
-                    validationAlert('Already exists ', xhr.responseJSON.message.permission, 'error', 5000, 'OK');
-                    console.log(xhr.responseJSON.message.permission);
+                $('.permissionBtn').prop('disabled', false);
+                let response = xhr.responseJSON;
+                console.log(xhr.responseJSON.message.permission);
+                if(response) {
+                    switch (response.error) {
+                        case 1:
+                            if(xhr.responseJSON.message != '') {
+                                for(let key in xhr.responseJSON.message) {
+                                    if(xhr.responseJSON.message.hasOwnProperty(key)) {
+                                        if(xhr.responseJSON.message[key][0] != '') {
+                                            validationAlert('Validation Error', xhr.responseJSON.message[key][0] || 'Validation failed', 'error', 5000, "OOP's");
+                                        } else if(xhr.responseJSON.message[key][1] != '') {
+                                            validationAlert('Validation Error', xhr.responseJSON.message[key][1] || 'Validation failed', 'error', 5000, "OOP's");
+                                        } else {
+                                            validationAlert('Validation Error', xhr.responseJSON.message[key][2] || 'Validation failed', 'error', 5000, "OOP's");
+                                        }
+                                    }
+                                }
+                            } else if(xhr.responseJSON.message.permission != '') {
+                                validationAlert('Already exist', xhr.responseJSON.message.permission || 'Already exist', 'error', 5000, "OOP's");
+                            }
+                            break;
+                        case 2:
+                            validationAlert('Error', 'Invalid module name selected.', 'error', 5000, "OOP's");
+                            break;
+                        default:
+                            validationAlert('Error', response.message || 'Something went wrong.', 'error', 5000, "OOP's");
+                            break;
+                    }
+                } else {
+                    validationAlert('Error', 'Unexpected server error', 'error', 5000, "OOP's");
                 }
             }
         })
@@ -201,10 +325,19 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
     function editPermission(button) {
         let permissionId = button.getAttribute('data-id');
         let permissionName = button.getAttribute('data-name');
-        let routePattern = button.getAttribute('data-route-pattern');
+        let moduleName = button.getAttribute('data-module-id') || '';
+        let $moduleSelect = $('#updateModuleName');
+        if ($moduleSelect.is('select')) {
+            if ($moduleSelect.find('option[value="' + moduleName + '"]').length > 0) {
+                $moduleSelect.val(moduleName).trigger('change');
+            } else {
+                $moduleSelect.val('').trigger('change');
+            }
+        } else {
+            document.getElementById('updateModuleName').value = moduleName;
+        }
         document.getElementById('hiddenPremissionId').value = permissionId;
         document.getElementById('updatePermissionName').value = permissionName;
-        document.getElementById('updateRoutePattern').value = routePattern;
     }
 
     function updatePermission(e) {
@@ -212,47 +345,72 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
         $('#updatePermissionBtn').prop('disabled', true);
         let permissionId = $("#hiddenPremissionId").val();
         let permissionName = $("#updatePermissionName").val();
-        let routePattern = $("#updateRoutePattern").val();
+        let moduleName = $("#updateModuleName").val();
         if (permissionName === '') {
             validationAlert('Missing permission name', 'Please enter a permission name.', 'error', 2000, 'OK');
             $('#updatePermissionBtn').prop('disabled', false);
             return false;
         }
-        if (routePattern === '') {
-            validationAlert('Missing route name', 'Please enter a route name.', 'error', 2000, 'OK');
+        if (moduleName === '') {
+            validationAlert('Missing module name', 'Please enter a route name.', 'error', 2000, 'OK');
             $('#updatePermissionBtn').prop('disabled', false);
             return false;
         }
-        updatePermissionAjax(permissionId, permissionName, routePattern);
+        updatePermissionAjax(permissionId, permissionName, moduleName);
     }
 
-    function updatePermissionAjax(permissionId, permissionName, routePattern) {
-        let permissions = permissionName;
-        let routes = routePattern;
-        let id = permissionId;
+    function updatePermissionAjax(permissionId, permissionName, moduleName) {
         let url = '/admin/permission/update';
         $.ajax({
             url: url,
             method: "POST",
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),
-                permission: permissions,
-                route_pattern: routes,
-                id: id
+                permission: permissionName,
+                module: moduleName,
+                id: permissionId
             },
             success: function(res) {
                 if(res.success) {
                     $('#updatePermissionBtn').prop('disabled', false);
                     $('#editPermission').modal('hide');
                     $('#updatePermissionName').val('');
+                    $('#updateModuleName').val('');
                     validationAlert('Permission updated', 'Successfully updated the permission.', 'success', 2000, 'OK');
                 }
             },
             error: function(xhr) {
                 $('#updatePermissionBtn').prop('disabled', false);
-                if(xhr.responseJSON) {
-                    validationAlert('Already exists', xhr.responseJSON.message.permission, 'error', 2000, 'OK');
-                    console.log(xhr.responseJSON.message.permission);
+                let response = xhr.responseJSON;
+                console.log(xhr.responseJSON.message.permission);
+                if(response) {
+                    switch (response.error) {
+                        case 1:
+                            if(xhr.responseJSON.message != '') {
+                                for(let key in xhr.responseJSON.message) {
+                                    if(xhr.responseJSON.message.hasOwnProperty(key)) {
+                                        if(xhr.responseJSON.message[key][0] != '') {
+                                            validationAlert('Validation Error', xhr.responseJSON.message[key][0] || 'Validation failed', 'error', 5000, "OOP's");
+                                        } else if(xhr.responseJSON.message[key][1] != '') {
+                                            validationAlert('Validation Error', xhr.responseJSON.message[key][1] || 'Validation failed', 'error', 5000, "OOP's");
+                                        } else {
+                                            validationAlert('Validation Error', xhr.responseJSON.message[key][2] || 'Validation failed', 'error', 5000, "OOP's");
+                                        }
+                                    }
+                                }
+                            } else if(xhr.responseJSON.message.permission != '') {
+                                validationAlert('Already exist', xhr.responseJSON.message.permission || 'Already exist', 'error', 5000, "OOP's");
+                            }
+                            break;
+                        case 2:
+                            validationAlert('Error', 'Invalid module name selected.', 'error', 5000, "OOP's");
+                            break;
+                        default:
+                            validationAlert('Error', response.message || 'Something went wrong.', 'error', 5000, "OOP's");
+                            break;
+                    }
+                } else {
+                    validationAlert('Error', 'Unexpected server error', 'error', 5000, "OOP's");
                 }
             }
         });
@@ -285,7 +443,7 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
     }
 
     function saveRolePermission(roleId, permissionIds) {
-        let url = 'admin/role-permission-mapping/save';
+        let url = 'admin/mapping-role-permission/save';
         $.ajax({
             url: url,
             method: "POST",
@@ -407,11 +565,6 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
         $("#routeUpdateId").val(routeNames).trigger("change");
     }
 // Route permission mapping js end --
-
-
-
-
-
 
 
 

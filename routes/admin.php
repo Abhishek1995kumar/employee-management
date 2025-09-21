@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
@@ -46,6 +47,16 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
             Route::post('delete', [RoleController::class, 'delete'])->name('admin.role.delete');
         });
 
+        
+        Route::group(['prefix' => 'module'], function () {
+            Route::get('/', [ModuleController::class, 'index'])->name('admin.modules.index');
+            Route::get('ajax', [ModuleController::class, 'index'])->name('admin.modules.ajax'); 
+            Route::post('save', [ModuleController::class, 'store'])->name('admin.modules.save');
+            Route::post('show', [ModuleController::class, 'show'])->name('admin.modules.show');
+            Route::post('update', [ModuleController::class, 'update'])->name('admin.modules.update');
+            Route::post('delete', [ModuleController::class, 'destroy'])->name('admin.modules.delete');
+        });
+
 
         Route::group(['prefix' => 'permission'], function () {
             Route::get('/', [PermissionController::class, 'index'])->name('admin.permission.index');
@@ -57,7 +68,7 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
         });
 
 
-        Route::group(['prefix' => 'role-permission-mapping'], function () {
+        Route::group(['prefix' => 'mapping-role-permission'], function () {
             Route::get('/', [RolePermissionMappingController::class, 'index'])->name('admin.role-permission-mapping.index');
             Route::post('save', [RolePermissionMappingController::class, 'save'])->name('admin.role-permission-mapping.save');
             Route::post('update', [RolePermissionMappingController::class, 'update'])->name('admin.role-permission-mapping.update');
