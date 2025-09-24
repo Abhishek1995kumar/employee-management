@@ -6,6 +6,7 @@ use Throwable;
 use Exception;
 use Dom\Document;
 use Carbon\Carbon;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use App\Models\Admin\Permission;
@@ -15,14 +16,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class PermissionController extends Controller {
-    use ValidationTrait, CommanFunctionTrait;
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
     public function index(Request $request) {
+        $routePermission = $this->routePermission();
         $moduleNames = DB::select("SELECT id, name FROM modules WHERE deleted_at IS NULL ORDER BY id DESC");
         $search = $request->input('search');
         $page = $request->input('page', 1);
-        $limit = 4;
+        $limit = 50;
         $offset = ($page - 1) * $limit;
-        $query = "SELECT id, name, module_name, module_id, created_by, created_at FROM permissions WHERE deleted_at IS NULL ORDER BY id DESC";
+        $query = "SELECT id, name, module_name, app_url, module_id, created_by, created_at FROM permissions WHERE deleted_at IS NULL ORDER BY id DESC";
         $countQuery = "SELECT COUNT(*) as total FROM permissions WHERE deleted_at IS NULL";
         $params = [];
         if (!empty($search)) {
@@ -51,6 +53,7 @@ class PermissionController extends Controller {
             'totalPages' => $totalPages,
             'search' => $search,
             'modules' => $moduleNames,
+            'routePermission' => $routePermission
         ]);
     }
 
@@ -153,6 +156,8 @@ class PermissionController extends Controller {
             
             $permission->name = $data['permission'];
             $permission->slug = str_replace(' ', '_', strtolower($data['permission']));
+            $permission->app_url = str_replace(' ', '.', trim($data['app_url']));
+            $permission->app_url_slug = $permission->app_url;
             $permission->module_name = $moduleName ?? $permission->module_name;
             $permission->module_id = (int) $data['module'] ?? $permission->module_id;
             $permission->updated_by = Auth::user()->id;

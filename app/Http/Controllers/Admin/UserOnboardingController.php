@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Throwable;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use Illuminate\Support\Facades\DB;
@@ -12,18 +14,28 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserOnboardingController extends Controller {
-    use ValidationTrait;
+    use ValidationTrait, QueryTrait;
 
     public function index() {
         $id = Auth::user()->id;
-        $users = DB::select("SELECT u.id, u.name username, u.email, u.phone, r.name AS role_name 
-                            FROM users u
-                            JOIN roles r ON r.id = u.role_id
-                            WHERE u.id != 1
-                            -- AND u.id != $id
-                            ORDER BY u.id DESC");
+        $permissions = $this->routePermission();
+
+        $users = DB::select("SELECT 
+            u.id, 
+            u.name AS username, 
+            u.email, 
+            u.phone, 
+            r.name AS role_name,
+            (SELECT COUNT(*) FROM users WHERE created_by = u.id) AS total_users
+            FROM users u
+            JOIN roles r ON r.id = u.role_id
+            WHERE u.id != 1
+            ORDER BY u.id DESC
+        ");
+        
         return view('admin.user-management.users.index', [
             'users' => $users,
+            'permissions' => $permissions
         ]);
     }
 

@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+
 use Throwable;
 use App\Models\User;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
+use App\Models\Admin\LoginOtp;
 use App\Traits\ValidationTrait;
 use App\Traits\CommanFunctionTrait;
 use App\Http\Controllers\Controller;
-use App\Models\Admin\LoginOtp;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller {
-   use ValidationTrait, CommanFunctionTrait;
+   use ValidationTrait, CommanFunctionTrait, QueryTrait;
     public function loadLogin() {
         return view("admin.auth.login");
     }

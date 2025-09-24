@@ -56,7 +56,7 @@
             document.documentElement.setAttribute("data-theme", themeMode);
         }
     </script>
-    
+
     <div class="d-flex flex-column flex-root">
         <div class="page d-flex flex-row flex-column-fluid">
             <div id="kt_aside" class="aside" data-kt-drawer="true" data-kt-drawer-name="aside" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_aside_mobile_toggle">
@@ -120,22 +120,25 @@
                     <div class="hover-scroll-overlay-y my-5 px-2" id="kt_aside_menu_wrapper" data-kt-scroll="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="{default: '#kt_aside_toolbar, #kt_aside_footer', lg: '#kt_header, #kt_aside_toolbar, #kt_aside_footer'}" data-kt-scroll-wrappers="#kt_aside_menu" data-kt-scroll-offset="5px">
                         <div class="menu menu-column menu-title-gray-800 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-500" id="#kt_aside_menu" data-kt-menu="true">
                             <!-- Dashboard -->
-                            <a href="{{ route('admin.dashboard') }}" class="menu-item menu-accordion">
-                                <span class="menu-link {{Request::is('admin/dashboard*') ? 'active' : ''}}">
-                                    <span class="menu-icon">
-                                        <span class="svg-icon svg-icon-2">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" />
-                                                <rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="currentColor" />
-                                                <rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="currentColor" />
-                                                <rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="currentColor" />
-                                            </svg>
+                            @if(Auth::user()->hasPermission('Dashboard'))
+                                <a href="{{ route('admin.dashboard') }}" class="menu-item menu-accordion">
+                                    <span class="menu-link {{Request::is('admin/dashboard*') ? 'active' : ''}}">
+                                        <span class="menu-icon">
+                                            <span class="svg-icon svg-icon-2">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                    <rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                    <rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                    <rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                </svg>
+                                            </span>
                                         </span>
+                                        <span class="menu-title">{{ __('Dashboard')}}</span>
                                     </span>
-                                    <span class="menu-title">{{ __('Dashboard')}}</span>
-                                </span>
-                            </a>
-                            @if(auth()->user()->hasPermissionToRoute('admin/department'))
+                                </a>
+                            @endif
+
+                            @if(Auth::user()->hasPermission('Department')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/department') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/department*') ? 'active' : ''}}">
@@ -155,7 +158,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/designation'))
+                            @if(Auth::user()->hasPermission('Designation')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/designation') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/designation*') ? 'active' : ''}}">
@@ -175,7 +178,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/role'))
+                            @if(Auth::user()->hasPermission('Role')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/role') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/role*') ? 'active' : ''}}">
@@ -195,7 +198,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/module'))
+                            @if(Auth::user()->hasPermission('Module')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/module') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/module*') ? 'active' : ''}}">
@@ -215,7 +218,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/permission'))
+                            @if(Auth::user()->hasPermission('Designation')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/permission') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/permission*') ? 'active' : ''}}">
@@ -235,7 +238,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/mapping-role-permission'))
+                            @if(Auth::user()->hasPermission('Role Permission')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/mapping-role-permission') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{ Request::is('admin/mapping-role-permission*') ? 'active' : ''}}">
@@ -255,7 +258,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/route-permission-mapping'))
+                            @if(Auth::user()->hasPermission('Route Permission')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/route-permission-mapping') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/route-permission-mapping*') ? 'active' : ''}}">
@@ -275,7 +278,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/user'))
+                            @if(Auth::user()->hasPermission('User')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/user') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/user*') ? 'active' : ''}}">
@@ -295,7 +298,7 @@
                                 </div>
                             @endif
 
-                            @if(auth()->user()->hasPermissionToRoute('admin/holiday'))
+                            @if(Auth::user()->hasPermission('Employee')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/holiday') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/holiday*') ? 'active' : ''}}">

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use Exception;
+use Throwable;
 use Carbon\Carbon;
 use App\Models\Admin\Role;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use App\Models\Admin\Permission;
@@ -16,12 +18,15 @@ use App\Models\Admin\RoutePermission;
 use Illuminate\Support\Facades\Route;
 
 class RoutePermissionMappingController extends Controller {
-    use ValidationTrait, CommanFunctionTrait;
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
     public function __construct() {
         $this->middleware('isAdmin');
     }
 
     public function index() {
+        $id = Auth::user()->id;
+        $permissions = $this->routePermission();
+        
         $roles = Role::where('status', 1)->where('slug', '!=', 'super_admin')->get();
         $routePermissionMappingList = DB::select("SELECT rp.id, rp.permission_id, p.name permission_name, rp.route_name, u.name user_name 
                                         FROM route_permission rp LEFT JOIN permissions p ON p.id = rp.permission_id 
@@ -45,7 +50,8 @@ class RoutePermissionMappingController extends Controller {
         return view('admin..user-management.route-permission.index', [
             'roles' => $roles,
             'authenticatedRoutes' => $authenticatedRoutes,
-            'routePermissionMappingList' => $routePermissionMappingList
+            'routePermissionMappingList' => $routePermissionMappingList,
+            'permissions' => $permissions
         ]);
     }
 

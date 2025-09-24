@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+
+use Throwable;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use App\Models\Admin\Department;
 use Illuminate\Support\Facades\DB;
+use App\Traits\CommanFunctionTrait;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class DesignationController extends Controller {
-    use ValidationTrait;
-    public function create(Request $request) {
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
+    
+    public function index(Request $request) {
+        $id = Auth::user()->id;
+        $permissions = $this->routePermission();
+
         $sql = "SELECT id, name FROM departments WHERE deleted_at IS NULL";
         $query = DB::select($sql);
         if ($query) {
@@ -23,8 +32,10 @@ class DesignationController extends Controller {
         }  else {
             $departments = [];
         }
+
         return view('admin.user-management.designations.index', [
             'departments' => $departments,
+            'permissions' => $permissions
         ]);
     }
 

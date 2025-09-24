@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use Exception;
+use Throwable;
 use Carbon\Carbon;
 use App\Models\Admin\Role;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use App\Traits\CommanFunctionTrait;
@@ -12,11 +14,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller {
-    use ValidationTrait, CommanFunctionTrait;
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
     public function create() {
+        $id = Auth::user()->id;
+        $permissions = $this->routePermission();
         $roles = Role::where('status', 1)->get();
         return view('admin.user-management.roles.index', [
-            'roles' => $roles
+            'roles' => $roles,
+            'permissions' => $permissions
         ]);
     }
 
