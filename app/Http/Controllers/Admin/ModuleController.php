@@ -4,15 +4,23 @@ namespace App\Http\Controllers\Admin;
 
 use Throwable;
 use Exception;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Models\Admin\Module;
+use App\Traits\ValidationTrait;
 use Illuminate\Support\Facades\DB;
+use App\Traits\CommanFunctionTrait;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 
 class ModuleController extends Controller {
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
+
     public function index(Request $request) {
+        $id = Auth::user()->id;
+        $permissions = $this->routePermission();
+
         $limit = 4;
         $page = $request->input('page', 1);
         $offset = ($page - 1) * $limit;
@@ -46,7 +54,8 @@ class ModuleController extends Controller {
             'modules' => $modules, 
             'page' => $page, 
             'totalPages' => $totalPages,
-            'search' => $search
+            'search' => $search,
+            'permissions' => $permissions
         ]);
     }
 

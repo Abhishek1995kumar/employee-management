@@ -2,11 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+
+use Throwable;
 use Illuminate\Http\Request;
+use App\Traits\QueryTrait;
+use App\Traits\ValidationTrait;
+use App\Traits\CommanFunctionTrait;
+use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller {
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
+
     public function dashboard() {
-        return view("admin.dashboard");
+        $permissions = $this->routePermission();
+        return view("admin.dashboard", [
+            'permissions' => $permissions
+        ]);
     }
 }

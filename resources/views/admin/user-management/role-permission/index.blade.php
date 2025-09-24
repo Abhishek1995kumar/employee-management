@@ -1,5 +1,7 @@
 @extends('layouts.admin')
-@section('title') {{ __('Role Permission Mapping')}} @endsection
+@section('title') 
+    {{ __('Role Permission Mapping')}} 
+@endsection
 
 @section('header')
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -7,41 +9,41 @@
 @endsection
 
 @section('breadcrumb')
-<h1 class="d-flex flex-column text-dark fw-bold fs-3 mb-0">{{ __('Add User')}}</h1>
-<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 pt-1">
-    <li class="breadcrumb-item text-muted">
-        <a href="{{url('/admin/dashboard')}}" class="text-muted text-hover-primary">{{ __('Dashboard')}}</a>
-    </li>
-    <li class="breadcrumb-item">
-        <span class="bullet bg-gray-200 w-5px h-2px"></span>
-    </li>
-    <li class="breadcrumb-item text-muted">
-        <a href="{{url('/admin/permission')}}" class="text-muted text-hover-primary">{{ __('Role Permission Mapping')}}</a>
-    </li>
-    <li class="breadcrumb-item">
-        <span class="bullet bg-gray-200 w-5px h-2px"></span>
-    </li>
-    <li class="breadcrumb-item text-dark">{{ __('Role Permission Mapping')}}</li>
-</ul>
+    <h1 class="d-flex flex-column text-dark fw-bold fs-3 mb-0">{{ __('Add User')}}</h1>
+    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 pt-1">
+        <li class="breadcrumb-item text-muted">
+            <a href="{{url('/admin/dashboard')}}" class="text-muted text-hover-primary">{{ __('Dashboard')}}</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span class="bullet bg-gray-200 w-5px h-2px"></span>
+        </li>
+        <li class="breadcrumb-item text-muted">
+            <a href="{{url('/admin/permission')}}" class="text-muted text-hover-primary">{{ __('Role Permission Mapping')}}</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span class="bullet bg-gray-200 w-5px h-2px"></span>
+        </li>
+        <li class="breadcrumb-item text-dark">{{ __('Role Permission Mapping')}}</li>
+    </ul>
 @endsection
 
 @section('content')
-<!-- Alerts -->
-@foreach (['danger', 'warning', 'success', 'info'] as $msg)
-@if(Session::has('alert-' . $msg))
-<div class="col-sm-12">
-    <p class="alert alert-{{ $msg }}">{{ Session::get('alert-' . $msg) }} </p>
-</div>
-@endif
-@endforeach
-
-@if ($errors->any())
-<div class="col-sm-12">
-    @foreach ($errors->all() as $error)
-    <p class="alert alert-danger">{{ $error }}</p>
+    @foreach (['danger', 'warning', 'success', 'info'] as $msg)
+        @if(Session::has('alert-' . $msg))
+            <div class="col-sm-12">
+                <p class="alert alert-{{ $msg }}">{{ Session::get('alert-' . $msg) }} </p>
+            </div>
+        @endif
     @endforeach
-</div>
-@endif
+
+    @if ($errors->any())
+        <div class="col-sm-12">
+            @foreach ($errors->all() as $error)
+            <p class="alert alert-danger">{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-3">
             <div class="alert alert-success text-center border border-success">
@@ -66,12 +68,13 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                @if(Auth::user()->hasPermissionToRoute('admin/mapping-role-permission'))
+                @foreach($routeDetails as $permission)
+                    @if($permission->route_url == 'admin.role-permission-mapping.save')
                     <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addRolePermissionMapping" class="btn btn-primary"  id="createRolePermissionMapping">
                         {{ __('Add Role Permission Mapping')}}
                     </button>
-                @else
-                @endif
+                    @endif
+                @endforeach
             </div>
         </div>
         <div class="card-body table-responsive">
@@ -81,6 +84,7 @@
                         <th class="text-center min-w-125px">{{ __('Id')}}</th>
                         <th class="text-center min-w-125px">{{ __('Role')}}</th>
                         <th class="text-center min-w-125px">{{ __('Permision')}}</th>
+                        <th class="text-center min-w-125px">{{ __('Route')}}</th>
                         <th class="text-center min-w-125px">{{ __('Action')}}</th>
                     </tr>
                 </thead>
@@ -90,44 +94,52 @@
                             <td class="text-center">{{ $loop->index + 1 }}</td>
                             <td class="text-center">{{ $permission->role_name }}</td>
                             <td class="text-center">
-                                @if($permission->permission_names)
-                                        <span class="badge badge-light-primary">{{ $permission->permission_names }}</span>
+                                @if($permission->permission_name)
+                                        <span class="badge badge-light-primary">{{ $permission->permission_name }}</span>
                                 @else
                                     <span class="badge badge-light-danger">{{ __('No Permission')}}</span>
                                 @endif
                             </td>
                             <td class="text-center">
-                                @if(Auth::user()->hasPermissionToRoute('admin/mapping-role-permission/update'))
-                                    <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" 
-                                        data-bs-toggle="modal" data-bs-target="#editRole" 
-                                        data-id="{{ $permission->id }}" 
-                                        data-role_name="{{ $permission->role_name }}"
-                                        data-permission_id="{{ $permission->permission_names }}" 
-                                        onclick="editRolePermissionMapping(this)">
-                                        <span class="svg-icon svg-icon-3">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M14.8284 2.34315C15.2196 2.73438 15.2196 3.36739 14.8284 3.75862L12.5858 6L10.4142 3.82843L12.6569 1.58579C13.0481 1.19557 13.6811 1.19557 14.0724 1.58579L14.8284 2.34315Z" fill="currentColor"/>
-                                                <path d="M16.2426 3.75736C16.6338 4.14859 16.6338 4.78161 16.2426 5.17284L14 7L11.8284 4.82843L14.0701 2.58579C14.4613 2.19557 15.0944 2.19557 15.4856 2.58579L16.2426 3.75736Z" fill="currentColor"/>
-                                                <path d="M19 7H5C4.44772 7 4 7.44772 4 8V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V8C20 7.44772 19.5523 7 19 7ZM18 18H6V9
-                                                C6 8.44772 6.44772 8 7 8H18C18.5523 8 19 8.44772 19 9V18C19 18.5523 18.5523 19 18 19Z" fill="currentColor"/>
-                                                <path d="M7 10H17C17.5523 10 18 10.4477 18 11V12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12V11C6 10.4477 6.44772 10 7 10Z" fill="currentColor"/>
-                                            </svg>
-                                        </span>
-                                    </button>
+                                @if($permission->route_url)
+                                        <span class="badge badge-light-primary">{{ $permission->route_url }}</span>
                                 @else
+                                    <span class="badge badge-light-danger">{{ __('No Route Name')}}</span>
                                 @endif
-                                @if(Auth::user()->hasPermissionToRoute('admin/mapping-role-permission/delete'))
-                                    <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" onclick="deleteRole({{ $permission->id }})">
-                                        <span class="svg-icon svg-icon-3">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6V19ZM8 9H16V19H8V9Z" fill="currentColor"/>
-                                                <path d="M19.7071 4.29289C20.0976 3.90237 20.0976 3.2692 19.7071 2.87868L17.1213 0.292893C16.7308 -0.0976311 16.0976 -0.0976311 15.7071 0.292893L14.4142 1.58579L18.4142 5.58579L19.7071 4.29289Z" fill="currentColor"/>
-                                                <path d="M15.7071 4.29289C16.0976 3.90237 16.0976 3.2692 15.7071 2.87868L13.1213 0.292893C12.7308 -0.0976311 12.0976 -0.0976311 11.7071 0.292893L10.4142 1.58579L14.4142 5.58579L15.7071 4.29289Z" fill="currentColor"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                @else
-                                @endif
+                            </td>
+                            <td class="text-center">
+                                @foreach($routeDetails as $routeD)
+                                    @if($routeD->route_url == 'admin.role-permission-mapping.update')
+                                        <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" 
+                                            data-bs-toggle="modal" data-bs-target="#editRole" 
+                                            data-id="{{ $permission->id }}" 
+                                            data-role_name="{{ $permission->role_name }}"
+                                            data-permission_id="{{ $permission->permission_name }}" 
+                                            onclick="editRolePermissionMapping(this)">
+                                            <span class="svg-icon svg-icon-3">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M14.8284 2.34315C15.2196 2.73438 15.2196 3.36739 14.8284 3.75862L12.5858 6L10.4142 3.82843L12.6569 1.58579C13.0481 1.19557 13.6811 1.19557 14.0724 1.58579L14.8284 2.34315Z" fill="currentColor"/>
+                                                    <path d="M16.2426 3.75736C16.6338 4.14859 16.6338 4.78161 16.2426 5.17284L14 7L11.8284 4.82843L14.0701 2.58579C14.4613 2.19557 15.0944 2.19557 15.4856 2.58579L16.2426 3.75736Z" fill="currentColor"/>
+                                                    <path d="M19 7H5C4.44772 7 4 7.44772 4 8V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V8C20 7.44772 19.5523 7 19 7ZM18 18H6V9
+                                                    C6 8.44772 6.44772 8 7 8H18C18.5523 8 19 8.44772 19 9V18C19 18.5523 18.5523 19 18 19Z" fill="currentColor"/>
+                                                    <path d="M7 10H17C17.5523 10 18 10.4477 18 11V12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12V11C6 10.4477 6.44772 10 7 10Z" fill="currentColor"/>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    @endif
+
+                                    @if($routeD->route_url == 'admin.role-permission-mapping.delete')
+                                        <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" onclick="deleteRole({{ $permission->id }})">
+                                            <span class="svg-icon svg-icon-3">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6V19ZM8 9H16V19H8V9Z" fill="currentColor"/>
+                                                    <path d="M19.7071 4.29289C20.0976 3.90237 20.0976 3.2692 19.7071 2.87868L17.1213 0.292893C16.7308 -0.0976311 16.0976 -0.0976311 15.7071 0.292893L14.4142 1.58579L18.4142 5.58579L19.7071 4.29289Z" fill="currentColor"/>
+                                                    <path d="M15.7071 4.29289C16.0976 3.90237 16.0976 3.2692 15.7071 2.87868L13.1213 0.292893C12.7308 -0.0976311 12.0976 -0.0976311 11.7071 0.292893L10.4142 1.58579L14.4142 5.58579L15.7071 4.29289Z" fill="currentColor"/>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    @endif
+                                @endforeach
                             </td>
                         </tr>
                     @endforeach
@@ -176,28 +188,40 @@
                                                         </select>
                                                     </div>
                                                 </div>
+
                                                 <div class="col-md-6 mb-4" id="ngoCenterDiv">
-                                                    
                                                 </div>
-                                                <div class="col-md-12 mb-4" id="ngoCenterDiv">
+
+                                                <div class="col-md-12 mb-4 mt-3" id="ngoCenterDiv">
                                                     <label class="required fs-6 fw-semibold mb-2">{{ __('Permission')}}</label>
                                                     <div class="form-group">
-                                                        @if($permissions && !$permissions->isEmpty())
+                                                        @if($permissions)
                                                             @foreach($permissions as $permission)
-                                                                @if($loop->index % 3 == 0)
-                                                                    <div class="row">
-                                                                @endif
-                                                                    <div class="col-md-4">
-                                                                        <div class="form-check mb-2">
-                                                                            <input class="form-check-input" type="checkbox" name="permission_id[]" value="{{ $permission->id }}" id="permission_{{ $permission->id }}">
-                                                                            <label class="form-check-label" for="permission_{{ $permission->id }}">
-                                                                                {{ $permission->name }}
-                                                                            </label>
-                                                                        </div>
+                                                                <div class="col-md-12 mx-3 mb-3 p-3">
+                                                                    <div class="col-md-3 mb-2">{{ $permission['module_name'] }}</div>
+                                                                    <div class="col-md-12 ">
+                                                                        @foreach($permission['permissions'] as $perm)
+                                                                            @php 
+                                                                                $id = (int) $perm['id'];
+                                                                            @endphp
+                                                                            <div class="form-check form-check-custom form-check-solid mb-3">
+                                                                                <div class="col-md-6 ">
+                                                                                    <input class="form-check-input permission-checkbox" type="checkbox" value="{{ $id }}" id="permission_{{ $id }}" name="permission_id[]"/>
+                                                                                    <label class="form-check-label" for="permission_{{ $id }}">
+                                                                                        {{ $perm['name'] }} 
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="col-md-6 ">
+                                                                                    <input class="form-check-input permission-checkbox" type="checkbox" value="{{ $perm['route_url'] }}" id="route_url_{{ $id }}" name="route_url[]"/>
+                                                                                    <label class="form-check-label" for="route_url_{{ $id }}">
+                                                                                        {{ $perm['route_url'] }} 
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
                                                                     </div>
-                                                                @if(($loop->index + 1) % 3 == 0 || $loop->last)
-                                                                    </div>
-                                                                @endif
+                                                                </div>
+                                                                <hr>
                                                             @endforeach
                                                         @else
                                                             <span class="badge badge-light-danger">{{ __('No Permissions Available')}}</span>
@@ -221,6 +245,6 @@
 @endsection
 
 @section('scripts')
+    <script src="{{asset('assets/js/custom/comman.js')}}"></script>
     <script src="{{ asset('assets/js/custom/roles/role.js') }}"></script>
-    
 @endsection

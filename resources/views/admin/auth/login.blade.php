@@ -1,5 +1,5 @@
 @extends('layouts.auth')
-@section('title', 'Login')
+@section('title', 'Employee Management System')
 @section('header')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/comman.css') }}">
@@ -69,7 +69,7 @@
 										<div class="col-md-12 mb-4 " id="roleNameDiv">
 											<div class="form-group">
 												<label class="required fs-6 fw-semibold mb-2">{{ __('OTP Verification')}}</label>
-												<input type="text" name="otp" id="otpCode" class="form-control" maxlength="6" placeholder="Enter OTP" oninput="validateNumber(num)" />
+												<input type="text" name="otp" id="otpCode" class="form-control" maxlength="6" placeholder="Enter OTP" oninput="acceptOnlyNumber(this)" />
 												<input type="hidden" id="loggedInUserId" value="">
 											</div>
 										</div>
@@ -89,5 +89,6 @@
 
 @endsection
 @section('footer')
-<script src="{{asset('assets/js/custom/authentication/sign-in/general.js')}}"></script>
+    <script src="{{ asset('assets/js/custom/custom/comman.js') }}"></script>
+	<script src="{{asset('assets/js/custom/authentication/sign-in/general.js')}}"></script>
 @endsection

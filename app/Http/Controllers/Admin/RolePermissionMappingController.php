@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Admin\Role;
+use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use App\Models\Admin\Permission;
@@ -14,27 +15,59 @@ use App\Traits\CommanFunctionTrait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin\RolePermission;
+use Illuminate\Support\Facades\Route;
 
 class RolePermissionMappingController extends Controller {
-    use ValidationTrait, CommanFunctionTrait;
+    // agar group by ka error aaye to ye use karna hai
+    // DB::statement(DB::raw('SET sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY", ""))')); 
+    // ya phir config\database.php mein mysql ke andar 'strict' => false kar dena hai
+    use ValidationTrait, CommanFunctionTrait, QueryTrait;
     public function __construct() {
         $this->middleware('isAdmin');
     }
 
-    public function index() {
-        $permissionWithRoles = DB::select("SELECT rp.id, r.name AS role_name, GROUP_CONCAT(p.name ORDER BY p.name SEPARATOR ', ') AS permission_names
-                                                FROM role_permission rp
-                                                JOIN roles r ON rp.role_id = r.id
-                                                JOIN permissions p ON FIND_IN_SET(p.id, rp.permission_id)
-                                                GROUP BY rp.id, r.id
-                                                ORDER BY r.name;
+    public function index(Request $request) {
+        $routeDetails = $this->routePermission();
+        $permissionWithRoles = DB::select("SELECT rp.id, role_name, route_url, permission_name
+                                            FROM role_permission rp
+                                            WHERE deleted_at IS NULL
+                                            ORDER BY permission_name ASC
                                 ");
-        $permissions = Permission::all();
+        $permissions = DB::select("SELECT module_id, 
+                                    module_name, 
+                                    GROUP_CONCAT(name SEPARATOR ',') AS permission_names, 
+                                    GROUP_CONCAT(id SEPARATOR ',') AS permission_ids,
+                                    GROUP_CONCAT(app_url SEPARATOR ',') AS route_url
+                                FROM permissions 
+                                GROUP BY module_id, module_name
+                            ");
+        $result = [];
+        foreach($permissions as $permission) {
+            $ids = explode(',', $permission->permission_ids);
+            $names = explode(',', $permission->permission_names);
+            $route = explode(',', $permission->route_url);
+            $permArr = [];
+            for($i = 0; $i < count($ids); $i++) {
+                $permArr[] = [
+                    'id' => $ids[$i],
+                    'name' => $names[$i],
+                    'route_url' => $route[$i] // ye bhi add karna hai
+                ];
+            }
+            $result[] = [
+                'module_id' => $permission->module_id,
+                'module_name' => $permission->module_name,
+                'permissions' => $permArr
+            ];
+        }
+        
+
         $roles = Role::where('status', 1)->whereNot('slug', 'super_admin')->get();
         return view('admin..user-management.role-permission.index', [
             'roles' => $roles,
-            'permissions' => $permissions,
-            'permissionWithRoles' => $permissionWithRoles
+            'permissions' => $result,
+            'permissionWithRoles' => $permissionWithRoles,
+            'routeDetails' => $routeDetails
         ]);
     }
 
@@ -44,52 +77,69 @@ class RolePermissionMappingController extends Controller {
             $validator = $this->rolePermissionMappingValidation($data);
             if ($validator) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => $validator
+                    'success' => false,
+                    'message' => $validator,
+                    'error' => 1
                 ]);
             }
-            
-            // Check if any of the selected permissions are already assigned to the given role
-            // $d = DB::select("SELECT * FROM role_permission 
-            //             WHERE role_id = ? 
-            //             AND (
-            //                 " . implode(' OR ', array_fill(0, count($data['permission_id']), 'FIND_IN_SET(?, permission_id)')) . "
-            //             )", 
-            //             array_merge([$data['role_id']], $data['permission_id'])
-            // );
-            $isAssignedRole = RolePermission::where('role_id', $data['role_id'])
-                                ->where(function($query) use($data) {
-                                    foreach($data['permission_id'] as $permission) {
-                                        $query->orWhereRaw('FIND_IN_SET(?, permission_id)', [$permission]);
-                                    }
-                                })->first();
 
-            if($isAssignedRole) {
+            $roles = Role::find($data['role_id']);
+            if (!$roles) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => "{$isAssignedRole['permission_id'] } Permission is already assigned to selected role"
+                    'success' => false,
+                    'message' => "Selected role does not exist.",
+                    'error' => 2
                 ]);
             }
 
-            $rolePermissionMapping = new RolePermission();
-            $rolePermissionMapping->role_id = $data['role_id'];
-            $rolePermissionMapping->permission_id = implode(',', $data['permission_id']);
-            $rolePermissionMapping->created_by = Auth::id();
-            $rolePermissionMapping->updated_by = Auth::id();
-            $rolePermissionMapping->created_at = Carbon::now();
-            $rolePermissionMapping->updated_at = Carbon::now();
-            $rolePermissionMapping->save();
+            foreach ($data['permission_id'] as $index => $perId) {
+                // check duplicate
+                $isAssignedRole = RolePermission::where('role_id', $data['role_id'])
+                    ->where('permission_id', $perId)
+                    ->where('route_url', $data['route_url'][$index])
+                    ->first();
+                
+                if ($isAssignedRole) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Permission ID {$perId} is already assigned to selected role",
+                        'error' => 3
+                    ]);
+                }
+
+                if ($data['route_url'][$index] == null) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Route url {$data['route_url'][$index]} is already assigned to selected role",
+                        'error' => 3
+                    ]);
+                }
+
+                $permissions = Permission::find($perId);
+                if ($permissions) {
+                    $rolePermissionMapping = new RolePermission();
+                    $rolePermissionMapping->role_id = $data['role_id'];
+                    $rolePermissionMapping->route_url = $data['route_url'][$index];
+                    $rolePermissionMapping->permission_id = $perId;
+                    $rolePermissionMapping->permission_name = $permissions->name;
+                    $rolePermissionMapping->role_name = $roles->name;
+                    $rolePermissionMapping->created_by = Auth::id();
+                    $rolePermissionMapping->save();
+                }
+            }
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Role permission mapping saved successfully.'
-            ]);
+                'success' => true,
+                'message' => 'Role permission mapping saved successfully.',
+                'error' => 0
+            ], 200);
 
         } catch (Exception $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => 4
+            ], 500);
         }
     }
 

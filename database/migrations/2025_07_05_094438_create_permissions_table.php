@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
-            $table->string("slug");
-            $table->string("route_pattern")->nullable()->comment('save route name by permission');
+            $table->integer("module_id")->comment('module id getting from modules table');
+            $table->string("module_name")->nullable()->comment('module name getting from modules table');
+            $table->string("name")->unique();
+            $table->string("slug")->unique();
+            $table->string("app_url")->unique();
+            $table->string("app_url_slug")->unique();
             $table->string("description")->nullable();
             $table->tinyInteger("status")->nullable()->comment('1=active permission, 0=inactive permission')->default(1);
             $table->tinyInteger("created_by")->nullable();

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -59,6 +60,7 @@ class User extends Authenticatable
                 ]]
             ];
         }
+        
         // Step 1: Role ke base par permissions nikaalo
         $permission = DB::select("SELECT
                             rp.role_id,
@@ -110,21 +112,20 @@ class User extends Authenticatable
     }
 
 
-    public function hasPermissionToRoute($router) {
-        $role = DB::table('roles')->where('id', $this->role_id)->first();
-        // super_admin ke liye sab access
+    static function hasPermissionToRoute($router) {
+        $role = DB::table('roles')->where('id', Auth::user()->role_id)->first();
         if ($role && $role->slug === 'super_admin') {
             return true;
         }
 
         // Step 1: Role ke base par permissions nikaalo
-        $permissions = DB::select("SELECT rp.permission_id, p.name permission_name, p.route_pattern
+        $permissions = DB::select("SELECT rp.permission_id, p.name permission_name
                                 FROM role_permission rp
                                 JOIN permissions p ON p.id = rp.permission_id
                                 WHERE rp.role_id = ?
-                            ", [$this->role_id]
+                            ", [4]
                         );
-        
+                        
         if (empty($permissions)) {
             return false;
         }
@@ -147,6 +148,18 @@ class User extends Authenticatable
     }
 
 
+    public function hasPermission($permissionName) {
+        $role = DB::table('roles')->where('id', $this->role_id)->first();
+
+        if ($role && $role->slug === 'super_admin') {
+            return true;
+        }
+
+        return DB::table('role_permission')
+            ->where('role_id', $this->role_id)
+            ->where('permission_name', $permissionName)
+            ->exists();
+    }
 
 
     public function department() {

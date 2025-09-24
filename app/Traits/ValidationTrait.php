@@ -359,6 +359,7 @@ trait ValidationTrait {
                 $permissions = Permission::where('name', $data['permission'])->first();
                 $rules = [
                     'permission' => ['required', 'string', 'max:255'],
+                    'app_url' => ['required', 'string', 'max:255'],
                     'module' => ['integer', 'required'],
                 ];
 
@@ -366,6 +367,9 @@ trait ValidationTrait {
                     'permission.required' => 'The name field is required.',
                     'permission.string' => 'The name must be a string.',
                     'permission.max' => 'The name may not be greater than 255 characters.',
+                    'app_url.required' => 'The application url field is required.',
+                    'app_url.string' => 'The application url must be a string.',
+                    'app_url.max' => 'The application url may not be greater than 255 characters.',
                     'module.required' => 'The module name field is required.',
                     'module.integer' => 'The module name must be a integer.',
                     // 'description.max' => 'The description may not be greater than 255 characters.',
@@ -413,13 +417,17 @@ trait ValidationTrait {
             try {
                 $rules = [
                     'permission' => ['string', 'max:255'],
+                    'app_url' => ['string', 'max:255'],
                     'module' => ['integer']
                 ];
 
                 $messages = [
                     'permission.string' => 'The name must be a string.',
                     'permission.max' => 'The name may not be greater than 255 characters.',
+                    'app_url.string' => 'The application url must be a string.',
+                    'app_url.max' => 'The application url may not be greater than 255 characters.',
                     'module.integer' => 'The module name must be a integer.',
+
                 ];
 
                 $errors = [];
@@ -459,7 +467,9 @@ trait ValidationTrait {
                 $rules = [
                     'role_id' => ['required', 'exists:roles,id'],
                     'permission_id' => ['required', 'array'],
-                    'permission_id.*' => ['exists:permissions,id']
+                    'permission_id.*' => ['exists:permissions,id'],
+                    'route_url' => ['required', 'array'],
+                    'route_url.*' => ['exists:permissions,app_url']
                 ];
                 
                 $messages = [
@@ -467,7 +477,10 @@ trait ValidationTrait {
                     'role_id.exists' => 'The selected role does not exist.',
                     'permission_id.required' => 'The permission field is required.',
                     'permission_id.array' => 'The permission must be an array.',
-                    'permission_id.*.exists' => 'One or more selected permissions do not exist.'
+                    'permission_id.*.exists' => 'One or more selected permissions do not exist.',
+                    'route_url.required' => 'The route url field is required.',
+                    'route_url.array' => 'The route url must be an array.',
+                    'route_url.*.exists' => 'One or more selected route url do not exist.'
                 ];
                 $errors = [];
 

@@ -29,19 +29,24 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
 
     Route::group(['middleware' => ['isPermission']], function () {
         Route::group(['prefix' => 'department'], function () {
-            Route::get('/', [DepartmentController::class, 'createDepartment'])->name('admin.department.create');
-            Route::post('save', [DepartmentController::class, 'saveDepartment'])->name('admin.department.save');
+            Route::get('/', [DepartmentController::class, 'index'])->name('admin.department.index');
+            Route::post('save', [DepartmentController::class, 'save'])->name('admin.department.save');
+             Route::get('update', [DepartmentController::class, 'update'])->name('admin.department.update');
+            Route::post('delete', [DepartmentController::class, 'delete'])->name('admin.department.delete');
+             Route::get('show', [DepartmentController::class, 'show'])->name('admin.department.show');
         });
 
 
         Route::group(['prefix' => 'designation'], function () {
-            Route::get('/', [DesignationController::class, 'create'])->name('admin.designation.create');
+            Route::get('/', [DesignationController::class, 'index'])->name('admin.designation.index');
             Route::post('save', [DesignationController::class, 'save'])->name('admin.designation.save');
+            Route::post('update', [DesignationController::class, 'update'])->name('admin.designation.update');
+            Route::post('delete', [DesignationController::class, 'delete'])->name('admin.designation.delete');
         });
         
 
         Route::group(['prefix' => 'role'], function () {
-            Route::get('/', [RoleController::class, 'create'])->name('admin.role.create');
+            Route::get('/', [RoleController::class, 'create'])->name('admin.role.index');
             Route::post('save', [RoleController::class, 'save'])->name('admin.role.save');
             Route::post('update', [RoleController::class, 'update'])->name('admin.role.update');
             Route::post('delete', [RoleController::class, 'delete'])->name('admin.role.delete');
