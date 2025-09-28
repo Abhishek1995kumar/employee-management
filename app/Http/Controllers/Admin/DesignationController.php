@@ -48,6 +48,7 @@ class DesignationController extends Controller {
                 return $validationResponse;
             }
 
+            $this->storeLog('Designation', 'save', 'Designation');
             return response()->json([
                 'success' => true,
                 'message' => 'Designation created successfully.'

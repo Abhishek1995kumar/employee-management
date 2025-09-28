@@ -688,3 +688,206 @@ $.ajaxSetup({
     }
 // Document Js End --
 
+
+
+// Meeting Js Start --
+    function saveMeeting(e) {
+        e.preventDefault();
+        $('.meetingBtn').prop('disabled', true);
+        let meetingLocation = $("#location").val();
+        let clientName = $("#clientName").val();
+        let meetingTime = $("#meetingTime").val();
+        let meetingDate = $("#meetingDate").val();
+        let distanceInKm = $("#distanceInKm").val();
+        let durationInMinutes = $("#durationInMinutes").val();
+        if (meetingLocation === '') {
+            validationAlert('Missing meeting location', 'Please enter a meeting location.', 'error', 2000, 'OK');
+            $('.meetingBtn').prop('disabled', false);
+            return false;
+        }
+        if (clientName === '') {
+            validationAlert('Missing client name', 'Please enter a client name.', 'error', 2000, 'OK');
+            $('.meetingBtn').prop('disabled', false);
+            return false;
+        }
+        if (meetingTime === '') {
+            validationAlert('Missing meeting time', 'Please enter a valid meeting time.', 'error', 2000, 'OK');
+            $('.meetingBtn').prop('disabled', false);
+            return false;
+        }
+        if (meetingDate === '') {
+            validationAlert('Missing meeting date', 'Please enter a valid meeting date.', 'error', 2000, 'OK');
+            $('.meetingBtn').prop('disabled', false);
+            return false;
+        }
+        // if (distanceInKm === '') {
+        //     validationAlert('Missing distance', 'Please enter distance in km.', 'error', 2000, 'OK');
+        //     $('.meetingBtn').prop('disabled', false);
+        //     return false;
+        // }
+        // if (durationInMinutes === '') {
+        //     validationAlert('Missing duration', 'Please enter duration in minutes.', 'error', 2000, 'OK');
+        //     $('.meetingBtn').prop('disabled', false);
+        //     return false;
+        // }
+        submitMeeting(meetingLocation, clientName, meetingTime, meetingDate, distanceInKm=null, durationInMinutes=null);
+    }   
+
+
+    function submitMeeting(meetingLocation, clientName, meetingTime, meetingDate, distanceInKm, durationInMinutes) {
+        let url = 'admin/meeting/save';
+        $('#addMeeting').modal('hide');
+        $.ajax({
+            url: url,
+            method: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                location: meetingLocation,
+                client_name: clientName,
+                meeting_time: meetingTime,
+                meeting_date: meetingDate,
+                distance_in_km: distanceInKm,
+                duration_in_minutes: durationInMinutes
+            },
+            success: function(res) {
+                if(res.success) {
+                    $('.meetingBtn').prop('disabled', false);
+                    $('#location').val('');
+                    $('#clientName').val('');
+                    $('#meetingTime').val('');
+                    $('#meetingDate').val('');
+                    $('#distanceInKm').val('');
+                    $('#durationInMinutes').val('');
+                    validationAlert('Meeting created', 'Successfully created a new meeting.', 'success', 2000, 'OK');
+                    setTimeout(function() {
+                        window.location.reload();
+                    } , 200);
+                }
+            },
+            error: function(xhr) {
+                $('.meetingBtn').prop('disabled', false);
+                if(xhr.responseJSON) {
+                    validationAlert('Error ', xhr.responseJSON.message, 'error', 5000, false);
+                    console.log(xhr.responseJSON.message);
+                }
+            }
+        });
+    }
+// Meeting Js End --
+
+
+
+// Holiday Js Start --
+    function saveHoliday(e) {
+        e.preventDefault();
+        $('.saveHolidayBtn').prop('disabled', true);
+        let name_of_holiday = $("#name_of_holiday").val();
+        let firm_id = $("#firm_id").val();
+        let day_for_holiday = $("#day_for_holiday").val();
+        let holiday_month = $("#holiday_month").val();
+        let holiday_year = $("#holiday_year").val();
+        let color = $("#color").val();
+        let description = $("#description").val();
+        let holiday_start_date = $("#holiday_start_date").val();
+        let holiday_end_date = $("#holiday_end_date").val();
+        let category = $("#category_name").val();
+        let holiday_image = $("#holiday_image").val();
+        if (firm_id === '') {
+            validationAlert('Missing firm', 'Please enter a firm name.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (name_of_holiday === '') {
+            validationAlert('Missing holiday name', 'Please enter a holiday name.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (day_for_holiday === '') {
+            validationAlert('Missing holiday day', 'Please enter a holiday day.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (holiday_month === '') {
+            validationAlert('Missing holiday month', 'Please enter a valid holiday month.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (holiday_year === '') {
+            validationAlert('Missing holiday year', 'Please enter a valid holiday year.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (color === '') {
+            validationAlert('Missing color code', 'Please enter color code.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (holiday_start_date === '') {
+            validationAlert('Missing holiday start date', 'Please enter holiday start date.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (holiday_end_date === '') {
+            validationAlert('Missing holiday end date', 'Please enter holiday end date.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        if (category === '') {
+            validationAlert('Missing holiday category', 'Please enter holiday category.', 'error', 2000, 'OK');
+            $('.saveHolidayBtn').prop('disabled', false);
+            return false;
+        }
+        submitHoliday(firm_id, name_of_holiday, day_for_holiday, holiday_month, holiday_year, color, holiday_start_date, holiday_end_date, description, category, holiday_image);
+    }
+
+    function submitHoliday(firm_id, name_of_holiday, day_for_holiday, holiday_month, holiday_year, color, holiday_start_date, holiday_end_date, description, category, holiday_image) {
+        let url = 'admin/holiday/save';
+        $('#addHoliday').modal('hide');
+        $.ajax({
+            url: url,
+            method: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                firm_id: firm_id,
+                holiday_name: name_of_holiday,
+                day_of_holiday: day_for_holiday,
+                month_of_holiday: holiday_month,
+                year_of_holiday: holiday_year,
+                color: color,
+                holiday_start_date: holiday_start_date,
+                holiday_end_date: holiday_end_date,
+                description: description,
+                category: category,
+                holiday_image: holiday_image,
+            },
+            success: function(res) {
+                if(res.success) {
+                    $('.saveHolidayBtn').prop('disabled', true);
+                    $("#firm_id").val('');
+                    $("#name_of_holiday").val('');
+                    $("#day_for_holiday").val('');
+                    $("#holiday_month").val('');
+                    $("#holiday_year").val('');
+                    $("#color").val('');
+                    $("#description").val('');
+                    $("#holiday_start_date").val('');
+                    $("#holiday_end_date").val('');
+                    $("#category_name").val('');
+                    $("#holiday_image").val('');
+                    validationAlert('Holiday created', 'Successfully created a new holiday.', 'success', 2000, 'OK');
+                    setTimeout(function() {
+
+                    } , 200);
+                }
+            },
+            error: function(xhr) {
+                $('.saveHolidayBtn').prop('disabled', false);
+                if(xhr.responseJSON) {
+                    validationAlert('Error ', xhr.responseJSON.message, 'error', 5000, false);
+                    console.log(xhr.responseJSON.message);
+                }
+            }
+        });
+    }
+// Holiday Js End --
+

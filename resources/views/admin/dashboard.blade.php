@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="sweetalert2.min.css">
     <link href="{{ asset('assets/css/comman.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/datepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
     <style>
         .day{
             border-radius: 4rem;
@@ -18,6 +19,46 @@
             padding-right: 1rem !important;
         }
 
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        /* Calendar circular dates */
+        #calendar {
+            max-width: 700px !important;
+        }
+        .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            min-height: 2em;
+            position: relative ;
+        }
+        .fc .fc-daygrid-day-top {
+            display : flex ;
+            justify-content: center !important;
+        }
+        .fc-daygrid-day-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .fc-daygrid-day-number:hover {
+            background: #0d6efd;
+            color: #fff !important;
+            cursor: pointer;
+        }
+        /* Event style */
+        .fc-daygrid-event {
+            border-radius: 8px !important;
+            padding: 2px 6px !important;
+            font-size: 0.8rem !important;
+        }
+        .fc-toolbar-title {
+            font-size: 1.2rem !important;
+            font-weight: 600;
+        }
     </style>
 @endsection
 
@@ -58,34 +99,193 @@
     </div>
 </div>
 
-<div class="row mt-10">
-    <!-- ABC CENTER SUMMARY -->
-        <div class="col-md-4">
-            <div class="card mb-5 mb-xl-8">
-                <div class="card-header border-0 pt-5">
-                    <h3 class="card-title align-items-start flex-column">
-                        <span class="card-label fw-semibold fs-4 mb-1">{{ __('Calender')}}</span>
-                    </h3>
-                    <div class="card-toolbar">
-                        <div id="calendar">
-                            <div class="calendar-header">
-                                <button id="prevMonth">◀</button>
-                                <h2 id="monthYear"></h2>
-                                <button id="nextMonth">▶</button>
-                            </div>
-                            <div class="calendar-grid" id="calendarGrid"></div>
+<div class="row mt-10 calender_card">
+    <!-- Calender Start -->
+        <div class="col-md-8">
+            <div class="card mb-5">
+                <!-- Card Header with Toolbar -->
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">📅 Calendar</h3>
+                    <div class="card-toolbar d-flex gap-2">
+                        <button class="btn btn-primary btn-sm">Export</button>
+                        <button class="btn btn-success btn-sm">Leave Apply</button>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary btn-sm">Month</button>
+                            <button class="btn btn-outline-secondary btn-sm">Week</button>
+                            <button class="btn btn-outline-secondary btn-sm">Day</button>
                         </div>
-
-                        <!-- Hover tooltip -->
-                        <div id="tooltip" class="tooltip"></div>
                     </div>
                 </div>
-                <div class="card-body py-3">
-                    
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div id="calendar"></div>
                 </div>
             </div>
         </div>
-    <!-- ABC CENTER SUMMARY -->
+
+        <!-- Modal for Adding Event (Current Date) -->
+        <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <form id="eventForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Event</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="eventDate">
+                            <div class="mb-3">
+                                <label for="eventTitle" class="form-label">Event Title</label>
+                                <input type="text" id="eventTitle" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventTime" class="form-label">Event Time</label>
+                                <input type="time" id="eventTime" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventColor" class="form-label">Choose Color</label>
+                                <input type="color" id="eventColor" value="#0d6efd" class="form-control form-control-color">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save Event</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing Punchin Modal (Past Date)-->
+        <div class="modal fade" id="regularizeAttendanceModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm">{{ __('Apply Leave')}}</button>
+                    </div>
+                    
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('Add Request For Regularize Attendance')}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="regularizeAttendanceModalForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="eventDate">
+                            <div class="mb-3">
+                                <label for="punchInTimeId" class="form-label">{{ __('Punch In Time')}}</label>
+                                <input type="text" id="punchInTimeId" class="form-control" oninput="openFlatpickr(event)" require>
+                            </div>
+                            <div class="mb-3">
+                                <label for="punchOutTimeId" class="form-label">{{ __('Punch Out Time')}}</label>
+                                <input type="text" id="punchOutTimeId" class="form-control" oninput="openFlatpickr(event)" require>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventColor" class="form-label">{{ __('Reason')}}</label>
+                                <input type="color" id="eventColor" value="#0d6efd" class="form-control form-control-color" oninput="stringValidation(event)" require>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventColor" class="form-label">{{ __('Your Current Location:-')}}</label>
+                                <input type="color" id="eventColor" value="#0d6efd" class="form-control form-control-color">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save Event</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Adding Request Leave (Upcoming Date) -->
+        <div class="modal fade" id="requestLeaveModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="btn-group">
+                        <button class="btn btn-sm">{{ __('Apply Leave')}}</button>
+                    </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('Add Request For Leave')}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="requestLeaveForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="requestLeaveDate">
+                            <div class="mb-3">
+                                <label for="punchInTimeId" class="form-label">{{ __('Select Leave Type')}}</label>
+                                <select name="role_id" class="form-select" id="roleId" data-control="select2" data-placeholder="Select leave type">
+                                    <option></option>
+                                    <option value="professional_leave">{{ __('Professional Tax')}}</option>
+                                    <option value="sick_leave">{{ __('Sick Leave')}}</option>
+                                    <option value="emeragency_leave">{{ __('Emeragency Leave')}}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-group">
+                                    <label class="required fs-6 fw-semibold mb-2">{{ __('Single Or Multiple Days Leave')}}</label>
+                                    <div>
+                                        <label class=" fs-6 fw-semibold mb-2">
+                                            {{ __('Single')}}
+                                            <input type="checkbox" name="single_leave_type" id="single_leave_type" class="mx-2" onclick="handleTypeCheckbox('single_leave_type_div')">
+                                        </label>
+                                        <label class="fs-6 fw-semibold mb-2">
+                                            {{ __('Multiple')}}
+                                            <input type="checkbox" name="multiple_leave_type" id="multiple_leave_type" class="ml-4 mx-2" onclick="handleTypeCheckbox('multiple_leave_type_div')">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4" id="single_leave_type_div" style="display: none;">
+                                <div class="form-group">
+                                    <label class="fs-6 fw-semibold mb-2">{{ __('Select Date')}}</label>
+                                    <input type="text" name="leave_date" id="leave_date" onfocus="openFlatpickr(event)" class="form-control" placeholder="signle leave date">
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-4" id="multiple_leave_type_div" style="display: none;">
+                                <div class="d-flex justify-content-between">
+                                    <div class="col-md-5">
+                                        <label class="fs-6 fw-semibold mb-2">{{ __('From Date')}}</label>
+                                        <input type="text" name="leave_start_date" id="leave_start_date" onfocus="openFlatpickr(event)" class="form-control" placeholder="leave start date">
+                                    </div>
+                                    <div class="col-md-1"></div>
+                                    <div class="col-md-5">
+                                        <label class="fs-6 fw-semibold mb-2">{{ __('To Date')}}</label>
+                                        <input type="text" name="leave_end_date" id="leave_end_date" onfocus="openFlatpickr(event)" class="form-control" placeholder="leave end date">
+                                    </div>
+                                    <div class="col-md-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save Event</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <!-- Calender End -->
+
+
+    <!-- Holiday Section -->
+        <div class="col-md-4">
+            <div class="card mb-5 mb-xl-8">
+                <div class="card-header border-0 pt-5 d-flex flex-row align-items-center justify-content-between">
+                    <span class="card-label fw-semibold fs-4 mb-1">{{ __('Holidays')}}</span>
+                    <select class="form-select" style="width:30%; border:none; box-shadow:none;">
+                        <option value="2022">{{ __('2022')}}</option>
+                        <option value="2023">{{ __('2023')}}</option>
+                        <option value="2024">{{ __('2024')}}</option>
+                        <option selected value="2025">{{ __('2025')}}</option>
+                        <option value="2026">{{ __('2026')}}</option>
+                        <option value="2027">{{ __('2027')}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    <!-- Holiday Section -->
+
      
     <!-- Attendance & Leave Section -->
         <div class="col-md-4">
@@ -141,46 +341,7 @@
             </div>
         </div>
     <!-- Attendance & Leave Section -->
-     
-    <!-- Holiday Section -->
-        <div class="col-md-4">
-            <div class="card mb-5 mb-xl-8">
-                <div class="card-header border-0 pt-5 d-flex flex-row align-items-center justify-content-between">
-                    <span class="card-label fw-semibold fs-4 mb-1">{{ __('Holidays')}}</span>
-                    <select class="form-select" style="width:30%; border:none; box-shadow:none;">
-                        <option value="2022">{{ __('2022')}}</option>
-                        <option value="2023">{{ __('2023')}}</option>
-                        <option value="2024">{{ __('2024')}}</option>
-                        <option selected value="2025">{{ __('2025')}}</option>
-                        <option value="2026">{{ __('2026')}}</option>
-                        <option value="2027">{{ __('2027')}}</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    <!-- Holiday Section -->
 
-    <!-- Current Date Detail Section -->
-        <div class="col-md-4">
-            <div class="card mb-5 mb-xl-8">
-                <div class="card-header border-0 pt-5">
-                    <h3 class="card-title align-items-start flex-column">
-                        <span class="card-label fw-semibold fs-4 mb-1">{{ __('Current Date Detail') }}</span>
-                    </h3>
-                    <div class="card-toolbar">
-
-                    </div>
-                </div>
-                <div class="card-body py-3">
-                    <div class="table-responsive">
-                        <div class="align-items-start gap-4">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <!-- Current Date Detail Section -->
 
     <!-- Leave Balance Section -->
         <div class="col-md-4">
@@ -318,6 +479,29 @@
             </div>
         </div>
     <!-- Help Section -->
+
+
+    <!-- Current Date Detail Section -->
+        <div class="col-md-4">
+            <div class="card mb-5 mb-xl-8">
+                <div class="card-header border-0 pt-5">
+                    <h3 class="card-title align-items-start flex-column">
+                        <span class="card-label fw-semibold fs-4 mb-1">{{ __('Current Date Detail') }}</span>
+                    </h3>
+                    <div class="card-toolbar">
+
+                    </div>
+                </div>
+                <div class="card-body py-3">
+                    <div class="table-responsive">
+                        <div class="align-items-start gap-4">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Current Date Detail Section -->
 </div>
 
 <!-- Attendence Leave Modal Start -->
@@ -630,9 +814,83 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
-<script src="{{ asset('assets/js/custom/dashboard.js') }}"></script>
-<script src="{{ asset('assets/js/custom/comman.js') }}"></script>
-<script src="{{ asset('assets/js/jquery-date.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/comman.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery-date.js') }}"></script>
+    <!-- FullCalendar JS -->
+    <script src="{{ asset('assets/js/calender/index.global.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let regularizeAttendanceModal = new bootstrap.Modal(document.getElementById('regularizeAttendanceModal'));
+            let requestLeaveModal = new bootstrap.Modal(document.getElementById('requestLeaveModal'));
+            let eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+            let calendarEl = document.getElementById('calendar');
+            let eventForm = document.getElementById('eventForm');
+            let eventDateInput = document.getElementById('eventDate');
+            let eventTitleInput = document.getElementById('eventTitle');
+            let eventTimeInput = document.getElementById('eventTime');
+            let eventColorInput = document.getElementById('eventColor');
+
+            let calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                selectable: true,
+                editable: true,
+                events: [
+                    { title: 'Meeting', start: '2025-09-28T10:00:00', color: '#198754' }
+                ],
+                dateClick: function (info) {
+                    eventDateInput.value = info.dateStr;
+                    let currentDate = new Date().toISOString().slice(0, 10);
+                    eventTitleInput.value = '';
+                    eventTimeInput.value = '';
+                    eventColorInput.value = '#0d6efd';
+                    let selectedDate = eventDateInput.value
+
+                    if(selectedDate == currentDate) {
+                        regularizeAttendanceModal.show();
+                        console.log("User Select Current Date")
+                        
+                    } else if(selectedDate > currentDate) {
+                        requestLeaveModal.show()
+                        console.log("User Select Upcoming Date")
+
+                    } else {
+                        console.log("User Select Past Date")
+                    }
+                    
+                },
+                eventClick: function (info) {
+                    if (confirm("Do you want to delete this event?")) {
+                        info.event.remove();
+                    }
+                }
+            });
+
+            calendar.render();
+
+            // Form submit
+            eventForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                let title = eventTitleInput.value;
+                let date = eventDateInput.value;
+                let time = eventTimeInput.value;
+                let color = eventColorInput.value;
+
+                if (title) {
+                    let startDate = date + (time ? 'T' + time : '');
+                    calendar.addEvent({
+                        title: title,
+                        start: startDate,
+                        color: color
+                    });
+                    eventModal.hide();
+                }
+            });
+        });
+    </script>
 @endsection

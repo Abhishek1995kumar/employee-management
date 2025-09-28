@@ -5,23 +5,41 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class HasPermissionMiddleware {
     public function handle(Request $request, Closure $next): Response {
-        // $router = DB::table('permissions')->where('app_url', $request->route()->uri())->value('app_url');
-        $currentRoute = $request->route()->getName();
-        $router = DB::table('role_permission')->where('route_url', $currentRoute)->value('route_url');
-        $user = auth()->user()->id;
-        $permissions = DB::select("SELECT us.name, us.role_id, rp.role_id, rp.permission_name, rp.route_url FROM `users` us join role_permission rp ON rp.role_id = us.role_id where us.id= ?", [$user]);
-        if(auth()->user()->role_id === 1) {
-            return $next($request);
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return abort(401, 'You are not authenticated user to access this route');
+            }
 
-        } else {
-            if($currentRoute === $router && $permissions) {
+            $role = DB::table('roles')->where('id', $user->role_id)->first();
+            if ($role && $role->slug === 'super_admin') {
+                // Super Admin ko by default sabhi permission dena
+                return $next($request);
+            } 
+            
+            // Normal role ke liye jo assign kiya gaya hai wahi permission milega
+            $currentRoute = $request->route()->getName();
+            $allowedRoutes = DB::table('role_permission')
+                                ->where('role_id', $user->role_id)
+                                ->pluck('route_url')
+                                ->toArray(); // Allowed routes for the user's role based
+
+            if (in_array($currentRoute, $allowedRoutes)) {
+                // dd($currentRoute, $allowedRoutes);
                 return $next($request);
             }
+
+            return abort(403, 'Unauthorized Access');
+                
+            
+        } catch(Throwable $th) {
+            
         }
-        return abort(404, "Something went wrong");
+
     }
 }

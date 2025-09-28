@@ -28,11 +28,7 @@ class RoutePermissionMappingController extends Controller {
         $permissions = $this->routePermission();
         
         $roles = Role::where('status', 1)->where('slug', '!=', 'super_admin')->get();
-        $routePermissionMappingList = DB::select("SELECT rp.id, rp.permission_id, p.name permission_name, rp.route_name, u.name user_name 
-                                        FROM route_permission rp LEFT JOIN permissions p ON p.id = rp.permission_id 
-                                        LEFT JOIN users u ON u.id = rp.created_by
-                                    ");
-        
+        $routePermissionMappingList = $this->allRoutePermissionModuleTrait();
         $routes = Route::getRoutes();
         $middlewareGroup = 'isAdmin';
         $authenticatedRoutes = [];

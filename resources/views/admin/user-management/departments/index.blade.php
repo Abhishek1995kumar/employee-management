@@ -67,11 +67,10 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                @if(Auth::user()->hasPermissionToRoute('admin/department'))
+                @if(Auth::user()->hasPermission('admin.department.save'))
                     <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addAnimalVaccination" class="btn btn-primary" >
                         {{ __('Add Department')}}
                     </button>
-                @else
                 @endif
             </div>
         </div>

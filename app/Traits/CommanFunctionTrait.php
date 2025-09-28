@@ -144,7 +144,6 @@ trait CommanFunctionTrait {
         }
     }
 
-
     public function logoutTrait() {
         try {
             $user = Auth::user();
@@ -169,6 +168,16 @@ trait CommanFunctionTrait {
         }
     }
 
+    public function strtolowerWithTrimTrait($data) {
+        if($data) {
+            return strtolower(trim($data));
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No data is found',
+            ]);
+        }
+    }
 
 
 

@@ -72,7 +72,6 @@ function loadDatabaseRecord(url, columns, tableId, editFn, deleteFn, showFn, edi
 }
 
 
-
 // sweetalert 
 function validationAlert(title, text, icon, timer, confirmButtonText, showConfirmButton) {
     Swal.fire({
@@ -84,7 +83,6 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
         showConfirmButton: showConfirmButton === undefined ? true : showConfirmButton,
     });
 }
-
 
 
 // Accept Only Number function start 
@@ -127,22 +125,85 @@ const stringValidation = (event) => {
 
 // flatpickr calendar function start
 const openFlatpickr = (event) => {
-    const input = event.target;
-    if (input.type !== 'text') {
-        console.warn(`Input field with ID ${input.id} is not a text date input.`);
-        return;
-    }
+    let input = event.target;
+    // Arrays for restrictions
+    let blockNextDateArrays = ['date_of_birth']; // Past-only
+    let blockBackDateArrays = ['employee_last_working_date']; // Future-only
+    let fromDateArray = ['leave_start_date', 'perchase_date', 'previous_doj_1', 'holiday_start_date'];  // FROM, From date ka aur to date ka index same hona chahiye
+    let toDateArray = ['leave_end_date', 'assigned_date', 'previous_doe_1', 'holiday_end_date'];  // To, To date ka aur From date ka index same hona chahiye, tab hi work karega
+
     if (!input._flatpickr) {
-        input._flatpickr = flatpickr(input, {
-            dateFormat: 'Y-m-d',
-            allowInput: true,
-            onChange: function (selectedDates, dateStr) {
-                input.value = dateStr;
-            }
-        });
+        // Single leave
+        if (input.id === "leave_date") {
+            input._flatpickr = flatpickr(input, {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: "d F Y",
+                allowInput: true
+            });
+
+        // From Date Handling
+        } else if (fromDateArray.includes(input.id)) {
+            input._flatpickr = flatpickr(input, {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: "d F Y",
+                allowInput: true,
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        let fromDate = selectedDates[0];
+                        // Matching To-date field nikalna (array based mapping)
+                        let fromIndex = fromDateArray.indexOf(input.id);
+                        let toFieldId = toDateArray[fromIndex];  // same index ka pair lega
+                        let toDateInput = document.getElementById(toFieldId);
+
+                        if (toDateInput) {
+                            // Enable To-date only after From-date is chosen
+                            toDateInput.removeAttribute("disabled");
+
+                            // Destroy previous instance if exists
+                            if (toDateInput._flatpickr) {
+                                toDateInput._flatpickr.destroy();
+                            }
+
+                            // Re-init with restriction
+                            toDateInput._flatpickr = flatpickr(toDateInput, {
+                                dateFormat: 'Y-m-d',
+                                altInput: true,
+                                altFormat: "d F Y",
+                                allowInput: true,
+                                minDate: fromDate
+                            });
+                        }
+                    }
+                }
+            });
+
+        // ✅ Only Past Dates
+        } else if (blockNextDateArrays.includes(input.id)) {
+            input._flatpickr = flatpickr(input, {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: "d F Y",
+                allowInput: true,
+                maxDate: 'today'
+            });
+
+        // ✅ Only Future Dates
+        } else if (blockBackDateArrays.includes(input.id)) {
+            input._flatpickr = flatpickr(input, {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: "d F Y",
+                allowInput: true,
+                minDate: 'today'
+            });
+        }
     }
+
     input._flatpickr.open();
 };
+
 
 
 // Show Three Month Befrore From Crruent Month And One Month After function start
@@ -290,6 +351,23 @@ function handleTypeCheckbox(type) {
         }
     }
 
+
+        let singleLeaveTypeCheckbox = document.getElementById('single_leave_type');
+        let multipleLeaveTypeCheckbox = document.getElementById('multiple_leave_type');
+        if (type === 'single_leave_type_div') {
+            if (singleLeaveTypeCheckbox.checked) {
+                multipleLeaveTypeCheckbox.checked = false;
+                ifcheckThanShowDiv(singleLeaveTypeCheckbox, 'single_leave_type_div');
+                ifcheckThanShowDiv(multipleLeaveTypeCheckbox, 'multiple_leave_type_div');
+            }
+        } else if (type === 'multiple_leave_type_div') {
+            if (multipleLeaveTypeCheckbox.checked) {
+                singleLeaveTypeCheckbox.checked = false;
+                ifcheckThanShowDiv(multipleLeaveTypeCheckbox, 'multiple_leave_type_div');
+                ifcheckThanShowDiv(singleLeaveTypeCheckbox, 'single_leave_type_div');
+            }
+        }
+
     // Handle fixed time checkboxes start --
         let yesFixed = [], noFixed = [];
         for (let i = 1; i <= 8; i++) {
@@ -371,4 +449,88 @@ const ifcheckThanShowDiv = (checkboxElement, divId) => {
         targetDiv.style.display = 'none';
     }
 };
+
+
+
+// when user submit form tab check validation 
+function checkRequiredFields(formId, saveButtonId) {
+    const form = document.getElementById(formId);
+    const saveButton = document.getElementById(saveButtonId);
+    let allFilled = true;
+    let missingFields = [];
+
+    form.querySelectorAll("[required]").forEach(input => {
+        if (!input.value.trim()) {
+            allFilled = false;
+            // Label > placeholder > name > id
+            let label = "";
+            if (input.labels && input.labels.length > 0) {
+                label = input.labels[0].innerText;
+            } else {
+                label = input.getAttribute("placeholder") || input.getAttribute("name") || input.id || "Unnamed field";
+            }
+
+            missingFields.push(label);
+        }
+    });
+
+    if (allFilled) {
+        saveButton.style.display = "block";
+        saveButton.disabled = false;
+
+    } else {
+        saveButton.style.display = "none";
+        if (missingFields.length > 0) {
+            let message = "<b>Please fill the following fields:</b><ul style='text-align:left;'>";
+            missingFields.forEach(f => {
+                message += `<li>${f}</li>`;
+            });
+            message += "</ul>";
+            validationAlert("Missing Fields", message, "warning");
+        }
+    }
+}
+
+function validateBeforeSubmit(formId, saveButtonId) {
+    const form = document.getElementById(formId);
+    const saveButton = document.getElementById(saveButtonId);
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        let allFilled = true;
+        let missingFields = [];
+        form.querySelectorAll("[required]").forEach(input => {
+            if (!input.value.trim()) {
+                allFilled = false;
+                let label = "";
+                if (input.labels && input.labels.length > 0) {
+                    label = input.labels[0].innerText;
+                } else {
+                    label = input.getAttribute("placeholder") || input.getAttribute("name") || input.id || "Unnamed field";
+                }
+                missingFields.push(label);
+            }
+        });
+
+        if (!allFilled) {
+            let message = "<b>Please fill the following fields:</b><ul style='text-align:left;'>";
+            missingFields.forEach(f => {
+                message += `<li>${f}</li>`;
+            });
+            message += "</ul>";
+
+            validationAlert("Missing Fields", message, "warning");
+            return false;
+        }
+
+        // Disable save button to prevent multiple submits
+        saveButton.disabled = true;
+        saveButton.innerText = "Saving...";
+        // Finally submit form
+        form.submit();
+    });
+}
+
+
+
+
 

@@ -19,7 +19,6 @@ class UserOnboardingController extends Controller {
     public function index() {
         $id = Auth::user()->id;
         $permissions = $this->routePermission();
-
         $users = DB::select("SELECT 
             u.id, 
             u.name AS username, 
@@ -40,9 +39,7 @@ class UserOnboardingController extends Controller {
     }
 
     public function create() {
-        $roles = DB::select("SELECT rp.id, r.name AS role_name FROM role_permission rp
-                            JOIN roles r ON rp.role_id = r.id
-                            ORDER BY rp.id DESC");
+        $roles = $this->getRoleNames();
         return view('admin.user-management.users.create', [
             'roles' => $roles,
         ]);
@@ -54,8 +51,9 @@ class UserOnboardingController extends Controller {
             $validator = $this->validateUser($request);
             if($validator) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => $validator
+                    'success' => false,
+                    'message' => $validator,
+                    'code' => 1
                 ]);
             }
 
@@ -75,14 +73,18 @@ class UserOnboardingController extends Controller {
             $user->address = trim($request->address);
             $user->save();
             return response()->json([
-                'status' => 'success',
-                'message' => 'Role permission mapping saved successfully.'
+                'success' => true,
+                'message' => 'Role permission mapping saved successfully.',
+                'code' => 0
             ]);
 
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors($e->getMessage())->withInput();
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getTraceAsString(),
+                'code' => 2
+            ], 500);
         }
-        return redirect()->route('admin.user.index')->with('success', 'User created successfully.');
     }
 
 
@@ -91,17 +93,19 @@ class UserOnboardingController extends Controller {
             $validator = $this->validateUser($request, 'update');
             if($validator) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => $validator
-                ]);
+                    'success' => false,
+                    'message' => $validator,
+                    'code' => 1
+                ], 422);
             }
 
             $user = User::find($request->user_id);
             if(!$user) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'User not found.'
-                ]);
+                    'success' => false,
+                    'message' => 'User not found.',
+                    'code' => 2
+                ], 404);
             }
             $user->role_id = $request->role_id;
             $user->username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', trim($request->username)));
@@ -113,14 +117,19 @@ class UserOnboardingController extends Controller {
             $user->address = trim($request->address);
             $user->save();
             return response()->json([
-                'status' => 'success',
-                'message' => 'User updated successfully.'
-            ]);
+                'success' => true,
+                'message' => 'User updated successfully.',
+                'code' => 0
+            ], 200);
 
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors($e->getMessage())->withInput();
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getTraceAsString(),
+                'code' => 2
+            ], 500);
         }
-        return redirect()->route('admin.user.index')->with('success', 'User updated successfully.');
+        
     }
 
 
@@ -129,18 +138,24 @@ class UserOnboardingController extends Controller {
             $user = User::find($request->user_id);
             if(!$user) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'User not found.'
+                    'success' => false,
+                    'message' => 'User not found.',
+                    'code' => 1
                 ]);
             }
             $user->delete();
             return response()->json([
-                'status' => 'success',
-                'message' => 'User deleted successfully.'
+                'success' => false,
+                'message' => 'User deleted successfully.',
+                'code' => 0
             ]);
 
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors($e->getMessage())->withInput();
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getTraceAsString(),
+                'code' => 2
+            ], 500);
         }
         return redirect()->route('admin.user.index')->with('success', 'User deleted successfully.');
     }

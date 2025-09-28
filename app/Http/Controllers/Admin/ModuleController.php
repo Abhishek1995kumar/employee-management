@@ -13,6 +13,7 @@ use App\Traits\CommanFunctionTrait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 
 class ModuleController extends Controller {
     use ValidationTrait, CommanFunctionTrait, QueryTrait;
@@ -102,7 +103,7 @@ class ModuleController extends Controller {
                     }
                 }
             }
-
+            
             // agar koi bhi route match nahi karta
             if(!$isValidModule) {
                 return response()->json([
@@ -125,6 +126,7 @@ class ModuleController extends Controller {
             $module->slug = str_replace('-', '_', $module->name) ?? null;
             $module->updated_at = null;
             $module->save();
+            $this->storeLog('Module', 'save', 'Module');
             return response()->json([
                 'success' => true,
                 'message' => 'New module created successfully.',

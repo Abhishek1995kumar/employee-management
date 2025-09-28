@@ -550,5 +550,97 @@ trait ValidationTrait {
         }
     // Role Permission Mapping Validation Trait
 
+
+    public function holidayValidationTrait($data) {
+        try {
+            $rules = [
+                'firm_id'            => ['required', 'string'],
+                'holiday_name'       => ['required', 'string', 'max:255'],
+                'day_of_holiday'     => ['required', 'string'],
+                'month_of_holiday'   => ['required', 'string'],
+                'year_of_holiday'    => ['required', 'string'],
+                'holiday_start_date' => ['required', 'date'],
+                'holiday_end_date'   => ['required', 'date'],
+                'color'              => ['required', 'string'],
+                'holiday_image'      => ['nullable', 'string', 'max:500'],
+                'description'        => ['nullable', 'string', 'max:500'],
+                'category'           => ['required', 'integer'],
+            ];
+
+            $messages = [
+                'holiday_name.required'       => 'The holiday name field is required.',
+                'holiday_name.string'         => 'The holiday name must be a string.',
+                'holiday_name.max'            => 'The holiday name may not be greater than 255 characters.',
+                'day_of_holiday.required'     => 'The day of holiday field is required.',
+                'day_of_holiday.string'       => 'The day of holiday must be a string.',
+                'month_of_holiday.required'   => 'The month of holiday field is required.',
+                'month_of_holiday.string'     => 'The month of holiday must be a string.',
+                'year_of_holiday.required'    => 'The year of holiday field is required.',
+                'year_of_holiday.string'      => 'The year of holiday must be a string.',
+                'holiday_start_date.required' => 'The holiday start date field is required.',
+                'holiday_start_date.date'     => 'The holiday start date must be a date type like (2025-06-21).',
+                'holiday_end_date.required'   => 'The holiday end date field is required.',
+                'holiday_end_date.date'       => 'The holiday end date must be a date type like (2025-06-21).',
+                'color.required'              => 'The color field is required.',
+                'color.string'                => 'The color must be a string.',
+                'holiday_image.string'        => 'The holiday image must be a string.',
+                'holiday_image.max'           => 'The holiday image may not be greater than 255 characters.',
+                'description.string'          => 'The description must be a string.',
+                'description.max'             => 'The description may not be greater than 255 characters.',
+                'category.required'           => 'The category field is required.',
+                'category.integer'            => 'The category must be a integer.',
+            ];
+
+            $errors = [];
+
+            foreach ($rules as $field => $fieldRules) {
+                $value = $data[$field] ?? null;
+
+                foreach ($fieldRules as $rule) {
+                    // handle nullable fields
+                    if ($rule === 'nullable' && is_null($value)) {
+                        continue 2; // skip remaining rules for this field
+                    }
+
+                    // required
+                    if ($rule === 'required' && (is_null($value) || $value === '')) {
+                        $errors[$field][] = $messages["{$field}.required"];
+                    }
+
+                    // string
+                    elseif ($rule === 'string' && !is_string($value)) {
+                        $errors[$field][] = $messages["{$field}.string"];
+                    }
+
+                    // max length
+                    elseif (Str::startsWith($rule, 'max:')) {
+                        $max = (int) Str::after($rule, 'max:');
+                        if (!is_null($value) && strlen($value) > $max) {
+                            $errors[$field][] = $messages["{$field}.max"];
+                        }
+                    }
+
+                    // integer
+                    elseif ($rule === 'integer' && !is_numeric($value)) {
+                        $errors[$field][] = $messages["{$field}.integer"];
+                    }
+
+                    // date
+                    elseif ($rule === 'date' && (strtotime($value) === false)) {
+                        $errors[$field][] = $messages["{$field}.date"];
+                    }
+                }
+            }
+
+            return $errors;
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
+
 }
 

@@ -59,13 +59,11 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                @foreach($permissions as $permission)
-                    @if($permission->route_url == 'admin.user.create')
-                        <a href="{{ route('admin.user.create') }}" class="btn btn-primary mx-3">
-                            {{ __('Add Employee')}}
-                        </a>
-                    @endif
-                @endforeach
+                @if(Auth::user()->hasPermission('admin.user.create'))
+                    <a href="{{ route('admin.user.create') }}" class="btn btn-primary mx-3">
+                        {{ __('Add Employee')}}
+                    </a>
+                @endif
             </div>
         </div>
         <div class="card-body table-responsive">
@@ -90,10 +88,9 @@
                                     <span class="badge badge-light-danger">{{ __('No role name')}}</span>
                                 @endif
                             </td>
-                            @foreach($permissions as $permission)
                             <td class="text-center">
-                                @if($permission->route_url == 'admin.users.update')
-                                    <a href="{{ route('admin.users.update', $user->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                @if(Auth::user()->hasPermission('admin.user.update'))
+                                    <a href="{{ route('admin.user.update', $user->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
                                         <span class="svg-icon svg-icon-3">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M14.8284 2.34315C15.2196 2.73438 15.2196 3.36739 14.8284 3.75862L12.5858 6L10.4142 3.82843L12.6569 1.58579C13.0481 1.19557 13.6811 1.19557 14.0724 1.58579L14.8284 2.34315Z" fill="currentColor"/>
@@ -106,8 +103,8 @@
                                     </a>
                                 @endif
 
-                                @if($permission->route_url == 'admin.users.delete')
-                                    <a href="{{ route('admin.users.delete', $user->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                @if(Auth::user()->hasPermission('admin.user.delete'))
+                                    <a href="{{ route('admin.user.delete', $user->id) }}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
                                         <span class="svg-icon svg-icon-3">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6V19ZM8 9H16V19H8V9Z" fill="currentColor"/>
@@ -118,7 +115,6 @@
                                     </a>
                                 @endif
                             </td>
-                            @endforeach
                         </tr>
                     @endforeach
                 </tbody>
