@@ -22,7 +22,7 @@ var KTModalAdd = function () {
                             },
                             regexp: {
                                 // Accepts email, 10-digit number, or username (alphanumeric, dots, underscores, min 3 chars)
-                                regexp: /(^[^\s@]+@[^\s@]+\.[^\s@]+$)|(^[0-9]{10}$)|(^[a-zA-Z0-9._]{3,}$)/,
+                                regexp: /(^[^\s@]+@[^\s@]+\.[^\s@]+$)|(^[0-9]{10}$)|(^[a-zA-Z0-9._]{5,}$)/,
                                 message: "Please enter a valid login id (email, phone, or username)"
                             }
                         }

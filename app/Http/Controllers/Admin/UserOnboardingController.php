@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserOnboardingController extends Controller {
     use ValidationTrait, QueryTrait;
@@ -159,4 +161,61 @@ class UserOnboardingController extends Controller {
         }
         return redirect()->route('admin.user.index')->with('success', 'User deleted successfully.');
     }
+
+
+
+    public function userExcelSampleDownload(Request $request) {
+      
+            $employeeSheetRow = env('FORMATTED_ROWS', 100);
+            $fileToBeName = 'holiday-sample-' . time() . '.xlsx';
+            $savePath = public_path('Employee/Sample/' . $fileToBeName);
+
+            // agar folder exist nahi hai to bana do
+            if (!File::isDirectory(public_path('Holiday/Sample'))) {
+                File::makeDirectory(public_path('Holiday/Sample'), 0777, true, true);
+            }
+            $roles = User::selectRaw("CONCAT(id, '|', name) as role_option")->pluck('role_option')->toArray();
+            $gender = ['Male', 'Female', 'Other'];
+            $employeePerformanceLabel = ['30%', '40%', '50%', '60%', '70%','80%', '90%', '100%'];
+            $holidayMonth = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            $holidayYear = ['2021', '2022', '2023', '2024', '2025', '2026', '2027'];
+            $colorCode = ['#FF6F61', '#6B5B95', '#88B04B', '#F7CAC9', '#92A8D1', '#955251', '#B565A7', '#009B77', '#DD4124', '#D65076', '#45B8AC', '#EFC050', '#5B5EA6', '#9B2335', '#BC243C', '#C3447A', '#98B4D4', '#DEEAEE', '#7BC4C4', '#E15D44', '#53B0AE', '#EFC7C2', '#FFD662', '#6A5ACD', '#20B2AA'];
+            $columns = [
+                'Branch ID','Holiday Name','Holiday Image','Holiday Category',
+                'Holiday Day','Holiday Month','Holiday Year','Holiday Color',
+                'Start Date','End Date','Description',''
+            ];
+
+            $dropdownDetails = [
+                'holiday_category_index' => 3,
+                'holiday_category_option' => $holidayCategory,
+                'holiday_day_index' => 4,
+                'holiday_day_option' => $dayOfHoliday,
+                'holiday_month_index' => 5,
+                'holiday_month_option' => $holidayMonth,
+                'holiday_year_index' => 6,
+                'holiday_year_option' => $holidayYear,
+                'holiday_color_code_index' => 7,
+                'holiday_color_code_option' => $colorCode,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sample excel generated successfully.',
+                'code' => 0,
+                'download_url' => $downloadUrl
+            ]);
+
+    }
+
+
+    public function userBlukUpload(Request $request) {
+        try {
+            
+        } catch(Throwable $th) {
+
+        }
+    }
+
+
 }

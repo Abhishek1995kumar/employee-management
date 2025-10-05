@@ -66,6 +66,14 @@
                 <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addHoliday" class="btn btn-primary" >
                     {{ __('Add Holiday')}}
                 </button>
+                <a id="sampleExcelDownloadId" onclick="sampleExcelDownload(event)" class="btn btn-success mx-3" > {{ __('Excel Download')}} </a>
+                
+                <!-- For Import Button Start --><!-- Hidden file input -->
+                <input type="file" id="holidayExcelFile" accept=".xlsx, .xls" style="display:none" />
+                <button id="sampleExcelImportId" onclick="triggerHolidayFile()" class="btn btn-success mx-3">
+                    {{ __('Excel Import') }}
+                </button>
+                <!-- For Import Button End --><!-- Hidden file input -->
             </div>
         </div>
         <div class="card-body table-responsive">
@@ -111,8 +119,8 @@
                                             <div class="row">
                                                 <div class="col-md-6 mb-4 " id="firm_id_div">
                                                     <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Company Firm')}}</label>
-                                                        <select name="firm_id" id="firm_id" class="form-select" data-control="select2" data-placeholder="Select firm " >
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Company Branch')}}</label>
+                                                        <select name="branch_id" id="firm_id" class="form-select" data-control="select2" data-placeholder="Select branch " >
                                                             <option ></option>
                                                             <option value="luck_101">Lucknow</option>
                                                             <option value="del_101">Delhi</option>
@@ -125,14 +133,14 @@
                                                 <div class="col-md-6 mb-4 " id="name_of_holiday_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Name Of Holiday')}}</label>
-                                                        <input type="text" name="holiday_name" id="name_of_holiday" oninput="stringValidation(event)" class="form-control" placeholder="name of holiday" >
+                                                        <input type="text" name="holiday_name" id="name_of_holiday" class="form-control" placeholder="name of holiday" >
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6 mb-4 " id="day_for_holiday_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Day For Holiday')}}</label>
-                                                        <select name="day_of_holiday" id="day_for_holiday" class="form-select" data-control="select2" data-placeholder="Select day for holiday" >
+                                                        <select name="holiday_day" id="day_for_holiday" class="form-select" data-control="select2" data-placeholder="Select day for holiday" >
                                                             <option ></option>
                                                             <option value="Monday">Monday</option>
                                                             <option value="Tuesday">Tuesday</option>
@@ -148,7 +156,7 @@
                                                 <div class="col-md-6 mb-4 " id="holiday_month_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Month')}}</label>
-                                                        <select name="month_of_holiday" id="holiday_month" class="form-select" data-control="select2" data-placeholder="Select holiday month" >
+                                                        <select name="holiday_month" id="holiday_month" class="form-select" data-control="select2" data-placeholder="Select holiday month" >
                                                             <option ></option>
                                                             <option value="January">January</option>
                                                             <option value="February">February</option>
@@ -169,7 +177,7 @@
                                                 <div class="col-md-6 mb-4 " id="holiday_year_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Year')}}</label>
-                                                        <select name="year_of_holiday" id="holiday_year" class="form-select" data-control="select2" data-placeholder="Select holiday year" >
+                                                        <select name="holiday_year" id="holiday_year" class="form-select" data-control="select2" data-placeholder="Select holiday year" >
                                                             <option ></option>
                                                             <option value="2021">2021</option>
                                                             <option value="2022">2022</option>
@@ -184,7 +192,7 @@
                                                 <div class="col-md-6 mb-4 " id="category_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Category')}}</label>
-                                                        <select name="category" id="category_name" class="form-select" data-control="select2" data-placeholder="Select holiday category" >
+                                                        <select name="holiday_category" id="category_name" class="form-select" data-control="select2" data-placeholder="Select holiday category" >
                                                             <option value="">Select Category</option>
                                                             <option value="1">National Holiday</option>
                                                             <option value="2">State Holiday</option>
@@ -202,21 +210,21 @@
                                                 <div class="col-md-6 mb-4 " id="description_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Description')}}</label>
-                                                        <input type="text" name="description" id="description" onclick="stringValidation(event)" class="form-control" placeholder="Enter holiday description" >
+                                                        <input type="text" name="description" id="description" class="form-control" placeholder="Enter holiday description" >
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6 mb-4 " id="holiday_date_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Start Date')}}</label>
-                                                        <input type="text" name="holiday_start_date" id="holiday_start_date" onclick="openFlatpickr(event)" class="form-control" placeholder="Enter holiday start date" >
+                                                        <input type="text" name="start_date" id="holiday_start_date" onclick="openFlatpickr(event)" class="form-control" placeholder="Enter holiday start date" >
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6 mb-4 " id="holiday_date_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday End Date')}}</label>
-                                                        <input type="text" name="holiday_end_date" id="holiday_end_date" onclick="openFlatpickr(event)" class="form-control" placeholder="Enter holiday end date" >
+                                                        <input type="text" name="end_date" id="holiday_end_date" onclick="openFlatpickr(event)" class="form-control" placeholder="Enter holiday end date" >
                                                     </div>
                                                 </div>
 
@@ -245,8 +253,10 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('assets/js/custom/roles/role.js') }}"></script>
-<script src="{{ asset('assets/js/custom/comman.js') }}"></script>
 <script src="{{ asset('assets/js/jquery-date.js') }}"></script>
+<script src="{{ asset('assets/js/custom/comman.js') }}"></script>
+<script src="{{ asset('assets/js/custom/roles/role.js') }}"></script>
+<script>
 
+</script>
 @endsection

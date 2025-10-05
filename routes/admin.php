@@ -23,10 +23,17 @@ Route::group(['middleware' => 'guest'], function () {
 
 
 Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
-    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('forgetPassword', [AuthController::class, 'showforget']);
     Route::post('changePassword', [AuthController::class, 'changepassword']);
     Route::get('logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('get-employee-details', [DashboardController::class, 'getEmployeeAttendenceDetails'])->name('admin.dashboard.employee_data');
+        Route::get('get-holiday-details', [DashboardController::class, 'getHolidayDetails'])->name('admin.dashboard.holiday_year');
+        Route::get('get-id-holiday-details', [DashboardController::class, 'getIdBaseHolidayDetails'])->name('admin.dashboard.holiday_id');
+    });
+
 
     Route::group(['middleware' => ['isPermission']], function () {
         Route::group(['prefix' => 'department'], function () {
@@ -99,6 +106,8 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
             Route::post('save', [UserOnboardingController::class, 'save'])->name('admin.user.save');
             Route::post('update', [UserOnboardingController::class, 'update'])->name('admin.user.update');
             Route::post('delete', [UserOnboardingController::class, 'delete'])->name('admin.user.delete');
+            Route::get('excel-sample-download', [UserOnboardingController::class, 'userExcelSampleDownload'])->name('admin.user.excel_sample_download');
+            Route::post('bulk-upload', [UserOnboardingController::class, 'userBlukUpload'])->name('admin.user.bulk_upload');
         });
 
         
@@ -108,6 +117,8 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
             Route::post('update', [HolidayController::class, 'update'])->name('admin.holiday.update');
             Route::post('delete', [HolidayController::class, 'delete'])->name('admin.holiday.delete');
             Route::get('show', [HolidayController::class, 'show'])->name('admin.holiday.show');
+            Route::get('excel-generate', [HolidayController::class, 'holidayExcelDownload'])->name('admin.holiday.excel_generate');
+            Route::post('excel-import', [HolidayController::class, 'holidayExcelImport'])->name('admin.holiday.excel_generate');
         });
 
 

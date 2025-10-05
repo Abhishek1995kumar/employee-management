@@ -7,6 +7,15 @@ $.ajaxSetup({
 
 
 // Role Js Start --
+ "use strict";
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    }
+});
+
+
+// Role Js Start --
     // function fetchRoles() {
     //     $.ajax({
     //         url: 'admin/role',
@@ -733,7 +742,6 @@ $.ajaxSetup({
         submitMeeting(meetingLocation, clientName, meetingTime, meetingDate, distanceInKm=null, durationInMinutes=null);
     }   
 
-
     function submitMeeting(meetingLocation, clientName, meetingTime, meetingDate, distanceInKm, durationInMinutes) {
         let url = 'admin/meeting/save';
         $('#addMeeting').modal('hide');
@@ -889,5 +897,61 @@ $.ajaxSetup({
             }
         });
     }
-// Holiday Js End --
 
+
+    // Holiday Export Start --
+        $('#sampleExcelImportId').hide();
+        $('#sampleExcelDownloadId').show();
+
+        const sampleExcelDownload = (event) => {
+            $.ajax({
+                url: 'admin/holiday/excel-generate',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success == true && response.code == 0) {
+                        validationAlert('Holiday excel generate', 'Successfully generate sample holiday excel sheet.', 'success', 2000, 'OK');
+                        $('#sampleExcelImportId').show();
+                        $('#sampleExcelDownloadId').hide();
+                        // Actual download trigger
+                        window.location.href = response.download_url;
+                    } else {
+                        $('#sampleExcelImportId').hide();
+                        $('#sampleExcelDownloadId').show();
+                    }
+                }
+            })
+        }
+    // Holiday Export End --
+    
+    // Holiday Import Start --
+        const triggerHolidayFile = () => {
+            document.getElementById('holidayExcelFile').click();
+        }
+        // Jab file select ho jaye
+        document.getElementById('holidayExcelFile').addEventListener('change', function () {
+            let file = this.files[0];
+            if (!file) return;
+
+            let formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                url: 'admin/holiday/excel-import',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success === true && response.code === 0) {
+                        validationAlert('Holiday excel upload', 'Successfully upload holiday excel sheet.', 'success', 2000, 'OK');
+                        $('#sampleExcelImportId').hide();
+                        $('#sampleExcelDownloadId').show();
+                    } else {
+                        $('#sampleExcelImportId').show();
+                        $('#sampleExcelDownloadId').hide();
+                    }
+                }
+            });
+        });
+    // Holiday Import Start End --
+// Holiday Js End --

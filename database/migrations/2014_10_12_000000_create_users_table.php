@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('customer_id')->nullable()->comment('Customer id fetch from customer table');
             $table->string('customer_code')->nullable()->comment('Customer code fetch from customer table');
+            $table->string('branch_id')->nullable()->comment('branch id fetch from customer_branches table');
             $table->integer('department_id')->nullable()->comment('Department id fetch from department table');
             $table->integer('designation_id')->nullable()->comment('Designation id fetch from designation table');
             $table->integer('role_id')->nullable()->comment('role id fetch from roles table');

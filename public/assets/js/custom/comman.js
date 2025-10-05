@@ -533,4 +533,56 @@ function validateBeforeSubmit(formId, saveButtonId) {
 
 
 
+// Excel download and upload button hide show start --
+    $('#userUploadBtnId').hide();
+    const excelSampleDownload = (event, url, uploadBtnId) => {
+        event.preventDefault();
+        let anchorTagId;
+        if (event.target.tagName === 'A') {
+            anchorTagId = event.target.id;
+        } else {
+            // In case clicked element is inside <a> (like <span> or <i>)
+            anchorTagId = $(event.target).closest('a').attr('id');
+        }
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (response) {
+                if (response.success === true && response.code === 0) {
+                    validationAlert('Excel generate', 'Successfully generated sample excel sheet.', 'success', 2000, 'OK');
+                    $('#' + anchorTagId).hide(); // Hide current download button
+                    if (uploadBtnId) {
+                        $('#' + uploadBtnId).show(); // Show the related upload button (passed dynamically)
+                    }
+                    
+                    window.location.href = response.download_url; // Trigger actual download
+                } else {
+                    validationAlert('Error', response.message || 'Failed to generate excel.', 'error', 2000, 'OK');
+                    $('#' + anchorTagId).show(); // Show current download button
+                }
+            },
+            error: function () {
+                validationAlert('Error', 'Something went wrong during excel generation.', 'error', 2000, 'OK');
+                $('#' + anchorTagId).show(); // Show current download button
+            }
+        });
+    };
+// Excel download and upload button hide show end --
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -384,12 +384,12 @@
 
                             <!--begin::Theme mode-->
                             <div class="d-flex align-items-center gap-3">
-                                <!-- <a href="{{url('admin/notification')}}" class="btn btn-sm btn-icon btn-icon-muted btn-active-icon-primary" style="position: relative;">
-                                    <i class="far fa-bell text-primary" style="font-size: 25px;"></i>
-                                    <span style="position: absolute; top: 0; right: -5px; padding: 0 5px 0 5px; border-radius: 50%; background-color: #0093dd; color: #fff;">
+                                <a href="{{url('admin/notification')}}" class="btn btn-sm btn-icon btn-icon-muted btn-active-icon-primary" style="position: relative;">
+                                    <i class="far fa-bell text-primary" style="font-size: 20px;"></i>
+                                    <span style="position: absolute; top: 0; right: -2px; padding: 0 2px 0 5px; border-radius: 50%; background-color: #0093dd; color: #fff;">
                                         9+
                                     </span>
-                                </a> -->
+                                </a>
 
                                 <a href="#" class="btn btn-sm btn-icon btn-icon-muted btn-active-icon-primary" data-kt-menu-trigger="{default:'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
                                     <span class="svg-icon theme-light-show svg-icon-2">

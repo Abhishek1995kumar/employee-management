@@ -1,3 +1,4 @@
+
 "use strict";
 $.ajaxSetup({
     headers: {
@@ -128,6 +129,7 @@ function showUploadDocumentImage(input) {
     let iconPreview = previewContainer.querySelectorAll('.iconPreview')[0];
 }
 
+
 function addMoreBankDetails(e) {
     e.preventDefault();
     let newBankDetails = `
@@ -236,6 +238,8 @@ function addMoreDocumentDetails(e) {
         });
     });
 }
+
+
 // Attendence Management
 document.querySelectorAll('input[name="choice"]').forEach((elem) => {
     elem.addEventListener("change", function(event) {
@@ -271,4 +275,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Attach submit validation
     validateBeforeSubmit("quickForm", "userFormBtn");
 });
+
+
+
+
 
