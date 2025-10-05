@@ -66,11 +66,10 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                @if(Auth::user()->hasPermissionToRoute('admin/role'))
+                @if(Auth::user()->hasPermission('admin.role.save'))
                     <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addRole" class="btn btn-primary"  id="createRole">
                         {{ __('Add Role')}}
                     </button>
-                @else
                 @endif
             </div>
         </div>
@@ -90,42 +89,37 @@
                             <td class="text-center">{{ $role->id }}</td>
                             <td class="text-center">{{ $role->name }}</td>
                             <!-- <td class="text-center">{{ $role->description }}</td> -->
-                            @if($role->name == 'Super Admin')
-                                
-                            @else
-                                <td class="text-center">
-                                    @if(Auth::user()->hasPermissionToRoute('admin/role/update'))
-                                        <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" 
-                                            data-bs-toggle="modal" data-bs-target="#editRole" 
-                                            data-id="{{ $role->id }}" 
-                                            data-name="{{ $role->name }}" 
-                                            onclick="editRole(this)">
-                                            <span class="svg-icon svg-icon-3">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M14.8284 2.34315C15.2196 2.73438 15.2196 3.36739 14.8284 3.75862L12.5858 6L10.4142 3.82843L12.6569 1.58579C13.0481 1.19557 13.6811 1.19557 14.0724 1.58579L14.8284 2.34315Z" fill="currentColor"/>
-                                                    <path d="M16.2426 3.75736C16.6338 4.14859 16.6338 4.78161 16.2426 5.17284L14 7L11.8284 4.82843L14.0701 2.58579C14.4613 2.19557 15.0944 2.19557 15.4856 2.58579L16.2426 3.75736Z" fill="currentColor"/>
-                                                    <path d="M19 7H5C4.44772 7 4 7.44772 4 8V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V8C20 7.44772 19.5523 7 19 7ZM18 18H6V9
-                                                    C6 8.44772 6.44772 8 7 8H18C18.5523 8 19 8.44772 19 9V18C19 18.5523 18.5523 19 18 19Z" fill="currentColor"/>
-                                                    <path d="M7 10H17C17.5523 10 18 10.4477 18 11V12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12V11C6 10.4477 6.44772 10 7 10Z" fill="currentColor"/>
-                                                </svg>
-                                            </span>
-                                        </button>
-                                    @else
-                                    @endif
-                                    @if(Auth::user()->hasPermissionToRoute('admin/role/delete'))
-                                        <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" onclick="deleteRole({{ $role->id }})">
-                                            <span class="svg-icon svg-icon-3">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6V19ZM8 9H16V19H8V9Z" fill="currentColor"/>
-                                                    <path d="M19.7071 4.29289C20.0976 3.90237 20.0976 3.2692 19.7071 2.87868L17.1213 0.292893C16.7308 -0.0976311 16.0976 -0.0976311 15.7071 0.292893L14.4142 1.58579L18.4142 5.58579L19.7071 4.29289Z" fill="currentColor"/>
-                                                    <path d="M15.7071 4.29289C16.0976 3.90237 16.0976 3.2692 15.7071 2.87868L13.1213 0.292893C12.7308 -0.0976311 12.0976 -0.0976311 11.7071 0.292893L10.4142 1.58579L14.4142 5.58579L15.7071 4.29289Z" fill="currentColor"/>
-                                                </svg>
-                                            </span>
-                                        </button>
-                                    @else
-                                    @endif
-                                </td>
-                            @endif
+                            <td class="text-center">
+                                @if(Auth::user()->hasPermission('admin.role.update'))
+                                    <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" 
+                                        data-bs-toggle="modal" data-bs-target="#editRole" 
+                                        data-id="{{ $role->id }}" 
+                                        data-name="{{ $role->name }}" 
+                                        onclick="editRole(this)">
+                                        <span class="svg-icon svg-icon-3">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14.8284 2.34315C15.2196 2.73438 15.2196 3.36739 14.8284 3.75862L12.5858 6L10.4142 3.82843L12.6569 1.58579C13.0481 1.19557 13.6811 1.19557 14.0724 1.58579L14.8284 2.34315Z" fill="currentColor"/>
+                                                <path d="M16.2426 3.75736C16.6338 4.14859 16.6338 4.78161 16.2426 5.17284L14 7L11.8284 4.82843L14.0701 2.58579C14.4613 2.19557 15.0944 2.19557 15.4856 2.58579L16.2426 3.75736Z" fill="currentColor"/>
+                                                <path d="M19 7H5C4.44772 7 4 7.44772 4 8V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V8C20 7.44772 19.5523 7 19 7ZM18 18H6V9
+                                                C6 8.44772 6.44772 8 7 8H18C18.5523 8 19 8.44772 19 9V18C19 18.5523 18.5523 19 18 19Z" fill="currentColor"/>
+                                                <path d="M7 10H17C17.5523 10 18 10.4477 18 11V12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12V11C6 10.4477 6.44772 10 7 10Z" fill="currentColor"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                @endif
+
+                                @if(Auth::user()->hasPermission('admin.role.delete'))
+                                    <button type="button" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" onclick="deleteRole({{ $role->id }})">
+                                        <span class="svg-icon svg-icon-3">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6V19ZM8 9H16V19H8V9Z" fill="currentColor"/>
+                                                <path d="M19.7071 4.29289C20.0976 3.90237 20.0976 3.2692 19.7071 2.87868L17.1213 0.292893C16.7308 -0.0976311 16.0976 -0.0976311 15.7071 0.292893L14.4142 1.58579L18.4142 5.58579L19.7071 4.29289Z" fill="currentColor"/>
+                                                <path d="M15.7071 4.29289C16.0976 3.90237 16.0976 3.2692 15.7071 2.87868L13.1213 0.292893C12.7308 -0.0976311 12.0976 -0.0976311 11.7071 0.292893L10.4142 1.58579L14.4142 5.58579L15.7071 4.29289Z" fill="currentColor"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

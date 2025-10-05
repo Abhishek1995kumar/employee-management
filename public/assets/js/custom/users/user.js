@@ -1,3 +1,4 @@
+
 "use strict";
 $.ajaxSetup({
     headers: {
@@ -128,6 +129,7 @@ function showUploadDocumentImage(input) {
     let iconPreview = previewContainer.querySelectorAll('.iconPreview')[0];
 }
 
+
 function addMoreBankDetails(e) {
     e.preventDefault();
     let newBankDetails = `
@@ -236,6 +238,8 @@ function addMoreDocumentDetails(e) {
         });
     });
 }
+
+
 // Attendence Management
 document.querySelectorAll('input[name="choice"]').forEach((elem) => {
     elem.addEventListener("change", function(event) {
@@ -251,7 +255,28 @@ document.querySelectorAll('input[name="choice"]').forEach((elem) => {
 
 
 
-function validateFileType(e) {
+document.addEventListener("DOMContentLoaded", function () {
+    // Initially hide save button
+    const saveBtn = document.getElementById("userFormBtn");
+    saveBtn.style.display = "none";
 
-}
+    // On input/change in required fields, check if all filled
+    const form = document.getElementById("quickForm");
+
+    form.querySelectorAll("[required], input, select, textarea").forEach(field => {
+        field.addEventListener("input", function () {
+            checkRequiredFields("quickForm", "userFormBtn");
+        });
+        field.addEventListener("change", function () {
+            checkRequiredFields("quickForm", "userFormBtn");
+        });
+    });
+
+    // Attach submit validation
+    validateBeforeSubmit("quickForm", "userFormBtn");
+});
+
+
+
+
 

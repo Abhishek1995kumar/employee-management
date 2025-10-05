@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -11,12 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
-{
+class User extends Authenticatable {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
-
+    protected $table = 'users';
     protected $guarded = [];
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -148,41 +147,19 @@ class User extends Authenticatable
     }
 
 
-    public function hasPermission($permissionName) {
+    public function hasPermission($routeName) {
+        // Super Admin ke liye always true
         $role = DB::table('roles')->where('id', $this->role_id)->first();
-
         if ($role && $role->slug === 'super_admin') {
             return true;
         }
 
-        return DB::table('role_permission')
+        // Allowed routes
+        $allowedRoutes = DB::table('role_permission')
             ->where('role_id', $this->role_id)
-            ->where('permission_name', $permissionName)
-            ->exists();
-    }
+            ->pluck('route_url')
+            ->toArray();
 
-
-    public function department() {
-        return $this->belongsTo(Admin\Department::class, 'department_id', 'id');
-    }
-
-    public function designation() {
-        return $this->belongsTo(Admin\Designation::class, 'designation_id', 'id');
-    }
-
-    public function createdBy() {
-        return $this->belongsTo(User::class, 'created_by', 'id');
-    }
-
-    public function updatedBy() {
-        return $this->belongsTo(User::class, 'updated_by', 'id');
-    }
-
-    public function deletedBy() {
-        return $this->belongsTo(User::class, 'deleted_by', 'id');
-    }
-
-    public function attendance() {
-        return $this->hasMany(Admin\Attendance::class, 'user_id', 'id');
+        return in_array($routeName, $allowedRoutes);
     }
 }

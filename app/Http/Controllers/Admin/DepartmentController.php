@@ -34,6 +34,7 @@ class DepartmentController extends Controller {
                 return $validationResponse;
             }
 
+            $this->storeLog('Department', 'Save', 'Department');
             return response()->json([
                 'success' => true,
                 'message' => 'Department created successfully.'

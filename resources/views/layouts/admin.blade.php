@@ -120,7 +120,7 @@
                     <div class="hover-scroll-overlay-y my-5 px-2" id="kt_aside_menu_wrapper" data-kt-scroll="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="{default: '#kt_aside_toolbar, #kt_aside_footer', lg: '#kt_header, #kt_aside_toolbar, #kt_aside_footer'}" data-kt-scroll-wrappers="#kt_aside_menu" data-kt-scroll-offset="5px">
                         <div class="menu menu-column menu-title-gray-800 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-500" id="#kt_aside_menu" data-kt-menu="true">
                             <!-- Dashboard -->
-                            @if(Auth::user()->hasPermission('Dashboard'))
+                            @if(Auth::user()->hasPermission('admin.dashboard'))
                                 <a href="{{ route('admin.dashboard') }}" class="menu-item menu-accordion">
                                     <span class="menu-link {{Request::is('admin/dashboard*') ? 'active' : ''}}">
                                         <span class="menu-icon">
@@ -138,7 +138,7 @@
                                 </a>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Department')) 
+                            @if(Auth::user()->hasPermission('admin.department.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/department') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/department*') ? 'active' : ''}}">
@@ -158,7 +158,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Designation')) 
+                            @if(Auth::user()->hasPermission('admin.designation.index')) 
                                 <div class="menu-item">
                                     <a href="{{ url('admin/designation') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/designation*') ? 'active' : ''}}">
@@ -178,7 +178,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Role')) 
+                            @if(Auth::user()->hasPermission('admin.role.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/role') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/role*') ? 'active' : ''}}">
@@ -198,7 +198,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Module')) 
+                            @if(Auth::user()->hasPermission('admin.module.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/module') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/module*') ? 'active' : ''}}">
@@ -218,7 +218,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Designation')) 
+                            @if(Auth::user()->hasPermission('admin.permission.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/permission') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/permission*') ? 'active' : ''}}">
@@ -238,7 +238,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Role Permission')) 
+                            @if(Auth::user()->hasPermission('admin.mapping-role-permission.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/mapping-role-permission') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{ Request::is('admin/mapping-role-permission*') ? 'active' : ''}}">
@@ -258,7 +258,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Route Permission')) 
+                            @if(Auth::user()->hasPermission('admin.route-permission-mapping.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/route-permission-mapping') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/route-permission-mapping*') ? 'active' : ''}}">
@@ -278,7 +278,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('User')) 
+                            @if(Auth::user()->hasPermission('admin.user'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/user') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/user*') ? 'active' : ''}}">
@@ -298,7 +298,7 @@
                                 </div>
                             @endif
 
-                            @if(Auth::user()->hasPermission('Employee')) 
+                            @if(Auth::user()->hasPermission('admin.holiday.index'))
                                 <div class="menu-item">
                                     <a href="{{ url('admin/holiday') }}" class="menu-item menu-accordion">
                                         <span class="menu-link {{Request::is('admin/holiday*') ? 'active' : ''}}">
@@ -313,6 +313,26 @@
                                                 </span>
                                             </span>
                                             <span class="menu-title">{{ __('Holiday')}}</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            @endif
+
+                            @if(Auth::user()->hasPermission('admin.meeting.index'))
+                                <div class="menu-item">
+                                    <a href="{{ url('admin/meeting') }}" class="menu-item menu-accordion">
+                                        <span class="menu-link {{Request::is('admin/meeting*') ? 'active' : ''}}">
+                                            <span class="menu-icon">
+                                                <span class="svg-icon svg-icon-2">
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                        <rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="currentColor" />
+                                                        <rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                        <rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="currentColor" />
+                                                    </svg>
+                                                </span>
+                                            </span>
+                                            <span class="menu-title">{{ __('Meeting')}}</span>
                                         </span>
                                     </a>
                                 </div>
@@ -364,12 +384,12 @@
 
                             <!--begin::Theme mode-->
                             <div class="d-flex align-items-center gap-3">
-                                <!-- <a href="{{url('admin/notification')}}" class="btn btn-sm btn-icon btn-icon-muted btn-active-icon-primary" style="position: relative;">
-                                    <i class="far fa-bell text-primary" style="font-size: 25px;"></i>
-                                    <span style="position: absolute; top: 0; right: -5px; padding: 0 5px 0 5px; border-radius: 50%; background-color: #0093dd; color: #fff;">
+                                <a href="{{url('admin/notification')}}" class="btn btn-sm btn-icon btn-icon-muted btn-active-icon-primary" style="position: relative;">
+                                    <i class="far fa-bell text-primary" style="font-size: 20px;"></i>
+                                    <span style="position: absolute; top: 0; right: -2px; padding: 0 2px 0 5px; border-radius: 50%; background-color: #0093dd; color: #fff;">
                                         9+
                                     </span>
-                                </a> -->
+                                </a>
 
                                 <a href="#" class="btn btn-sm btn-icon btn-icon-muted btn-active-icon-primary" data-kt-menu-trigger="{default:'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
                                     <span class="svg-icon theme-light-show svg-icon-2">

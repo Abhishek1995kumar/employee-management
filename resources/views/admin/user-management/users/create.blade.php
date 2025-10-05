@@ -1,3 +1,5 @@
+
+user create blade page --
 @extends('layouts.admin')
 @section('title') {{ __('Employee')}} @endsection
 
@@ -71,7 +73,7 @@
                                                 <select name="role_id" class="form-select" id="roleId" data-control="select2" data-placeholder="Select role name">
                                                     <option></option>
                                                     @foreach($roles as $role)
-                                                        <option value="{{ $role->id }}">{{ $role->role_name }}</option>
+                                                        <option value="{{ $role->role_id }}">{{ $role->role_name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -445,7 +447,7 @@
                                                 <div class="col-md-6 mb-4" id="sanction_date_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Sanction Date')}}</label>
-                                                        <input type="text" name="sanction_date[]" id="sanction_date" class="form-control" placeholder="date for sanction" onclick="openFlatpickr(event)" oninput="stringValidation(event)">
+                                                        <input type="text" name="sanction_date[]" id="sanction_date" class="form-control" placeholder="date for sanction" onclick="openFlatpickr(event)">
                                                     </div>
                                                 </div>
                                             </div>
@@ -494,19 +496,21 @@
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Salary Type Details')}}</label>
                                                         <select name="salary_type_detail" class="form-select" id="salary_type_detail" data-control="select2" data-placeholder="Select salary type detail">
                                                             <option></option>
-                                                            <option value="Basic">{{ __('Basic')}}</option>
-                                                            <option value="Medical Allowance">{{ __('Medical Allowance')}}</option>
-                                                            <option value="House Rent Allowance(HRA)">{{ __('House Rent Allowance(HRA)')}}</option>
-                                                            <option value="Leave Travel Allowance (LTA)">{{ __('Leave Travel Allowance (LTA)')}}</option>
-                                                            <option value="Other Allowance">{{ __('Other Allowance')}}</option>
-                                                            <option value="conveyance">{{ __('Conveyance')}}</option>
-                                                            <option value="Children Education">{{ __('Children Education')}}</option>
-                                                            <option value="August">{{ __('August')}}</option>
-                                                            <option value="Special Allowance">{{ __('Special Allowance')}}</option>
-                                                            <option value="Travelling Allowance">{{ __('Travelling Allowance')}}</option>
-                                                            <option value="Variable">{{ __('Variable')}}</option>
                                                             <option value="ESOPS">{{ __('ESOPS')}}</option>
                                                             <option value="Fixed Remenuration">{{ __('Fixed Remenuration')}}</option>
+                                                            <option value="basic">{{ __('Basic')}}</option>
+                                                            <option value="medical_allowance">{{ __('Medical Allowance')}}</option>
+                                                            <option value="house_rent_allowance(HRA)">{{ __('House Rent Allowance(HRA)')}}</option>
+                                                            <option value="leave Travel_alllowance (LTA)">{{ __('Leave Travel Allowance (LTA)')}}</option>
+                                                            <option value="other_alllowance">{{ __('Other Allowance')}}</option>
+                                                            <option value="conveyance">{{ __('Conveyance')}}</option>
+                                                            <option value="children_education">{{ __('Children Education')}}</option>
+                                                            <option value="special_alllowance">{{ __('Special Allowance')}}</option>
+                                                            <option value="travelling_alllowance">{{ __('Travelling Allowance')}}</option>
+                                                            <option value="ESOPS">{{ __('ESOPS')}}</option>
+                                                            <option value="fixed_remenuration">{{ __('Fixed Remenuration')}}</option>
+                                                            <option value="variable">{{ __('Variable')}}</option>
+                                                            <option value="august">{{ __('August')}}</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -1331,7 +1335,7 @@
                                                 </div>
                                                 <div class="col-md-6 mb-4" id="asset_descrption_div">
                                                     <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Specification')}}</label>
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Asset Descrption')}}</label>
                                                         <div class="form-group">
                                                             <input type="text" name="descrption" id="asset_descrption" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="asset descrption">
                                                         </div>
@@ -1339,7 +1343,7 @@
                                                 </div>
                                                 <div class="col-md-6 mb-4" id="system_vendor_div">
                                                     <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Specification')}}</label>
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('System Vendor')}}</label>
                                                         <div class="form-group">
                                                             <input type="text" name="system_vendor" id="system_vendor" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="system vendor">
                                                         </div>
@@ -1349,7 +1353,16 @@
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Perchase Date')}}</label>
                                                         <div class="form-group">
-                                                            <input type="text" name="perchase_date" id="perchase_date" oninput="stringValidation(event)" class="form-control" maxlength="100" placeholder="perchase date">
+                                                            <input type="text" name="perchase_date" id="perchase_date" class="form-control" placeholder="perchase date" onclick="openFlatpickr(event)">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-4" id="assigned_date_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Assigned Date')}}</label>
+                                                        <div class="form-group">
+                                                            <input type="text" name="assigned_date" id="assigned_date" class="form-control" placeholder="assigned date" onclick="openFlatpickr(event)">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1639,8 +1652,11 @@
 @endsection
 
 @section('scripts')
+<script src="{{ asset('assets/js/jquery-date.js') }}"></script>
 <script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
 <script src="{{ asset('assets/js/custom/dashboard.js') }}"></script>
 <script src="{{ asset('assets/js/custom/comman.js') }}"></script>
-<script src="{{ asset('assets/js/jquery-date.js') }}"></script>
 @endsection
+
+
+

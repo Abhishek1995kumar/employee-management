@@ -67,11 +67,10 @@
                 </div>
             </div>
             <div class="card-toolbar">
-                @if(Auth::user()->hasPermissionToRoute('admin/designation'))
+                @if(Auth::user()->hasPermission('admin.designation.save'))
                     <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addDesignation" class="btn btn-primary" >
                         {{ __('Add Designation')}}
                     </button>
-                @else
                 @endif
             </div>
         </div>

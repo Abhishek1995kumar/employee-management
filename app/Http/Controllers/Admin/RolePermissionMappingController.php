@@ -28,19 +28,18 @@ class RolePermissionMappingController extends Controller {
 
     public function index(Request $request) {
         $routeDetails = $this->routePermission();
-        $permissionWithRoles = DB::select("SELECT rp.id, role_name, route_url, permission_name
-                                            FROM role_permission rp
-                                            WHERE deleted_at IS NULL
-                                            ORDER BY permission_name ASC
-                                ");
-        $permissions = DB::select("SELECT module_id, 
-                                    module_name, 
-                                    GROUP_CONCAT(name SEPARATOR ',') AS permission_names, 
-                                    GROUP_CONCAT(id SEPARATOR ',') AS permission_ids,
-                                    GROUP_CONCAT(app_url SEPARATOR ',') AS route_url
-                                FROM permissions 
-                                GROUP BY module_id, module_name
-                            ");
+        $permissionWithRoles = $this->allAssignedPermission();
+        $permissions = $this->allPermission();
+
+        if (empty($routeDetails) || empty($permissions) || empty($permissionWithRoles)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Data not avalaible",
+                'data' => [],
+                'error' => 1
+            ]);
+        }
+
         $result = [];
         foreach($permissions as $permission) {
             $ids = explode(',', $permission->permission_ids);
@@ -93,7 +92,6 @@ class RolePermissionMappingController extends Controller {
             }
 
             foreach ($data['permission_id'] as $index => $perId) {
-                // check duplicate
                 $isAssignedRole = RolePermission::where('role_id', $data['role_id'])
                     ->where('permission_id', $perId)
                     ->where('route_url', $data['route_url'][$index])
@@ -127,7 +125,7 @@ class RolePermissionMappingController extends Controller {
                     $rolePermissionMapping->save();
                 }
             }
-
+            $this->storeLog('Role Permission', 'save', 'Role Permission');
             return response()->json([
                 'success' => true,
                 'message' => 'Role permission mapping saved successfully.',

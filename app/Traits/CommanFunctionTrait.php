@@ -144,7 +144,6 @@ trait CommanFunctionTrait {
         }
     }
 
-
     public function logoutTrait() {
         try {
             $user = Auth::user();
@@ -169,6 +168,59 @@ trait CommanFunctionTrait {
         }
     }
 
+    public function strtolowerWithTrimTrait($data) {
+        if($data) {
+            return strtolower(trim($data));
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No data is found',
+            ]);
+        }
+    }
+
+
+    public function uploadImageTrait($file, $path) {
+        try {
+            $fileName = null;
+
+            // Agar file array hai aur valid tmp_name hai
+            if (is_array($file) && isset($file['tmp_name'], $file['name']) && is_uploaded_file($file['tmp_name'])) {
+
+                // Directory check/create
+                $uploadDir = public_path('uploads/' . trim($path, '/') . '/');
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                // Unique file name
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $fileName = uniqid('img_', true) . '.' . $ext;
+
+                // Move file
+                $destination = $uploadDir . $fileName;
+                if (!move_uploaded_file($file['tmp_name'], $destination)) {
+                    $fileName = null;
+                }
+            }
+
+            // Agar string pass hua hai (edit ke time already image ka naam)
+            elseif (is_string($file) && !empty($file)) {
+                $fileName = $file;
+            } 
+            // else {
+            //     $oldImagePath = public_path('uploads/' . trim($path, '/') . '/');
+            //     if (file_exists($oldImagePath)) {
+            //         unlink($oldImagePath);
+            //     }
+            //     $fileName = $file;
+            // }
+
+            return $fileName;
+        } catch (\Throwable $th) {
+            return null;
+        }
+    }
 
 
 

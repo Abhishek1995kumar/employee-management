@@ -66,6 +66,14 @@
                 <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#addHoliday" class="btn btn-primary" >
                     {{ __('Add Holiday')}}
                 </button>
+                <a id="sampleExcelDownloadId" onclick="sampleExcelDownload(event)" class="btn btn-success mx-3" > {{ __('Excel Download')}} </a>
+                
+                <!-- For Import Button Start --><!-- Hidden file input -->
+                <input type="file" id="holidayExcelFile" accept=".xlsx, .xls" style="display:none" />
+                <button id="sampleExcelImportId" onclick="triggerHolidayFile()" class="btn btn-success mx-3">
+                    {{ __('Excel Import') }}
+                </button>
+                <!-- For Import Button End --><!-- Hidden file input -->
             </div>
         </div>
         <div class="card-body table-responsive">
@@ -102,47 +110,45 @@
                         </div>
                     </div>
                     <div class="modal-body">
-                        <form id="holidayForm" action="{{ route('admin.designation.save') }}" method="POST" enctype="multipart/form-data">
+                        <form id="holidayForm" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
+                                                <div class="col-md-6 mb-4 " id="firm_id_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Company Branch')}}</label>
+                                                        <select name="branch_id" id="firm_id" class="form-select" data-control="select2" data-placeholder="Select branch " >
+                                                            <option ></option>
+                                                            <option value="luck_101">Lucknow</option>
+                                                            <option value="del_101">Delhi</option>
+                                                            <option value="mum_101">Mumbai</option>
+                                                            <option value="chen_101">Chennai</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
                                                 <div class="col-md-6 mb-4 " id="name_of_holiday_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Name Of Holiday')}}</label>
-                                                        <input type="text" name="name_of_holiday" id="name_of_holiday" oninput="stringValidation(event)" class="form-control" placeholder="name of holiday" >
+                                                        <input type="text" name="holiday_name" id="name_of_holiday" class="form-control" placeholder="name of holiday" >
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6 mb-4 " id="day_for_holiday_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Day For Holiday')}}</label>
-                                                        <select name="day_for_holiday" id="day_for_holiday" class="form-select" data-control="select2" data-placeholder="Select day for holiday" >
+                                                        <select name="holiday_day" id="day_for_holiday" class="form-select" data-control="select2" data-placeholder="Select day for holiday" >
                                                             <option ></option>
-                                                                <option >Monday</option>
-                                                                <option >Tuesday</option>
-                                                                <option >Wednesday</option>
-                                                                <option >Thusday</option>
-                                                                <option >Friday</option>
-                                                                <option >Saturday</option>
-                                                                <option >Sunday</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6 mb-4 " id="holiday_year_div">
-                                                    <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Year')}}</label>
-                                                        <select name="holiday_year" class="form-select" id="holiday_year" data-control="select2" data-placeholder="Select holiday year" >
-                                                            <option ></option>
-                                                                <option >2021</option>
-                                                                <option >2022</option>
-                                                                <option >2023</option>
-                                                                <option >2024</option>
-                                                                <option >2025</option>
-                                                                <option >2026</option>
+                                                            <option value="Monday">Monday</option>
+                                                            <option value="Tuesday">Tuesday</option>
+                                                            <option value="Wednesday">Wednesday</option>
+                                                            <option value="Thusday">Thusday</option>
+                                                            <option value="Friday">Friday</option>
+                                                            <option value="Saturday">Saturday</option>
+                                                            <option value="Sunday">Sunday</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -150,34 +156,89 @@
                                                 <div class="col-md-6 mb-4 " id="holiday_month_div">
                                                     <div class="form-group">
                                                         <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Month')}}</label>
-                                                        <select name="holiday_month" class="form-select" id="holiday_month" data-control="select2" data-placeholder="Select holiday month" >
+                                                        <select name="holiday_month" id="holiday_month" class="form-select" data-control="select2" data-placeholder="Select holiday month" >
                                                             <option ></option>
-                                                            <option >January</option>
-                                                            <option >Feb</option>
-                                                            <option >March</option>
-                                                            <option >April</option>
-                                                            <option >May</option>
-                                                            <option >June</option>
-                                                            <option >July</option>
-                                                            <option >August</option>
-                                                            <option >September</option>
-                                                            <option >Octuber</option>
-                                                            <option >November</option>
-                                                            <option >December</option>
+                                                            <option value="January">January</option>
+                                                            <option value="February">February</option>
+                                                            <option value="March">March</option>
+                                                            <option value="April">April</option>
+                                                            <option value="May">May</option>
+                                                            <option value="June">June</option>
+                                                            <option value="July">July</option>
+                                                            <option value="August">August</option>
+                                                            <option value="September">September</option>
+                                                            <option value="October">October</option>
+                                                            <option value="November">November</option>
+                                                            <option value="December">December</option>
                                                         </select>
                                                     </div>
                                                 </div>
-                                                
-                                                <div class="col-md-6 mb-4 " id="holiday_date_div">
+
+                                                <div class="col-md-6 mb-4 " id="holiday_year_div">
                                                     <div class="form-group">
-                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Date')}}</label>
-                                                        <input type="text" name="holiday_date" id="holiday_date" onclick="openFlatpickrForMonth(event)" class="form-control" placeholder="Enter description" >
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Year')}}</label>
+                                                        <select name="holiday_year" id="holiday_year" class="form-select" data-control="select2" data-placeholder="Select holiday year" >
+                                                            <option ></option>
+                                                            <option value="2021">2021</option>
+                                                            <option value="2022">2022</option>
+                                                            <option value="2023">2023</option>
+                                                            <option value="2024">2024</option>
+                                                            <option value="2025">2025</option>
+                                                            <option value="2026">2026</option>
+                                                        </select>
                                                     </div>
                                                 </div>
+
+                                                <div class="col-md-6 mb-4 " id="category_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Category')}}</label>
+                                                        <select name="holiday_category" id="category_name" class="form-select" data-control="select2" data-placeholder="Select holiday category" >
+                                                            <option value="">Select Category</option>
+                                                            <option value="1">National Holiday</option>
+                                                            <option value="2">State Holiday</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-4 " id="color_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Color')}}</label>
+                                                        <input type="color" name="color" id="color" class="form-control" value="#ff0000">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-4 " id="description_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Description')}}</label>
+                                                        <input type="text" name="description" id="description" class="form-control" placeholder="Enter holiday description" >
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-4 " id="holiday_date_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Start Date')}}</label>
+                                                        <input type="text" name="start_date" id="holiday_start_date" onclick="openFlatpickr(event)" class="form-control" placeholder="Enter holiday start date" >
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-4 " id="holiday_date_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday End Date')}}</label>
+                                                        <input type="text" name="end_date" id="holiday_end_date" onclick="openFlatpickr(event)" class="form-control" placeholder="Enter holiday end date" >
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-4 " id="holiday_image_div">
+                                                    <div class="form-group">
+                                                        <label class="required fs-6 fw-semibold mb-2">{{ __('Holiday Image')}}</label>
+                                                        <input type="file" name="holiday_image" id="holiday_image" class="form-control" placeholder="Enter holiday image" >
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <div class="card-footer modal-footer">
-                                            <button type="submit" class="btn btn-primary" id="" onclick="saveDesignation(event)">Create Designation</button>
+                                            <button type="submit" class="btn btn-primary saveHolidayBtn" id="" onclick="saveHoliday(event)">Create Designation</button>
                                         </div>
                                     </div>
                                 </div>
@@ -192,59 +253,10 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
 <script src="{{ asset('assets/js/jquery-date.js') }}"></script>
+<script src="{{ asset('assets/js/custom/comman.js') }}"></script>
+<script src="{{ asset('assets/js/custom/roles/role.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const yearSelect = document.getElementById('holiday_year');
-    const monthSelect = document.getElementById('holiday_month');
-    const dateInput = document.getElementById('holiday_date');
 
-    // 1 — Auto open month when year is selected
-    yearSelect.addEventListener('change', function () {
-        if (this.value) {
-            monthSelect.focus();
-            monthSelect.click();
-        }
-    });
-
-    monthSelect.addEventListener('change', function () {
-        if (this.value && yearSelect.value) {
-            openFlatpickrForMonth(dateInput, yearSelect.value, this.value);
-        }
-    });
-});
-
-function getMonthNumber(monthName) {
-    const months = {
-        January: 1, Feb: 2, March: 3, April: 4, May: 5, June: 6,
-        July: 7, August: 8, September: 9, Octuber: 10, November: 11, December: 12
-    };
-    return months[monthName] || null;
-}
-
-function openFlatpickrForMonth(input, year, monthName) {
-    const monthNum = getMonthNumber(monthName);
-    if (!monthNum) return;
-
-    const firstDay = new Date(year, monthNum - 1, 1);
-    const lastDay = new Date(year, monthNum, 0);
-
-    if (input._flatpickr) {
-        input._flatpickr.destroy(); // Re-init if already exists
-    }
-
-    input._flatpickr = flatpickr(input, {
-        dateFormat: 'Y-m-d',
-        minDate: firstDay,
-        maxDate: lastDay,
-        defaultDate: firstDay,
-        onChange: function (selectedDates, dateStr) {
-            input.value = dateStr;
-        }
-    });
-
-    input._flatpickr.open();
-}
 </script>
 @endsection
