@@ -9,17 +9,14 @@ let hasPunchedIn = false; // jab user punchin karega tab true ho jayega
 
 // Hide all buttons by default first
 function hideAllPunchButtons() {
-    // document.querySelectorAll('[id$="_div"]').forEach(div => {
-    //     div.style.display = 'none';
-    // });
-    $('[id$="_div"]').forEach(div => {
-        div.hide();
+    document.querySelectorAll('[id$="_div"]').forEach(div => {
+        div.style.display = 'none';
     });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     hideAllPunchButtons();
-    $('ifOutSideLocation').hide();
+    document.getElementById('ifOutSideLocation').style.display = 'none';
     let currentDate;
     let todayAttendanceModal = new bootstrap.Modal(document.getElementById('todayAttendanceModal'));
     let regularizeAttendanceModal = new bootstrap.Modal(document.getElementById('regularizeAttendanceModal'));

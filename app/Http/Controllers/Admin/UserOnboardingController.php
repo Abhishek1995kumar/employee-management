@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class UserOnboardingController extends Controller {
     use ValidationTrait, QueryTrait;
@@ -163,9 +165,8 @@ class UserOnboardingController extends Controller {
     }
 
 
-
     public function userExcelSampleDownload(Request $request) {
-      
+        try {
             $employeeSheetRow = env('FORMATTED_ROWS', 100);
             $fileToBeName = 'holiday-sample-' . time() . '.xlsx';
             $savePath = public_path('Employee/Sample/' . $fileToBeName);
@@ -177,34 +178,102 @@ class UserOnboardingController extends Controller {
             $roles = User::selectRaw("CONCAT(id, '|', name) as role_option")->pluck('role_option')->toArray();
             $gender = ['Male', 'Female', 'Other'];
             $employeePerformanceLabel = ['30%', '40%', '50%', '60%', '70%','80%', '90%', '100%'];
-            $holidayMonth = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            $holidayYear = ['2021', '2022', '2023', '2024', '2025', '2026', '2027'];
-            $colorCode = ['#FF6F61', '#6B5B95', '#88B04B', '#F7CAC9', '#92A8D1', '#955251', '#B565A7', '#009B77', '#DD4124', '#D65076', '#45B8AC', '#EFC050', '#5B5EA6', '#9B2335', '#BC243C', '#C3447A', '#98B4D4', '#DEEAEE', '#7BC4C4', '#E15D44', '#53B0AE', '#EFC7C2', '#FFD662', '#6A5ACD', '#20B2AA'];
+            $startMonth = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            $financialYear = ['2021', '2022', '2023', '2024', '2025', '2026', '2027'];
+            $salaryTypeDetails = [
+                'Fixed Remenuration', 'ESOPS', 'Basic', 'Medical Allowance', 'House Rent Allowance(HRA)', 'Leave Travel Allowance (LTA)', 'Other Allowance', 'Conveyance', 'Children Education', 'Special Allowance', 'Travelling Allowance',
+            ];
+
+            $salaryDeductionType = ['Professional Tax', 'Provident Fund', 'TDS', 'Other Deductions'];
+
+            $shiftApplicable = ['Day Shift', 'Night Shift'];
+            $outsidePunchApplicable = ['Yes', 'No'];
+            $workType = ['Full Time', 'Part Time','Contract'];
+            $overtimeApplicable = ['Yes', 'No'];
+            $sandwichLeaveApplicable = ['Yes', 'No'];
+            $employeeFirmLocation = ['Lucknow', 'Delhi', 'Mumbai', 'Gurugram', 'Noida', 'Chennai'];
+
+            $lateApplicable = ['Yes', 'No'];
+            $lateDay = ['Half Day', 'Quater'];
+            $lateHours = [ '1 hour', '2 hour', '3 hour', '4 hour', '5 hour', '6 hour', '7 hour', '8 hour', '9 hour' ];
+            $leavePeriod = ['Weekly', 'Monthly'];
+            $leaveshouldBeAccuredFrom = [
+                'Professional Leave', 'Emergency Leave', 'Sick Leave', 'Earned Leave', 'Maternity Leave', 'Paternity Leave', 'Casual Leave', 'Compensatory Leave', 'Unpaid Leave'
+            ];
+
+            $assetName = ['Software', 'Hardware'];
+            $subAssetName = [
+                'Operation Syatem', 'Productivity Tool', 'Antivirus Tool', 'Database System'
+            ];
+
+            $documentType = [
+                'Marksheet', 'Pan Card', 'Aadhar Card', 'Room Rent Agreement'
+            ];
+
             $columns = [
-                'Branch ID','Holiday Name','Holiday Image','Holiday Category',
-                'Holiday Day','Holiday Month','Holiday Year','Holiday Color',
-                'Start Date','End Date','Description',''
+                'Role Name','Gender Name','Employee Performance Label','Start Month',
+                'Financial Year','Salary Type Details','Salary Deduction Type','Shift Applicable',
+                'Ooutside Punch Applicable','Wwork Type','Overtime Applicable',
+                'Sandwich Leave Applicable', 'Eemployee Firm Location', 'Late Applicable', 'Late Day',
+                'Late Hours', 'Leave Period', 'Leave Should Be Accured From',
+                'Aasset Name', 'Sub Asset Name', 'Document Type'
             ];
 
             $dropdownDetails = [
-                'holiday_category_index' => 3,
-                'holiday_category_option' => $holidayCategory,
-                'holiday_day_index' => 4,
-                'holiday_day_option' => $dayOfHoliday,
-                'holiday_month_index' => 5,
-                'holiday_month_option' => $holidayMonth,
-                'holiday_year_index' => 6,
-                'holiday_year_option' => $holidayYear,
-                'holiday_color_code_index' => 7,
-                'holiday_color_code_option' => $colorCode,
+                'roles_index' => 0,
+                'roles_option' => $roles,
+                'gender_index' => 1,
+                'gender_option' => $gender,
+                'employee_performance_label_index' => 2,
+                'employee_performance_label_option' => $employeePerformanceLabel,
+                'start_month_index' => 3,
+                'start_month_option' => $startMonth,
+                'financial_year_index' => 4,
+                'financial_year_option' => $financialYear,
+                'salary_type_details_index' => 5,
+                'salary_type_details_option' => $salaryTypeDetails,
+                'salary_deduction_type_index' => 6,
+                'salary_deduction_type_option' => $salaryDeductionType,
+                'shift_applicable_index' => 7,
+                'shift_applicable_option' => $shiftApplicable,
+                'outside_punch_applicable_index' => 8,
+                'outside_punch_applicable_option' => $outsidePunchApplicable,
+                'work_type_index' => 9,
+                'work_type_option' => $workType,
+                'overtime_applicable_index' => 10,
+                'overtime_applicable_option' => $overtimeApplicable,
+                'sandwich_leave_applicable_index' => 11,
+                'sandwich_leave_applicable_option' => $sandwichLeaveApplicable,
+                'employee_firm_location_index' => 12,
+                'employee_firm_location_option' => $employeeFirmLocation,
+                'late_lpplicable_index' => 13,
+                'late_lpplicable_option' => $lateApplicable,
+                'late_day_index' => 14,
+                'late_day_option' => $lateDay,
+                'late_hours_index' => 15,
+                'late_hours_option' => $lateHours,
+                'leave_period_index' => 16,
+                'leave_period_option' => $leavePeriod,
+                'leave_should_be_accured_from_index' => 17,
+                'leave_should_be_accured_from_option' => $leaveshouldBeAccuredFrom,
+                'asset_name_index' => 18,
+                'asset_name_option' => $assetName,
+                'sub_asset_name_index' => 19,
+                'sub_asset_name_option' => $subAssetName,
+                'document_type_index' => 20,
+                'document_type_option' => $documentType
             ];
-
+            $downloadUrl = '';
             return response()->json([
                 'success' => true,
                 'message' => 'Sample excel generated successfully.',
                 'code' => 0,
                 'download_url' => $downloadUrl
             ]);
+
+        } catch(Throwable $th) {
+
+        }
 
     }
 
