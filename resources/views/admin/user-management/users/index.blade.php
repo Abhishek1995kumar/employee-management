@@ -129,6 +129,6 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('assets/js/custom/custom/comman.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/comman.js') }}"></script>
     <script src="{{ asset('assets/js/custom/roles/role.js') }}"></script>
 @endsection

@@ -1653,9 +1653,8 @@ user create blade page --
 
 @section('scripts')
 <script src="{{ asset('assets/js/jquery-date.js') }}"></script>
-<script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
-<script src="{{ asset('assets/js/custom/dashboard.js') }}"></script>
 <script src="{{ asset('assets/js/custom/comman.js') }}"></script>
+<script src="{{ asset('assets/js/custom/users/user.js') }}"></script>
 @endsection
 
 
