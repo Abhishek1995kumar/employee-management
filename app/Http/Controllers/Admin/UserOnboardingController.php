@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Exports\EmployeeOnboardingExport;
 
 class UserOnboardingController extends Controller {
     use ValidationTrait, QueryTrait;
@@ -166,14 +167,14 @@ class UserOnboardingController extends Controller {
 
 
     public function userExcelSampleDownload(Request $request) {
-        try {
+        
             $employeeSheetRow = env('FORMATTED_ROWS', 100);
-            $fileToBeName = 'holiday-sample-' . time() . '.xlsx';
-            $savePath = public_path('Employee/Sample/' . $fileToBeName);
+            $fileToBeName = 'onboarding-sample-' . time() . '.xlsx';
+            $savePath = public_path('Onboarding/Sample/' . $fileToBeName);
 
             // agar folder exist nahi hai to bana do
-            if (!File::isDirectory(public_path('Holiday/Sample'))) {
-                File::makeDirectory(public_path('Holiday/Sample'), 0777, true, true);
+            if (!File::isDirectory(public_path('Onboarding/Sample'))) {
+                File::makeDirectory(public_path('Onboarding/Sample'), 0777, true, true);
             }
             $roles = User::selectRaw("CONCAT(id, '|', name) as role_option")->pluck('role_option')->toArray();
             $gender = ['Male', 'Female', 'Other'];
@@ -246,8 +247,8 @@ class UserOnboardingController extends Controller {
                 'sandwich_leave_applicable_option' => $sandwichLeaveApplicable,
                 'employee_firm_location_index' => 12,
                 'employee_firm_location_option' => $employeeFirmLocation,
-                'late_lpplicable_index' => 13,
-                'late_lpplicable_option' => $lateApplicable,
+                'late_applicable_index' => 13,
+                'late_applicable_option' => $lateApplicable,
                 'late_day_index' => 14,
                 'late_day_option' => $lateDay,
                 'late_hours_index' => 15,
@@ -263,7 +264,19 @@ class UserOnboardingController extends Controller {
                 'document_type_index' => 20,
                 'document_type_option' => $documentType
             ];
-            $downloadUrl = '';
+
+            // Excel file ko binary me le aao
+            $excelBinary = Excel::raw(
+                new EmployeeOnboardingExport($columns, $employeeSheetRow, $dropdownDetails),
+                \Maatwebsite\Excel\Excel::XLSX
+            );
+
+            // Binary ko public folder me save karo
+            File::put($savePath, $excelBinary);
+
+            // public URL banake bhejo
+            $downloadUrl = url('Onboarding/Sample/' . $fileToBeName);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Sample excel generated successfully.',
@@ -271,9 +284,7 @@ class UserOnboardingController extends Controller {
                 'download_url' => $downloadUrl
             ]);
 
-        } catch(Throwable $th) {
-
-        }
+        
 
     }
 

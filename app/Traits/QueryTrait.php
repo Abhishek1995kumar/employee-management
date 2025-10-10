@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use Exception;
 use Throwable;
-use Pusher\Pusher;
 use App\Models\Logs;
 use App\Models\User;
 use App\Mail\OtpVerified;

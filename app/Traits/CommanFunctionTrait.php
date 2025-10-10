@@ -2,17 +2,17 @@
 
 namespace App\Traits;
 
-use App\Mail\OtpVerified;
-use App\Models\Admin\LoginOtp;
+use Throwable;
 use Exception;
 use Pusher\Pusher;
 use App\Models\Logs;
 use App\Models\User;
+use App\Mail\OtpVerified;
+use App\Models\Admin\LoginOtp;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Throwable;
 
 trait CommanFunctionTrait {
     public function storeLog($action, $type, $model) {
@@ -223,42 +223,24 @@ trait CommanFunctionTrait {
     }
 
 
+    public function sendNotification($action, $type, $model) {
+        $pusher = new Pusher(
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ]
+        );
+        $data = [
+            'action' => $action,
+            'type' => $type,
+            'model' => $model,
+        ];
+        $pusher->trigger('my-channel', 'my-event', $data);
+        return response()->json(['success' => true]);
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // public function sendNotification($action, $type, $model) {
-    //     $pusher = new Pusher(
-    //         env('PUSHER_APP_KEY'),
-    //         env('PUSHER_APP_SECRET'),
-    //         env('PUSHER_APP_ID'),
-    //         [
-    //             'cluster' => env('PUSHER_APP_CLUSTER'),
-    //             'useTLS' => true,
-    //         ]
-    //     );
-    //     $data = [
-    //         'action' => $action,
-    //         'type' => $type,
-    //         'model' => $model,
-    //     ];
-    //     $pusher->trigger('my-channel', 'my-event', $data);
-    //     return response()->json(['success' => true]);
-    // }
 }

@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 
-class HolidayExport implements WithStrictNullComparison, WithEvents, WithHeadings, ShouldAutoSize{
+class HolidayExport implements WithStrictNullComparison, WithEvents, WithHeadings, ShouldAutoSize {
     protected $columns, $branch_id_index, $branch_id_option, $holiday_category_index, $holiday_category, $holiday_day_index;
     protected $holiday_day_option, $alphabetsArray, $rows, $holiday_year_option, $holiday_year_index;
     protected $holiday_month_option, $holiday_month_index, $holiday_color_code_index, $holiday_color_code_option;
