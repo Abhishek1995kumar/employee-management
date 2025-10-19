@@ -10,11 +10,18 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\DesignationController;
+use App\Http\Controllers\Admin\InterviewController;
 use App\Http\Controllers\Admin\UserOnboardingController;
 use App\Http\Controllers\Admin\RolePermissionMappingController;
 use App\Http\Controllers\Admin\RoutePermissionMappingController;
+use App\Http\Controllers\CandidateController;
 
 Route::group(['middleware' => 'guest'], function () {
+    Route::group(['prefix' => 'candidate'], function () {
+        Route::get('/', [CandidateController::class, 'loginPage'])->name('candidate.login');
+        Route::post('login', [CandidateController::class, 'login'])->name('candidate.save');
+    });
+
     Route::get('admin/login', [AuthController::class, 'loadLogin'])->name('login');
     Route::post('auth', [AuthController::class, 'login'])->name('admin.auth');
     Route::post('admin/verify-otp', [AuthController::class, 'otpVerified'])->name('admin.verify-otp');
@@ -128,6 +135,21 @@ Route::group(['middleware' => ['isAdmin'], 'prefix' => 'admin'], function () {
             Route::post('update', [MeetingController::class, 'update'])->name('admin.meeting.update');
             Route::post('delete', [MeetingController::class, 'delete'])->name('admin.meeting.delete');
             Route::get('show', [MeetingController::class, 'update'])->name('admin.meeting.show');
+        });
+
+
+        Route::group(['prefix' => 'interview'], function () {
+            Route::get('/', [InterviewController::class, 'index'])->name('admin.interview.index');
+            Route::group(['prefix' => 'subject'], function () {
+                Route::post('save', [InterviewController::class, 'saveSubject'])->name('admin.interview.subject.save');
+                Route::post('update', [InterviewController::class, 'updateDetails'])->name('admin.interview.subject.update');
+                
+            });
+            Route::group(['prefix' => 'exam'], function () {
+                Route::post('save-interview', [InterviewController::class, 'saveInterview'])->name('admin.interview.exam.save');
+                Route::post('delete', [InterviewController::class, 'deleteDetails'])->name('admin.interview.subject.delete');
+                Route::post('show', [InterviewController::class, 'showDetails'])->name('admin.interview.subject.show');
+            });
         });
 
 

@@ -3,6 +3,8 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -19,18 +21,8 @@ class EmployeeOnboardingExport implements WithStrictNullComparison, WithEvents, 
     protected $sandwich_leave_applicable_index, $sandwich_leave_applicable_option, $employee_firm_location_index, $employee_firm_location_option;
     protected $late_applicable_index, $late_applicable_option, $late_day_index, $late_day_option, $late_hours_index, $late_hours_option;
     protected $leave_period_index, $leave_period_option;
-    protected $leave_should_be_accured_from_index, $leave_should_be_accured_from_option;
-    protected $asset_name_index, $asset_name_option;
-    protected $sub_asset_name_index, $sub_asset_name_option;
-    protected $document_type_index, $document_type_option;
-
-    // protected $indexArray = [$roles_index, $gender_index, $employee_performance_label_index, $financial_year_index,
-    //     $start_month_index, $salary_type_details_index, $salary_deduction_type_index, $shift_applicable_index,
-    //     $outside_punch_applicable_index, $work_type_index, $overtime_applicable_index, $sandwich_leave_applicable_index,
-    //     $employee_firm_location_index, $late_applicable_index, $late_day_index, $late_hours_index, $leave_period_index,
-
-    // ];
-    protected $optionArray = [];
+    protected $leave_should_be_accured_from_index, $leave_should_be_accured_from_option, $asset_name_index, $asset_name_option;
+    protected $sub_asset_name_index, $sub_asset_name_option, $document_type_index, $document_type_option;
 
     public function __construct($headers, $userOnboardingSheet, $data) {
         $this->columns                              = $headers;
@@ -82,438 +74,81 @@ class EmployeeOnboardingExport implements WithStrictNullComparison, WithEvents, 
 
     }
 
-
     public function registerEvents(): array {
-        $sheet = [
+        return [
             AfterSheet::class => function (AfterSheet $event) {
-                if ($this->roles_index !== null && count($this->roles_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->roles_index];
-                    $branchIdOption = $this->roles_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a role value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $branchIdOption)));
+                $validations = [
+                    ['index' => $this->roles_index, 'options' => $this->roles_option, 'prompt' => 'role'],
+                    ['index' => $this->gender_index, 'options' => $this->gender_option, 'prompt' => 'gender'],
+                    ['index' => $this->employee_performance_label_index, 'options' => $this->employee_performance_label_option, 'prompt' => 'employee performance label'],
+                    ['index' => $this->financial_year_index, 'options' => $this->financial_year_option, 'prompt' => 'financial year'],
+                    ['index' => $this->start_month_index, 'options' => $this->start_month_option, 'prompt' => 'start month'],
+                    ['index' => $this->salary_type_details_index, 'options' => $this->salary_type_details_option, 'prompt' => 'salary type details'],
+                    ['index' => $this->salary_deduction_type_index, 'options' => $this->salary_deduction_type_option, 'prompt' => 'salary deduction type'],
+                    ['index' => $this->shift_applicable_index, 'options' => $this->shift_applicable_option, 'prompt' => 'shift applicable'],
+                    ['index' => $this->outside_punch_applicable_index, 'options' => $this->outside_punch_applicable_option, 'prompt' => 'outside punch applicable'],
+                    ['index' => $this->work_type_index, 'options' => $this->work_type_option, 'prompt' => 'work type'],
+                    ['index' => $this->overtime_applicable_index, 'options' => $this->overtime_applicable_option, 'prompt' => 'overtime applicable'],
+                    ['index' => $this->sandwich_leave_applicable_index, 'options' => $this->sandwich_leave_applicable_option, 'prompt' => 'sandwich leave applicable'],
+                    ['index' => $this->employee_firm_location_index, 'options' => $this->employee_firm_location_option, 'prompt' => 'employee firm location'],
+                    ['index' => $this->late_applicable_index, 'options' => $this->late_applicable_option, 'prompt' => 'late applicable'],
+                    ['index' => $this->late_day_index, 'options' => $this->late_day_option, 'prompt' => 'late day'],
+                    ['index' => $this->late_hours_index, 'options' => $this->late_hours_option, 'prompt' => 'late hours'],
+                    ['index' => $this->leave_period_index, 'options' => $this->leave_period_option, 'prompt' => 'leave period'],
+                    ['index' => $this->leave_should_be_accured_from_index, 'options' => $this->leave_should_be_accured_from_option, 'prompt' => 'leave accrued from'],
+                    ['index' => $this->asset_name_index, 'options' => $this->asset_name_option, 'prompt' => 'asset name'],
+                    ['index' => $this->sub_asset_name_index, 'options' => $this->sub_asset_name_option, 'prompt' => 'sub asset name'],
+                    ['index' => $this->document_type_index, 'options' => $this->document_type_option, 'prompt' => 'document type'],
+                ];
 
+                foreach ($validations as $item) {
+                    if (!is_null($item['index']) && count($item['options']) > 0) {
+                        $drop_column = $this->alphabetsArray[$item['index']];
+                        $options = $item['options'];
+
+                        $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
+                        $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+                        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+                        $validation->setAllowBlank(false);
+                        $validation->setShowInputMessage(true);
+                        $validation->setShowErrorMessage(true);
+                        $validation->setShowDropDown(true);
+                        $validation->setErrorTitle('Input error');
+                        $validation->setError('Value is not in list.');
+                        $validation->setPromptTitle('Pick from list');
+                        $validation->setPrompt("Please pick a {$item['prompt']} value from the drop-down list.");
+                        $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
+                        
+                        for ($i = 2; $i <= $this->rows; $i++) {
+                            $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
+                        }
+                    }
+                }
+
+                /** 🗓️ Date Columns with Date Format */
+                $dateColumns = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CI', 'CJ', 'CK'];
+
+                foreach ($dateColumns as $col) {
                     for ($i = 2; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
+                        $cell = "{$col}{$i}";
+                        $sheet = $event->sheet->getDelegate();
 
-                if ($this->gender_index && count($this->gender_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->gender_index];
-                    $options = $this->gender_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a gender value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
+                        // मत डालो कोई string date — Excel समझेगा "text"
+                        // खाली छोड़ दो लेकिन format date रखो
+                        $sheet->setCellValueExplicit($cell, null, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NULL);
 
-                if ($this->employee_performance_label_index && count($this->employee_performance_label_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->employee_performance_label_index];
-                    $options = $this->employee_performance_label_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a employee performance label value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->start_month_index && count($this->start_month_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->start_month_index];
-                    $options = $this->start_month_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a start month value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->financial_year_index && count($this->financial_year_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->financial_year_index];
-                    $options = $this->financial_year_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a financial year value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-                
-                if ($this->salary_type_details_index && count($this->salary_type_details_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->salary_type_details_index];
-                    $options = $this->salary_type_details_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a salary type details value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-                
-                if ($this->salary_deduction_type_index && count($this->salary_deduction_type_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->salary_deduction_type_index];
-                    $options = $this->salary_deduction_type_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a salary deduction type value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->shift_applicable_index && count($this->shift_applicable_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->shift_applicable_index];
-                    $options = $this->shift_applicable_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a shift applicable value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->outside_punch_applicable_index && count($this->outside_punch_applicable_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->outside_punch_applicable_index];
-                    $options = $this->outside_punch_applicable_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a outside punch applicable value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->work_type_index && count($this->work_type_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->work_type_index];
-                    $options = $this->work_type_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a work type value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->overtime_applicable_index && count($this->overtime_applicable_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->overtime_applicable_index];
-                    $options = $this->overtime_applicable_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a overtime applicable value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->sandwich_leave_applicable_index && count($this->sandwich_leave_applicable_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->sandwich_leave_applicable_index];
-                    $options = $this->sandwich_leave_applicable_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a sandwich leave applicable value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->employee_firm_location_index && count($this->employee_firm_location_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->employee_firm_location_index];
-                    $options = $this->employee_firm_location_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a employee firm location value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->late_applicable_index && count($this->late_applicable_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->late_applicable_index];
-                    $options = $this->late_applicable_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a late applicable value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->late_day_index && count($this->late_day_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->late_day_index];
-                    $options = $this->late_day_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a late day value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->late_hours_index && count($this->late_hours_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->late_hours_index];
-                    $options = $this->late_hours_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a late hours value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->leave_period_index && count($this->leave_period_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->leave_period_index];
-                    $options = $this->leave_period_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a leave period value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->leave_should_be_accured_from_index && count($this->leave_should_be_accured_from_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->leave_should_be_accured_from_index];
-                    $options = $this->leave_should_be_accured_from_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a leave should be accured from value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->asset_name_index && count($this->asset_name_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->asset_name_index];
-                    $options = $this->asset_name_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a asset name value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->sub_asset_name_index && count($this->sub_asset_name_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->sub_asset_name_index];
-                    $options = $this->sub_asset_name_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a sub asset name value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
-                    }
-                }
-
-                if ($this->document_type_index && count($this->document_type_option) > 0) {
-                    $drop_column = $this->alphabetsArray[$this->document_type_index];
-                    $options = $this->document_type_option;
-                    $validation = $event->sheet->getCell("{$drop_column}2")->getDataValidation();
-                    $validation->setType(DataValidation::TYPE_LIST);
-                    $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                    $validation->setAllowBlank(false);
-                    $validation->setShowInputMessage(true);
-                    $validation->setShowErrorMessage(true);
-                    $validation->setShowDropDown(true);
-                    $validation->setErrorTitle('Input error');
-                    $validation->setError('Value is not in list.');
-                    $validation->setPromptTitle('Pick from list');
-                    $validation->setPrompt('Please pick a document type value from the drop-down list.');
-                    $validation->setFormula1(sprintf('"%s"', implode(',', $options)));
-                    for ($i = 3; $i <= $this->rows; $i++) {
-                        $event->sheet->getCell("{$drop_column}{$i}")->setDataValidation(clone $validation);
+                        // Cell को "Date" के रूप में format करो
+                        $sheet->getStyle($cell)
+                            ->getNumberFormat()
+                            ->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
                     }
                 }
             },
         ];
-        
-        return $sheet;
     }
 
     public function collection() {
-        $details = [
+        return [
             $this->roles_index,
             $this->roles_option,
             $this->gender_index,
@@ -557,10 +192,10 @@ class EmployeeOnboardingExport implements WithStrictNullComparison, WithEvents, 
             $this->document_type_index,
             $this->document_type_option,
         ];
-        return $details;
     }
 
     public function headings(): array {
         return $this->columns;
     }
+
 }

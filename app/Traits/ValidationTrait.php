@@ -642,5 +642,125 @@ trait ValidationTrait {
         }
     }
 
+
+    public function subjectValidationTrait($data) {
+        try {
+            $rules = [
+                'subject_name'       => ['required', 'string', 'max:255'],
+                'description'        => ['nullable', 'string', 'max:500'],
+            ];
+
+            $messages = [
+                'subject_name.required'       => 'The holiday name field is required.',
+                'subject_name.string'         => 'The holiday name must be a string.',
+                'subject_name.max'            => 'The holiday name may not be greater than 255 characters.',
+                'description.string'          => 'The description must be a string.',
+                'description.max'             => 'The description may not be greater than 255 characters.',
+            ];
+
+            $errors = [];
+
+            foreach ($rules as $field => $fieldRules) {
+                $value = $data[$field] ?? null;
+
+                foreach ($fieldRules as $rule) {
+                    // handle nullable fields
+                    if ($rule === 'nullable' && is_null($value)) {
+                        continue 2; // skip remaining rules for this field
+                    }
+
+                    // required
+                    if ($rule === 'required' && (is_null($value) || $value === '')) {
+                        $errors[$field][] = $messages["{$field}.required"];
+                        
+                    } elseif ($rule === 'string' && !is_string($value)) {
+                        $errors[$field][] = $messages["{$field}.string"];
+
+                    } elseif (Str::startsWith($rule, 'max:')) {
+                        $max = (int) Str::after($rule, 'max:');
+                        if (!is_null($value) && strlen($value) > $max) {
+                            $errors[$field][] = $messages["{$field}.max"];
+                        }
+                    }
+                }
+            }
+
+            return $errors;
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
+
+
+    public function interviewValidationTrait($data) {
+        try {
+            $rules = [
+                'subject_id'            => ['required', 'integer'],
+                'interview_name'        => ['required', 'string', 'max:500'],
+                'interview_time'        => ['required', 'string'],
+                'interview_date'        => ['required', 'string', 'date'],
+                'attempted'             => ['required', 'integer'],
+            ];
+
+            $messages = [
+                'subject_id.required'     => 'The subject name field is required.',
+                'subject_id.integer'      => 'Please enter the valid subject name.',
+                'interview_name.required' => 'The subject name field i required.',
+                'interview_name.string'   => 'The subject name must be a integer.',
+                'interview_name.max'      => 'The interview name may not be greater than 255 characters.',
+                'interview_time.required' => 'The interview time field i required.',
+                'interview_time.string'   => 'The interview time must be a string.',
+                'interview_date.required' => 'The interview date field i required.',
+                'interview_date.string'   => 'The interview date must be a string.',
+                'interview_date.date'     => 'The interview date must be a date type like (2025-06-21).',
+                'attempted.required'      => 'The interview attempted field i required.',
+                'attempted.integer'       => 'The interview attempted must be a integer.',
+            ];
+
+            $errors = [];
+
+            foreach ($rules as $field => $fieldRules) {
+                $value = $data[$field] ?? null;
+                foreach ($fieldRules as $rule) {
+                    // handle nullable fields
+                    if ($rule === 'nullable' && is_null($value)) {
+                        continue 2; // skip remaining rules for this field
+                    }
+
+                    // required
+                    if ($rule === 'required' && (is_null($value) || $value === '')) {
+                        $errors[$field][] = $messages["{$field}.required"];
+                        
+                    } elseif ($rule === 'string' && !is_string($value)) {
+                        $errors[$field][] = $messages["{$field}.string"];
+
+                    } elseif (Str::startsWith($rule, 'max:')) {
+                        $max = (int) Str::after($rule, 'max:');
+                        if (!is_null($value) && strlen($value) > $max) {
+                            $errors[$field][] = $messages["{$field}.max"];
+                        }
+                    } elseif ($rule === 'integer' && !is_numeric($value)) {
+                        $errors[$field][] = $messages["{$field}.integer"];
+                        
+                    } elseif ($rule === 'date' && (strtotime($value) === false)) {
+                        $errors[$field][] = $messages["{$field}.date"];
+                    }
+                }
+            }
+
+            return $errors;
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
+
 }
 

@@ -38,7 +38,8 @@ trait CommanFunctionTrait {
                         $otp = $this->generateOtp();
                         $this->loginOtpTrait($result->id, $result->email, $otp, $result->name);
                         return response()->json([
-                            'success' => 200,
+                            'success' => true,
+                            'code' => 200,
                             'message' => 'Generate otp successfully',
                             'data' => [
                                 'otp_verified' => $result->is_otp_verified,
@@ -52,6 +53,7 @@ trait CommanFunctionTrait {
                     } else {
                         return response()->json([
                             'success' => false,
+                            'code' => 201,
                             'message' => 'Incorrect Password',
                         ]);
                     }
@@ -59,35 +61,42 @@ trait CommanFunctionTrait {
                     if ($result->status != 1) {
                         return response()->json([
                             'success' => false,
-                            'message' => 'User Not Active',
+                            'code' => 202,
+                            'message' => 'You have been deactivated from logging into the panel. Kindly contact the admin to reinstate your privileges',
                         ]);
-                    } elseif ($result->deleted_at != null) {
+                    } elseif (!is_null($result->deleted_at)) {
                         return response()->json([
                             'success' => false,
+                            'code' => 203,
                             'message' => 'User Deleted',
                         ]);
-                    } elseif ($result->login_status == 1) {
+                    } elseif ($result->login_status == 1 && $result->is_otp_verified == 1) {
                         return response()->json([
                             'success' => false,
+                            'code' => 204,
                             'message' => 'Already User Login',
                         ]);
-                    } elseif ($result->is_otp_verified != 1) {
+                    } else {
                         return response()->json([
                             'success' => false,
-                            'message' => 'Please ener otp first',
+                            'code' => 205,
+                            'message' => 'You are not authorised to log into Admin Panel.',
                         ]);
                     }
                 }
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid Details',
+                    'code' => 206,
+                    'message' => 'User not found in our records',
                 ]);
             }
         } catch (Exception $e) { 
             return response()->json([
+                "success"=> false,
+                "code"=> 422,
                 "message"=> $e->getMessage()
-            ], 422);
+            ]);
         }
     }
 

@@ -88,17 +88,18 @@ function validationAlert(title, text, icon, timer, confirmButtonText, showConfir
 // Accept Only Number function start 
 const acceptOnlyNumber = (event) => {
     const input = event.target;
-    console.log(`Input field: ${input.placeholder || input.name}`, `Value: ${input.value}`);
     const value = input.value;
-    const regex = /^[0-9]*$/;
-    if (!regex.test(value)) {
-        input.value = value.replace(/[^0-9]/g, '');
-        Swal.fire({
-            title: 'Invalid Input',
-            text: "Please enter a valid " + (input.placeholder || input.name) + "\nonly numbers are allowed.",
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
+    input.value = value.replace(/\D/g, '');
+    if (input.value.length >= 10) {
+        input.value = input.value.substring(0, 10);
+        event.preventDefault();
+    } else {
+        // Swal.fire({
+        //     title: 'Invalid Input',
+        //     text: "Please enter a valid " + (input.placeholder || input.name) + "\nonly numbers are allowed.",
+        //     icon: 'error',
+        //     confirmButtonText: 'OK'
+        // });
     }
 };
 
@@ -128,7 +129,7 @@ const openFlatpickr = (event) => {
     let input = event.target;
     // Arrays for restrictions
     let blockNextDateArrays = ['date_of_birth']; // Past-only
-    let blockBackDateArrays = ['employee_last_working_date']; // Future-only
+    let blockBackDateArrays = ['employee_last_working_date', 'interview_date']; // Future-only
     let fromDateArray = ['leave_start_date', 'perchase_date', 'previous_doj_1', 'holiday_start_date'];  // FROM, From date ka aur to date ka index same hona chahiye
     let toDateArray = ['leave_end_date', 'assigned_date', 'previous_doe_1', 'holiday_end_date'];  // To, To date ka aur From date ka index same hona chahiye, tab hi work karega
 
@@ -491,6 +492,7 @@ function checkRequiredFields(formId, saveButtonId) {
     }
 }
 
+
 function validateBeforeSubmit(formId, saveButtonId) {
     const form = document.getElementById(formId);
     const saveButton = document.getElementById(saveButtonId);
@@ -532,9 +534,8 @@ function validateBeforeSubmit(formId, saveButtonId) {
 
 
 
-
 // Excel download and upload button hide show start --
-    $('#userUploadBtnId').hide();
+    $('#userUploadBtnId').show();
     const excelSampleDownload = (event, url, uploadBtnId) => {
         event.preventDefault();
         let anchorTagId;
@@ -568,21 +569,109 @@ function validateBeforeSubmit(formId, saveButtonId) {
             }
         });
     };
+
+
+    // Jab file select ho jaye
+    const triggerUserCreateExcelFile = (event, url, id, fileId) => {
+        event.preventDefault();
+        let uploadBtnId;
+        if (event.target.tagName === 'BUTTON') {
+            uploadBtnId = event.target.id;
+        } else {
+            uploadBtnId = $(event.target).closest('button').attr('id');
+        }
+
+        const fileInput = $('#' + fileId);
+        fileInput.click();
+
+        fileInput.off('change').on('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            let formData = new FormData();
+            formData.append('file', file); // use same key as backend expects
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success === true && response.code === 0) {
+                        validationAlert('Excel generate', 'Successfully uploaded sample excel sheet.', 'success', 2000, 'OK');
+                        $('#' + uploadBtnId).hide();
+                        if (id) $('#' + id).show();
+                        window.location.href = response.download_url;
+                    } else {
+                        validationAlert('Error', response.message || 'Failed to upload excel.', 'error', 2000, 'OK');
+                        $('#' + uploadBtnId).show();
+                    }
+                },
+                error: function () {
+                    validationAlert('Error', 'Something went wrong during excel upload.', 'error', 2000, 'OK');
+                    $('#' + uploadBtnId).show();
+                }
+            });
+        });
+    };
+
 // Excel download and upload button hide show end --
 
 
 
+// Comman Delete Function Start --
+    function deleteDetails(event, url) {
+        event.preventDefault();
+        let button = $(event.currentTarget);
+        let id = button.data('id');
+        let module = button.data('module') || 'record';
+        if (!id) {
+            alert('Missing record ID.');
+            return;
+        } else {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+                });
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: `Are you sure you want to delete this ${module}?`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            id: id
+                        },
+                        success: function(res) {
+                            if(res.success === true) {
+                                validationAlert('Deleted', `Successfully deleted the ${module}.`, 'success', 2000, 'OK');
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                validationAlert('Error', res.message || `Failed to delete the ${module}.`, 'error', 2000, 'OK');
+                            }
+                        }
+                    });
+                } else if ( result.dismiss === Swal.DismissReason.cancel) {
+                    validationAlert('Error', res.message || `Failed to delete the ${module}.`, 'error', 2000, 'OK');
+                };
+            });
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    
+// Comman Delete Function End -- 
 

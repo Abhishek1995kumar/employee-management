@@ -955,3 +955,141 @@ $.ajaxSetup({
         });
     // Holiday Import Start End --
 // Holiday Js End --
+
+
+
+// Subject Js Start --
+    function saveSubject(event) {
+        event.preventDefault();
+        $('.saveSubjectBtn').prop('disabled', true);
+        let subjectName = document.getElementById('name_of_subject').value;
+        let description = document.getElementById('description').value;
+        if (subjectName === '') {
+            validationAlert('Missing subject', 'Please enter a subject.', 'error', 2000, 'OK');
+            $('.saveSubjectBtn').prop('disabled', false);
+            return false;
+        }
+        if (description === '') {
+            validationAlert('Missing description', 'Please enter a description.', 'error', 2000, 'OK');
+            $('.saveSubjectBtn').prop('disabled', false);
+            return false;
+        }
+        submitSubject(subjectName, description);
+    }
+
+    function submitSubject(subjectName, description) {
+        let url = 'admin/interview/subject/save';
+        $('#addSubject').modal('hide');
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                subject_name: subjectName,
+                description: description
+            },
+            success: function(res) {
+                if(res.success) {
+                    $('.saveSubjectBtn').prop('disabled', false);
+                    $('#name_of_subject').val('');
+                    $('#description').val('');
+                    validationAlert('Subject created', 'Successfully created a new subject.', 'success', 2000, 'OK');
+                    setTimeout(function() {
+                        window.location.reload();
+                    } , 200);
+                }
+            },
+            error: function(xhr) {
+                $('.saveSubjectBtn').prop('disabled', false);
+                if(xhr.responseJSON) {
+                    validationAlert('Error ', xhr.responseJSON.message, 'error', 5000, false);
+                    console.log(xhr.responseJSON.message);
+                }
+            }
+        });
+    }
+// Subject Js End --
+
+
+
+// Subject Js Start --
+    function saveInterview(event) {
+        event.preventDefault();
+        $('.saveInterviewBtn').prop('disabled', true);
+        let subject_id = document.getElementById('subject_id').value;
+        let interview_name = document.getElementById('interview_name').value;
+        let interview_time = document.getElementById('interview_time').value;
+        let interview_date = document.getElementById('interview_date').value;
+        let attempted = document.getElementById('attempted').value;
+        if (subject_id === '') {
+            validationAlert('Missing subject', 'Please select a subject name.', 'error', 2000, 'OK');
+            $('.saveInterviewBtn').prop('disabled', false);
+            return false;
+        }
+        if (interview_name === '') {
+            validationAlert('Missing interview name', 'Please enter a interview name.', 'error', 2000, 'OK');
+            $('.saveInterviewBtn').prop('disabled', false);
+            return false;
+        }
+        if (interview_time === '') {
+            validationAlert('Missing interview time', 'Please enter a interview time.', 'error', 2000, 'OK');
+            $('.saveInterviewBtn').prop('disabled', false);
+            return false;
+        }
+        if (interview_date === '') {
+            validationAlert('Missing interview date', 'Please enter a interview date.', 'error', 2000, 'OK');
+            $('.saveInterviewBtn').prop('disabled', false);
+            return false;
+        }
+        if (attempted === '') {
+            validationAlert('Missing attempted', 'Please enter a interview attempted.', 'error', 2000, 'OK');
+            $('.saveInterviewBtn').prop('disabled', false);
+            return false;
+        }
+        submitInterview(subject_id, interview_name, interview_time, interview_date, attempted);
+    }
+
+    function submitInterview(subject_id, interview_name, interview_time, interview_date, attempted) {
+        let url = 'admin/interview/exam/save-interview';
+        $('#addSubject').modal('hide');
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                subject_id: subject_id,
+                interview_name: interview_name,
+                interview_time: interview_time,
+                interview_date: interview_date,
+                attempted: attempted,
+            },
+            success: function(res) {
+                if(res.success) {
+                    $('.saveInterviewBtn').prop('disabled', false);
+                    $('#subject_id').val('');
+                    $('#interview_name').val('');
+                    $('#interview_time').val('');
+                    $('#interview_date').val('');
+                    $('#attempted').val('');
+                    validationAlert('Subject created', 'Successfully created a new subject.', 'success', 2000, 'OK');
+                    setTimeout(function() {
+                        window.location.reload();
+                    } , 200);
+                }
+            },
+            error: function(xhr) {
+                $('.saveInterviewBtn').prop('disabled', false);
+                if(xhr.responseJSON) {
+                    validationAlert('Error ', xhr.responseJSON.message, 'error', 5000, false);
+                    console.log(xhr.responseJSON.message);
+                }
+            }
+        });
+    }
+// Subject Js End --
+
+
+
+
+
+
