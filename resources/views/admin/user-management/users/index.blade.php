@@ -67,7 +67,7 @@
                 @if(Auth::user()->hasPermission('admin.user.excel_sample_download'))
                     <a id="userEcelDownloadId" onclick="excelSampleDownload(event, 'admin/user/excel-sample-download', 'userUploadBtnId')" class="btn btn-success mx-3"> {{ __('Excel Download') }} </a>
                     <input type="file" id="userExcelFile" accept=".xlsx, .xls" style="display:none" />
-                    <button id="userUploadBtnId" onclick="triggerUserCreateExcelFile()" class="btn btn-success mx-3"> {{ __('Excel Upload')}} </button>
+                    <button id="userUploadBtnId" onclick="triggerUserCreateExcelFile(event, 'admin/user/bulk-upload', 'userEcelDownloadId', 'userExcelFile')" class="btn btn-success mx-3"> {{ __('Excel Upload')}} </button>
                 @endif
             </div>
         </div>
@@ -130,5 +130,4 @@
 
 @section('scripts')
     <script src="{{ asset('assets/js/custom/comman.js') }}"></script>
-    <script src="{{ asset('assets/js/custom/roles/role.js') }}"></script>
 @endsection

@@ -87,7 +87,7 @@
                 <tbody class="fw-semibold text-gray-600">
                     @forelse ($permissions as $permission)
                         <tr>
-                            <td class="text-center">{{ $permission->id }}</td>
+                            <td class="text-center">{{ $loop->index + 1 }}</td>
                             <td class="text-center">{{ $permission->name }}</td>
                             <td class="text-center">{{ $permission->app_url ?? '-' }}</td>
                             <td class="text-center">{{ $permission->module_name }}</td>

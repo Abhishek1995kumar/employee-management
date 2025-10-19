@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use Exception;
 use Throwable;
-use Pusher\Pusher;
 use App\Models\Logs;
 use App\Models\User;
 use App\Mail\OtpVerified;
@@ -97,6 +96,27 @@ trait QueryTrait {
             return DB::select("SELECT id, role_id, role_name FROM role_permission rp
                             GROUP BY role_name
                             ORDER BY rp.id DESC");
+        } catch(Throwable $th) {
+            Log::error($th->getMessage());
+            return [];
+        }
+    }
+
+    public function getSubject() {
+        try {
+            // return DB::select("SELECT ss.id, ss.subject_name, GROUP_CONCAT(its.interview_name) interview_name, GROUP_CONCAT(its.interview_time) interview_time,
+            //                     GROUP_CONCAT(its.interview_date) interview_date FROM subjects ss 
+            //                     JOIN subject_interviews its on its.subject_id = ss.id 
+            //                     GROUP BY ss.id
+            //                     ORDER BY id DESC
+            //       ");
+
+            return DB::select("SELECT ss.id, its.id it_id, ss.subject_name, its.interview_name interview_name, its.interview_time interview_time,
+                                its.interview_date interview_date, ss.created_by FROM subjects ss 
+                                JOIN subject_interviews its on its.subject_id = ss.id
+                                WHERE its.deleted_at IS NULL
+                                ORDER BY ss.id DESC
+                  ");
         } catch(Throwable $th) {
             Log::error($th->getMessage());
             return [];

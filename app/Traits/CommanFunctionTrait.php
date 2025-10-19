@@ -2,17 +2,17 @@
 
 namespace App\Traits;
 
-use App\Mail\OtpVerified;
-use App\Models\Admin\LoginOtp;
+use Throwable;
 use Exception;
 use Pusher\Pusher;
 use App\Models\Logs;
 use App\Models\User;
+use App\Mail\OtpVerified;
+use App\Models\Admin\LoginOtp;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Throwable;
 
 trait CommanFunctionTrait {
     public function storeLog($action, $type, $model) {
@@ -38,7 +38,8 @@ trait CommanFunctionTrait {
                         $otp = $this->generateOtp();
                         $this->loginOtpTrait($result->id, $result->email, $otp, $result->name);
                         return response()->json([
-                            'success' => 200,
+                            'success' => true,
+                            'code' => 200,
                             'message' => 'Generate otp successfully',
                             'data' => [
                                 'otp_verified' => $result->is_otp_verified,
@@ -52,6 +53,7 @@ trait CommanFunctionTrait {
                     } else {
                         return response()->json([
                             'success' => false,
+                            'code' => 201,
                             'message' => 'Incorrect Password',
                         ]);
                     }
@@ -59,35 +61,42 @@ trait CommanFunctionTrait {
                     if ($result->status != 1) {
                         return response()->json([
                             'success' => false,
-                            'message' => 'User Not Active',
+                            'code' => 202,
+                            'message' => 'You have been deactivated from logging into the panel. Kindly contact the admin to reinstate your privileges',
                         ]);
-                    } elseif ($result->deleted_at != null) {
+                    } elseif (!is_null($result->deleted_at)) {
                         return response()->json([
                             'success' => false,
+                            'code' => 203,
                             'message' => 'User Deleted',
                         ]);
-                    } elseif ($result->login_status == 1) {
+                    } elseif ($result->login_status == 1 && $result->is_otp_verified == 1) {
                         return response()->json([
                             'success' => false,
+                            'code' => 204,
                             'message' => 'Already User Login',
                         ]);
-                    } elseif ($result->is_otp_verified != 1) {
+                    } else {
                         return response()->json([
                             'success' => false,
-                            'message' => 'Please ener otp first',
+                            'code' => 205,
+                            'message' => 'You are not authorised to log into Admin Panel.',
                         ]);
                     }
                 }
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid Details',
+                    'code' => 206,
+                    'message' => 'User not found in our records',
                 ]);
             }
         } catch (Exception $e) { 
             return response()->json([
+                "success"=> false,
+                "code"=> 422,
                 "message"=> $e->getMessage()
-            ], 422);
+            ]);
         }
     }
 
@@ -223,42 +232,24 @@ trait CommanFunctionTrait {
     }
 
 
+    public function sendNotification($action, $type, $model) {
+        $pusher = new Pusher(
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ]
+        );
+        $data = [
+            'action' => $action,
+            'type' => $type,
+            'model' => $model,
+        ];
+        $pusher->trigger('my-channel', 'my-event', $data);
+        return response()->json(['success' => true]);
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // public function sendNotification($action, $type, $model) {
-    //     $pusher = new Pusher(
-    //         env('PUSHER_APP_KEY'),
-    //         env('PUSHER_APP_SECRET'),
-    //         env('PUSHER_APP_ID'),
-    //         [
-    //             'cluster' => env('PUSHER_APP_CLUSTER'),
-    //             'useTLS' => true,
-    //         ]
-    //     );
-    //     $data = [
-    //         'action' => $action,
-    //         'type' => $type,
-    //         'model' => $model,
-    //     ];
-    //     $pusher->trigger('my-channel', 'my-event', $data);
-    //     return response()->json(['success' => true]);
-    // }
 }

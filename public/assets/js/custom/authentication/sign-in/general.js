@@ -6,6 +6,8 @@ $.ajaxSetup({
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
 });
+
+
 var KTModalAdd = function () {
     var t, e, o, n, r, i, submitBtn;
     return {
@@ -22,7 +24,7 @@ var KTModalAdd = function () {
                             },
                             regexp: {
                                 // Accepts email, 10-digit number, or username (alphanumeric, dots, underscores, min 3 chars)
-                                regexp: /(^[^\s@]+@[^\s@]+\.[^\s@]+$)|(^[0-9]{10}$)|(^[a-zA-Z0-9._]{5,}$)/,
+                                regexp: /(^[^\s@]+@[^\s@]+\.[^\s@]+$)|(^[0-9]{10}$)|(^[a-zA-Z0-9._]{10,}$)/,
                                 message: "Please enter a valid login id (email, phone, or username)"
                             }
                         }
@@ -58,7 +60,7 @@ var KTModalAdd = function () {
                     },
                     dataType: "json",
                     success: function (response) {
-                        if (response.success == 200) {
+                        if (response.success == true && response.code == 200) {
                             $("#kt_sign_in_submit").prop('disabled', true);
                             swal.fire({
                                 text: "Your credentials matches our record",
@@ -76,7 +78,7 @@ var KTModalAdd = function () {
                                 }
                             };
                             work();
-                        } else if (response.success == 201) {
+                        } else if (response.success == false && response.code == 201) {
                             $("#kt_sign_in_submit").prop('disabled', false);
                             swal.fire({
                                 text: "Password is incorrect",
@@ -89,20 +91,7 @@ var KTModalAdd = function () {
                             }).then(function () {
                                 KTUtil.scrollTop();
                             });
-                        } else if (response.success == 202) {
-                            $("#kt_sign_in_submit").prop('disabled', false);
-                            swal.fire({
-                                text: "User not found in our records",
-                                icon: "error",
-                                buttonsStyling: false,
-                                confirmButtonText: "Try Again",
-                                customClass: {
-                                    confirmButton: "btn font-weight-bold btn-light-primary"
-                                }
-                            }).then(function () {
-                                KTUtil.scrollTop();
-                            });
-                        } else if (response.success == 204) {
+                        } else if (response.success == false && response.code == 202) {
                             $("#kt_sign_in_submit").prop('disabled', false);
                             swal.fire({
                                 text: "You have been deactivated from logging into the panel. Kindly contact the admin to reinstate your privileges.",
@@ -115,20 +104,33 @@ var KTModalAdd = function () {
                             }).then(function () {
                                 KTUtil.scrollTop();
                             });
-                        } else if (response.success == 205) {
+                        } else if (response.success == false && response.code == 203) {
                             $("#kt_sign_in_submit").prop('disabled', false);
                             swal.fire({
-                                text: "You have been banned from accessing the Admin Panel.",
+                                text: "User not found or remove in our records",
                                 icon: "error",
                                 buttonsStyling: false,
                                 confirmButtonText: "Try Again",
                                 customClass: {
                                     confirmButton: "btn font-weight-bold btn-light-primary"
                                 }
-                            }).then(function() {
+                            }).then(function () {
                                 KTUtil.scrollTop();
                             });
-                        } else if (response.success == 206) {
+                        } else if (response.success == false && response.code == 204) {
+                            $("#kt_sign_in_submit").prop('disabled', false);
+                            swal.fire({
+                                text: "User is already logged in, please first logout than try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Try Again",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            }).then(function () {
+                                KTUtil.scrollTop();
+                            });
+                        } else if (response.success == false && response.code == 203) {
                             $("#kt_sign_in_submit").prop('disabled', false);
                             swal.fire({
                                 text: "You are not authorised to log into Admin Panel.",
@@ -141,19 +143,6 @@ var KTModalAdd = function () {
                             }).then(function() {
                                 KTUtil.scrollTop();
                             });
-                        }else {
-                            $("#kt_sign_in_submit").prop('disabled', false);
-                            swal.fire({
-                                text: "User already logged in.",
-                                icon: "error",
-                                buttonsStyling: false,
-                                confirmButtonText: "Try Again",
-                                customClass: {
-                                    confirmButton: "btn font-weight-bold btn-light-primary"
-                                }
-                            }).then(function () {
-                                KTUtil.scrollTop();
-                            });
                         }
                     }
                 });
@@ -161,9 +150,12 @@ var KTModalAdd = function () {
         }
     }
 }();
+
+
 KTUtil.onDOMContentLoaded(function () {
     KTModalAdd.init();
 });
+
 
 function verifyOtp() {
     let otp = document.getElementById('otpCode').value;

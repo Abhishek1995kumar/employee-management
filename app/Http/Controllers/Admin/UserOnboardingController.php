@@ -9,11 +9,17 @@ use App\Traits\QueryTrait;
 use Illuminate\Http\Request;
 use App\Traits\ValidationTrait;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\EmployeeOnboardingJob;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Admin\ExcelErrorReport;
+use App\Jobs\DumpEmployeeOnboardingJob;
+use App\Exports\EmployeeOnboardingExport;
+use App\Imports\EmployeeOnboardingImport;
+use App\Models\Admin\Role;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -168,14 +174,14 @@ class UserOnboardingController extends Controller {
     public function userExcelSampleDownload(Request $request) {
         try {
             $employeeSheetRow = env('FORMATTED_ROWS', 100);
-            $fileToBeName = 'holiday-sample-' . time() . '.xlsx';
-            $savePath = public_path('Employee/Sample/' . $fileToBeName);
+            $fileToBeName = 'onboarding-sample-' . time() . '.xlsx';
+            $savePath = public_path('Onboarding/Sample/' . $fileToBeName);
 
             // agar folder exist nahi hai to bana do
-            if (!File::isDirectory(public_path('Holiday/Sample'))) {
-                File::makeDirectory(public_path('Holiday/Sample'), 0777, true, true);
+            if (!File::isDirectory(public_path('Onboarding/Sample'))) {
+                File::makeDirectory(public_path('Onboarding/Sample'), 0777, true, true);
             }
-            $roles = User::selectRaw("CONCAT(id, '|', name) as role_option")->pluck('role_option')->toArray();
+            $roles = Role::selectRaw("CONCAT(id, '|', name) as role_option")->pluck('role_option')->toArray();
             $gender = ['Male', 'Female', 'Other'];
             $employeePerformanceLabel = ['30%', '40%', '50%', '60%', '70%','80%', '90%', '100%'];
             $startMonth = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -213,10 +219,18 @@ class UserOnboardingController extends Controller {
             $columns = [
                 'Role Name','Gender Name','Employee Performance Label','Start Month',
                 'Financial Year','Salary Type Details','Salary Deduction Type','Shift Applicable',
-                'Ooutside Punch Applicable','Wwork Type','Overtime Applicable',
+                'Ooutside Punch Applicable','Work Type','Overtime Applicable',
                 'Sandwich Leave Applicable', 'Eemployee Firm Location', 'Late Applicable', 'Late Day',
                 'Late Hours', 'Leave Period', 'Leave Should Be Accured From',
-                'Aasset Name', 'Sub Asset Name', 'Document Type'
+                'Aasset Name', 'Sub Asset Name', 'Document Type', 'Username', 'Name', 'Phone', 'Email', 'Address',
+                'Previous Company Name', 'Previous Role', 'Previous Employee Experience (in years)', 'Previous Employee ID', 'Previous Official Email', 'Previous Probation Period (in months)', 'Previous Salary (in INR)', 'Previous HR Number',
+                'Bank Name', 'Bank Account Number', 'IFSC Code', 'Branch Name', 'Account Holder Name', 'Beneficiary Name', 
+                'Performance Bonus Amount', 'Loan Details', 'Loan Amount', 'Loan EMI (in INR)', 'Reason for Loan', 'Total Month', 'Salary Amount (in INR)', 'Fixed Amount', 'Percentage Amount',
+                'Asset Name', 'Asset Sub Name', 'Asset Brand Name', 'Asset Model Number', 'Asset Serial Number', 'Asset Specification', 'Asset Warranty (in years)', 'Asset Condition', 'Asset Assigned By', 'Asset Assigned To','Asset Descrption',
+                'Document Type', 'Document File URL',
+                'Set the minutes for daily late', 'Total Leaves in a year', 'Total Leaves Allowed at a time', 'Balance Leave', 'Maximum Carry Forward Leaves', 'Maximum Leave Encashment in a year', 'Leave Encashment per Leave (in INR)', 'Notice Period (in days)', 'Probation Period (in months)', 'Standard Working Hours (in hours)', 'Overtime Rate (in INR)', 'PF Percentage (%)', 'ESI Percentage (%)', 'Professional Tax (in INR)', 'Gratuity Percentage (%)', 'TDS Percentage (%)',
+                'Date of Birth', 'Previous Date of Joining', 'Previous Date of Relieving', 'Previous Confirmation Date (dd-mm-yyyy)', 'Asset Return Date', 'Asset Purchase Date', 'Assigned Date', 'Loan Start Date', 'Loan End Date', 'Sanction Date', 'Date Of Bonus'
+                
             ];
 
             $dropdownDetails = [
@@ -246,8 +260,8 @@ class UserOnboardingController extends Controller {
                 'sandwich_leave_applicable_option' => $sandwichLeaveApplicable,
                 'employee_firm_location_index' => 12,
                 'employee_firm_location_option' => $employeeFirmLocation,
-                'late_lpplicable_index' => 13,
-                'late_lpplicable_option' => $lateApplicable,
+                'late_applicable_index' => 13,
+                'late_applicable_option' => $lateApplicable,
                 'late_day_index' => 14,
                 'late_day_option' => $lateDay,
                 'late_hours_index' => 15,
@@ -263,7 +277,19 @@ class UserOnboardingController extends Controller {
                 'document_type_index' => 20,
                 'document_type_option' => $documentType
             ];
-            $downloadUrl = '';
+
+            // Excel file ko binary me le aao
+            $excelBinary = Excel::raw(
+                new EmployeeOnboardingExport($columns, $employeeSheetRow, $dropdownDetails),
+                \Maatwebsite\Excel\Excel::XLSX
+            );
+
+            // Binary ko public folder me save karo
+            File::put($savePath, $excelBinary);
+
+            // public URL banake bhejo
+            $downloadUrl = url('Onboarding/Sample/' . $fileToBeName);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Sample excel generated successfully.',
@@ -272,7 +298,11 @@ class UserOnboardingController extends Controller {
             ]);
 
         } catch(Throwable $th) {
-
+            return response()->json([
+                'success' => false,
+                'message' => $th->getTraceAsString(),
+                'code' => 0,
+            ]);
         }
 
     }
@@ -280,9 +310,65 @@ class UserOnboardingController extends Controller {
 
     public function userBlukUpload(Request $request) {
         try {
+            ini_set('memory_limit','-1');
+            ini_set('max_execution_time',0);
+            set_time_limit(0);
+
+            if (!$request->hasFile('file')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No file uploaded.',
+                    'code' => 1
+                ], 400);
+            }
+
+            $file = $request->file('file');
+            $errorReportId = 0;
+            $fileToBeName = 'onboarding-import-' . time() . '.xlsx';
+            $destinationPath = public_path('Onboarding/Import');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+
+            $request->file('file')->move($destinationPath, $fileToBeName);
+            $savePath = $destinationPath . '/' . $fileToBeName;
+            $publicUrl = asset('Onboarding/Import', $fileToBeName);
+
+            $errorReport = new ExcelErrorReport();
+            $errorReport->document_type_id = ExcelErrorReport::SUCCESS;
+            $errorReport->original_document_url = $publicUrl;
+            $errorReport->status = ExcelErrorReport::PROCESSING;
+            $errorReport->save();
+            $errorReportId = $errorReport->id;
+
+            $excelData = \Maatwebsite\Excel\Facades\Excel::toArray(new EmployeeOnboardingImport($errorReportId), $savePath);
+            if(!isset($excelData)) {
+                $deleteExcel = ExcelErrorReport::find($errorReportId);
+                if(!empty($deleteExcel)) {
+                    $deleteExcel->delete();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Uploaded Excel is empty.',
+                        'code' => 2
+                    ]);
+                }
+            } else {
+                foreach($excelData as $onboard) {
+                    DumpEmployeeOnboardingJob::dispatch($onboard, $errorReportId);
+                }
+                if($errorReportId) {
+                    EmployeeOnboardingJob::dispatch($errorReportId);
+                }
+
+            }
+            dd($file->getClientOriginalName()); // check file name
             
         } catch(Throwable $th) {
-
+            return response()->json([
+                'success' => true,
+                'message' => $th->getMessage(),
+                'code' => 0,
+            ]);
         }
     }
 
